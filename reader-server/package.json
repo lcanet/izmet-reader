@@ -1,0 +1,17 @@
+{
+    "name": "reader-server",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "express": "3.2.4",
+        "jade": "*",
+        "swagger": "*",
+        "swagger-node-express": "*",
+        "pg": "1.1.0",
+        "sql": "0.16.0",
+        "promises-a": "2.3.0"
+    }
+}
