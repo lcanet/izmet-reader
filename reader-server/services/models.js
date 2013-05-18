@@ -57,7 +57,20 @@ exports.models = {
                 "type": "string"
             }
         }
+    },
+
+    "ArticleState": {
+        "id": "ArticleState",
+        "properties": {
+            "id": {
+                "type": "long"
+            },
+            "read": {
+                "type": "boolean"
+            }
+        }
 
     }
+
 
 };

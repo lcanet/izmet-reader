@@ -12,6 +12,7 @@
         "swagger-node-express": "*",
         "pg": "1.1.0",
         "sql": "0.16.0",
-        "promises-a": "2.3.0"
+        "promises-a": "2.3.0",
+        "cron": "1.0.1"
     }
 }
