@@ -8,7 +8,9 @@ Platform
 ------------
 
 NodeJS + Postgres on the server side.
+
 angular + bootstrap on the client side.
+
 maybe some specific client (either using cordova or android native)
 
 
