@@ -119,6 +119,7 @@ var addArticle = {
         if (!feedId) {
             throw swagger.errors.invalid('feedId');
         }
+        console.log(req.body);
         res.send("?");
         // TODO
     }
