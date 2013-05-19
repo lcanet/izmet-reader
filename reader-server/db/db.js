@@ -1,8 +1,7 @@
-var pg = require('pg');
+var pg = require('pg'),
+    config = require('../config/config.js');
 
-// TODO: parametrer
-var conString = "postgres://reader:reader@192.168.0.2/reader";
-var client = new pg.Client(conString);
+var client = new pg.Client(config.pgUrl);
 client.connect(function(err) {
     console.log("Postgres Client connected");
     if (err){

@@ -7,13 +7,13 @@ var express = require('express')
     , path = require('path')
     , services = require('./services')
     , poller = require('./poller/poller.js')
+    , config = require('./config/config.js')
     , swagger = require('swagger-node-express');
 
 var app = express();
 
 
 // all environments
-app.set('port', process.env.PORT || 3000);
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
@@ -34,10 +34,10 @@ swagger.addPut(services.article.markArticle);
 swagger.addPut(services.article.markArticles);
 swagger.addGet(services.article.findArticles);
 swagger.configureSwaggerPaths("", "/api-docs", "");
-swagger.configure("http://localhost:8002", "0.1");
+swagger.configure(config.apiUrl, "0.1");
 
-app.listen(8002);
-console.log("Server launched");
+app.listen(config.serverPort);
+console.log("Server launched on port " + config.serverPort);
 
 poller.startPoller();
 console.log("Poller launched");
