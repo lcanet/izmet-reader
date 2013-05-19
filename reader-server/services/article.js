@@ -154,8 +154,10 @@ var addArticle = {
                 res.send({"code": 201, "description": 'article created'}, 201);
                 return execSql('update feed set nb_unread = nb_unread + 1 where id = $1', [feedId]);
             }, function(err){
-                console.log("Cannot add article to db", err);
-                res.send({"code": 500, "description": 'cannot add article'}, 500);
+                if (err !== 0){
+                    console.log("Cannot add article to db", err);
+                    res.send({"code": 500, "description": 'cannot add article'}, 500);
+                }
             });
     }
 };

@@ -6,13 +6,22 @@ var cronJob = require('cron').CronJob,
     url = require('url'),
     moment = require('moment');
 
+var pollers = {
+    'rss': pollFeedRSS
+};
 
 function processFeeds(feeds) {
     var nbFeedProcessed = 0;
     for (var i = 0; i < feeds.length; i++) {
         if (shouldPollFeed(feeds[i])){
-            pollFeed(feeds[i]);
-            nbFeedProcessed++;
+
+            var poller = pollers[feeds[i].type];
+            if (poller) {
+                poller(feeds[i]);
+                nbFeedProcessed++;
+            } else{
+                console.log("Cannot find poller for feed type " + feed.type);
+            }
 
             markFeedUpdated(feeds[i]);
         }
@@ -31,7 +40,7 @@ function shouldPollFeed(feed) {
     return nextPoll.isBefore(moment());
 }
 
-function pollFeed(feed) {
+function pollFeedRSS(feed) {
     console.log("Polling feed " + feed.name);
     request(feed.url)
         .pipe(new FeedParser({feedurl: feed.url}))
