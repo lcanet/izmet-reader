@@ -4,7 +4,10 @@ var pg = require('pg');
 var conString = "postgres://reader:reader@192.168.0.2/reader";
 var client = new pg.Client(conString);
 client.connect(function(err) {
-    console.log("Client connected", err);
+    console.log("Postgres Client connected");
+    if (err){
+        console.log("Achtung: error ", err);
+    }
 });
 
 exports.client = client;

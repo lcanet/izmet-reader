@@ -6,6 +6,7 @@ var express = require('express')
     , http = require('http')
     , path = require('path')
     , services = require('./services')
+    , poller = require('./poller/poller.js')
     , swagger = require('swagger-node-express');
 
 var app = express();
@@ -37,3 +38,6 @@ swagger.configure("http://localhost:8002", "0.1");
 
 app.listen(8002);
 console.log("Server launched");
+
+poller.startPoller();
+console.log("Poller launched");
