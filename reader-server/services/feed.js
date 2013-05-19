@@ -72,6 +72,53 @@ var findAll = {
     }
 };
 
+
+var updateFeed = {
+    'spec': {
+        "description" : "Update a feed",
+        "path" : "/feed/{id}",
+        "notes" : "Updates a feed (only the poll_date is supported)",
+        "summary" : "Updates a feed",
+        "method": "PUT",
+        "params" : [
+            swagger.pathParam("id", "ID of the feed", "string"),
+            {
+                paramType: "body",
+                required: "true",
+                dataType: "Feed",
+                description: "feed data"
+            }
+        ],
+        "responseClass" : "Feed",
+        "errorResponses" : [
+            swagger.errors.invalid('id'),
+            swagger.errors.notFound('feed')
+        ],
+        "nickname" : "updateFeed"
+    },
+    'action': function (req,res) {
+        if (!req.params.id) {
+            throw swagger.errors.invalid('id');
+        }
+        var id = parseInt(req.params.id);
+        var feedData = req.body;
+
+        db.client.query("update feed set last_poll = $1 where id = $2", [ new Date(feedData.last_poll), id],
+            function(err, result){
+                if (err) {
+                    res.send({"code": 500, "description": 'feed cannot be updated'}, 500);
+                } else if (result.rowCount != 1) {
+                    swagger.errors.notFound('feed', res);
+                } else {
+                    res.send("");
+                }
+            });
+
+    }
+};
+
+
 exports.getImage = getImage;
 exports.findById = findById;
 exports.findAll = findAll;
+exports.updateFeed = updateFeed;

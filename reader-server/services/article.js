@@ -111,7 +111,12 @@ var addArticle = {
         ],
         "method": "POST",
         "responseClass" : "void",
-        "errorResponses" : [swagger.errors.invalid('id'), swagger.errors.notFound('feed')],
+        "errorResponses" : [
+            swagger.errors.invalid('id'),
+            swagger.errors.notFound('feed'),
+            {code: 201, description: 'Article created'},
+            {code: 304, description: 'Article already exists'}
+        ],
         "nickname" : "addArticle"
     },
     'action': function (req,res) {
@@ -119,9 +124,39 @@ var addArticle = {
         if (!feedId) {
             throw swagger.errors.invalid('feedId');
         }
-        console.log(req.body);
-        res.send("?");
-        // TODO
+
+        var article = req.body;
+
+        // first check if article exists
+        execSql("select count(1) as nb from article where feed_id = $1 and article_date = $2 and title = $3",
+            [feedId, new Date(article.article_date), article.title])
+            .then(function(result){
+                var nb = result.rows[0].nb;
+                if (nb == 0){
+                    // add article
+                  return execSql("insert into article (feed_id, fetch_date, article_date, title, content, url, article_id, read)" +
+                      "values ($1, $2, $3, $4, $5, $6, $7, $8)",
+                      [feedId,
+                          new Date(article.fetch_date),
+                          new Date(article.article_date),
+                          article.title,
+                          article.content,
+                          article.url,
+                          article.article_id,
+                          false]);
+                } else {
+                    res.send({"code": 304, "description": 'article already exists'}, 304);
+                    throw 0;
+                }
+            })
+            .then(function(){
+                // update feed article count
+                res.send({"code": 201, "description": 'article created'}, 201);
+                return execSql('update feed set nb_unread = nb_unread + 1 where id = $1', [feedId]);
+            }, function(err){
+                console.log("Cannot add article to db", err);
+                res.send({"code": 500, "description": 'cannot add article'}, 500);
+            });
     }
 };
 

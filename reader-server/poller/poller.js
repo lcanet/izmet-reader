@@ -3,7 +3,7 @@ var cronJob = require('cron').CronJob,
     config = require('../config/config.js'),
     FeedParser  = require('feedparser'),
     request = require('request'),
-    url = require('url')
+    url = require('url'),
     moment = require('moment');
 
 
@@ -13,6 +13,8 @@ function processFeeds(feeds) {
         if (shouldPollFeed(feeds[i])){
             pollFeed(feeds[i]);
             nbFeedProcessed++;
+
+            markFeedUpdated(feeds[i]);
         }
 
         if (nbFeedProcessed > config.maxFeedsPerPoll){
@@ -49,7 +51,8 @@ function processFeedArticle(feed, article) {
         fetch_date: new Date().getTime(),
         content: article.description,
         url: article.link,
-        title: article.summary
+        title: article.summary,
+        article_id: null
     };
 
     // create http request for posting article
@@ -61,7 +64,8 @@ function processFeedArticle(feed, article) {
         "Content-Type": "application/json"
     };
     var req = http.request(opts, function(res){
-        if (res.statusCode != 200) {
+        // not
+        if (res.statusCode != 201 && res.statusCode != 304) {
             console.log("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
             return;
         }
@@ -77,6 +81,34 @@ function processFeedArticle(feed, article) {
     req.write(JSON.stringify(articleData));
     req.write("\n");
     req.end();
+}
+
+function markFeedUpdated(feed){
+    var feedData = {
+        last_poll: new Date().getTime()
+    };
+
+    var opts = url.parse(config.apiUrl + '/feed/' + feed.id);
+    opts.method = 'PUT';
+    opts.headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    };
+    var req = http.request(opts, function(res){
+        // not
+        if (res.statusCode != 200) {
+            console.log("Error updating feed (" + http.STATUS_CODES[res.statusCode] + ")");
+            return;
+        }
+        res.on("end", function(){
+            // fin ...
+        });
+    });
+
+    req.write(JSON.stringify(feedData));
+    req.write("\n");
+    req.end();
+
 }
 
 function doPoll() {

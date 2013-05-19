@@ -28,6 +28,7 @@ swagger.addModels(services.models);
 swagger.addGet(services.feed.findById);
 swagger.addGet(services.feed.findAll);
 swagger.addGet(services.feed.getImage);
+swagger.addPut(services.feed.updateFeed);
 swagger.addGet(services.article.findByFeed);
 swagger.addPost(services.article.addArticle);
 swagger.addPut(services.article.markArticle);
