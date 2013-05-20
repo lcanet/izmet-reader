@@ -7,6 +7,7 @@ function execSql(query, params) {
     var def = promise();
     db.client.query(query, params, function(err,res){
         if (err) {
+            console.log("SQL Error", err);
             def.reject(err);
         } else {
             def.fulfill(res);
@@ -128,15 +129,25 @@ var addArticle = {
         var article = req.body;
 
         // first check if article exists
-        execSql("select count(1) as nb from article where feed_id = $1 and article_date = $2 and title = $3",
-            [feedId, new Date(article.article_date), article.title])
+        var queryExists;
+        var queryParams;
+        if (article.article_id) {
+            queryExists = "select count(1) as nb from article where feed_id = $1 and article_id = $2";
+            queryParams = [feedId, article.article_id];
+        } else {
+            queryExists = "select count(1) as nb from article where feed_id = $1 and article_date = $2 and title = $3";
+            queryParams = [feedId, new Date(article.article_date), article.title];
+        }
+
+        execSql(queryExists, queryParams)
             .then(function(result){
                 var nb = result.rows[0].nb;
+
                 if (nb == 0){
                     // add article
-                  return execSql("insert into article (feed_id, fetch_date, article_date, title, content, url, article_id, read)" +
-                      "values ($1, $2, $3, $4, $5, $6, $7, $8)",
-                      [feedId,
+                    return execSql("insert into article (feed_id, fetch_date, article_date, title, content, url, article_id, read)" +
+                        "values ($1, $2, $3, $4, $5, $6, $7, $8)",
+                        [feedId,
                           new Date(article.fetch_date),
                           new Date(article.article_date),
                           article.title,
@@ -147,6 +158,11 @@ var addArticle = {
                 } else {
                     res.send({"code": 304, "description": 'article already exists'}, 304);
                     throw 0;
+                }
+            })
+            .then(function(result){
+                if (result != 0) {
+                    res.send({"code": 201, "description": 'article created'}, 201);
                 }
             });
     }

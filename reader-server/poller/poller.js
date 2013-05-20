@@ -1,13 +1,14 @@
 var cronJob = require('cron').CronJob,
     http = require('http'),
     config = require('../config/config.js'),
-    FeedParser  = require('feedparser'),
-    request = require('request'),
     url = require('url'),
-    moment = require('moment');
+    moment = require('moment'),
+    rss = require('./poller_rss.js'),
+    twitter = require('./poller_twitter.js');
 
 var pollers = {
-    'rss': pollFeedRSS
+    'rss': rss.poll,
+    'twitter': twitter.poll
 };
 
 function processFeeds(feeds) {
@@ -38,58 +39,6 @@ function shouldPollFeed(feed) {
     }
     var nextPoll = moment(feed.last_poll).add('minutes', feed.poll_frequency);
     return nextPoll.isBefore(moment());
-}
-
-function pollFeedRSS(feed) {
-    console.log("Polling feed " + feed.name);
-    request(feed.url)
-        .pipe(new FeedParser({feedurl: feed.url}))
-        .on('error', function(err) {
-            console.log("Error polling feed " + feed.name, err);
-        })
-        .on('article', function(article){
-            processFeedArticle(feed, article);
-        })
-        ;
-}
-
-function processFeedArticle(feed, article) {
-    // push the article
-    var articleData = {
-        article_date: article.date.getTime(),
-        fetch_date: new Date().getTime(),
-        content: article.description,
-        url: article.link,
-        title: article.summary,
-        article_id: null
-    };
-
-    // create http request for posting article
-    // backend will check if article doesn't already exists
-    var opts = url.parse(config.apiUrl + '/feed/' + feed.id + '/article');
-    opts.method = 'POST';
-    opts.headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    };
-    var req = http.request(opts, function(res){
-        // not
-        if (res.statusCode != 201 && res.statusCode != 304) {
-            console.log("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
-            return;
-        }
-        var chunks = [];
-        res.on("data", function(data){
-            chunks.push(data);
-        });
-        res.on("end", function(){
-            // fin ...
-        });
-    });
-
-    req.write(JSON.stringify(articleData));
-    req.write("\n");
-    req.end();
 }
 
 function markFeedUpdated(feed){
@@ -146,6 +95,5 @@ function startPoller() {
     doPoll();
 }
 
-exports.startPoller = startPoller;
 exports.startPoller = startPoller;
 
