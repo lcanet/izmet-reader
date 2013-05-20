@@ -30,7 +30,7 @@ var findByFeed = {
         "method": "GET",
         "responseClass" : "Array[Article]",
         "errorResponses" : [swagger.errors.invalid('id'), swagger.errors.notFound('feed')],
-        "nickname" : "findAllArticles"
+        "nickname" : "findAllArticples"
     },
     'action': function (req,res) {
         var feedId = req.params.id;
@@ -148,19 +148,52 @@ var addArticle = {
                     res.send({"code": 304, "description": 'article already exists'}, 304);
                     throw 0;
                 }
-            })
-            .then(function(){
-                // update feed article count
-                res.send({"code": 201, "description": 'article created'}, 201);
-                return execSql('update feed set nb_unread = nb_unread + 1 where id = $1', [feedId]);
-            }, function(err){
-                if (err !== 0){
-                    console.log("Cannot add article to db", err);
-                    res.send({"code": 500, "description": 'cannot add article'}, 500);
-                }
             });
     }
 };
+
+function buildQueryPlaceholder(nb) {
+    var s = "(";
+    for (var i = 0; i < nb; i++) {
+        if (i != 0){
+            s += ", ";
+        }
+        s+= ("$" + (i+1));
+    }
+    s += ")";
+    return s;
+}
+
+function updateArticles(articlesState) {
+    var idsRead = [];
+    var idsUnread = [];
+    for (var i = 0; i < articlesState.length; i++){
+        if (articlesState[i].read){
+            idsRead.push(articlesState[i].id);
+        } else {
+            idsUnread.push(articlesState[i].id);
+        }
+    }
+
+    var def = promise();
+    var p = def.promise;
+    if (idsRead.length > 0){
+        p = p.then(function(){
+            return execSql("update article set read = true where id in " + buildQueryPlaceholder(idsRead.length),
+                idsRead);
+        });
+    }
+    if (idsUnread.length > 0){
+        p = p.then(function(){
+            return execSql("update article set read = false where id in " + buildQueryPlaceholder(idsUnread.length),
+                idsUnread);
+        });
+    }
+    def.fulfill("0");
+    return p;
+}
+
+
 
 var markArticle = {
     'spec': {
@@ -187,8 +220,13 @@ var markArticle = {
         if (!articleId) {
             throw swagger.errors.invalid('articleId');
         }
-        res.send("?");
-        // TODO
+        var state = req.body;
+        var p = updateArticles([{
+            id: articleId,
+            read: state.read
+        }]).then(function(result){
+            res.send("");
+        });
     }
 };
 
@@ -212,8 +250,10 @@ var markArticles = {
         "nickname" : "markArticles"
     },
     'action': function (req,res) {
-        res.send("?");
-        // TODO
+        var state = req.body;
+        updateArticles(req.body).then(function(result){
+           res.send("");
+        });
     }
 };
 

@@ -118,7 +118,34 @@ var updateFeed = {
 };
 
 
+
+var addFeed = {
+    'spec': {
+        "description" : "Add a new feed",
+        "path" : "/feed",
+        "notes" : "Creates a new feed",
+        "summary" : "Creates a new feed",
+        "method": "POST",
+        "params" : [
+            {
+                paramType: "body",
+                required: "true",
+                dataType: "Feed",
+                description: "feed data"
+            }
+        ],
+        "responseClass" : "Feed",
+        "nickname" : "addFeed"
+    },
+    'action': function (req,res) {
+        // TODO
+        res.send("");
+    }
+};
+
+
 exports.getImage = getImage;
 exports.findById = findById;
 exports.findAll = findAll;
 exports.updateFeed = updateFeed;
+exports.addFeed = addFeed;
