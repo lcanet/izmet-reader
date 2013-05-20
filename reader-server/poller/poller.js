@@ -20,7 +20,7 @@ function processFeeds(feeds) {
                 poller(feeds[i]);
                 nbFeedProcessed++;
             } else{
-                console.log("Cannot find poller for feed type " + feed.type);
+                console.log("Cannot find poller for feed type " + feeds[i].type);
             }
 
             markFeedUpdated(feeds[i]);
