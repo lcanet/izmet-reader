@@ -27,3 +27,36 @@ CREATE TABLE article
 WITH (
   OIDS=FALSE
 );
+
+CREATE LANGUAGE PLPGSQL;
+DROP FUNCTION update_article_unread();
+CREATE FUNCTION update_article_unread() RETURNS TRIGGER AS $eof$
+BEGIN
+	IF TG_OP = 'INSERT' AND NEW.read = false THEN
+		UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
+	END IF;
+	IF TG_OP = 'UPDATE' AND OLD.read <> NEW.read AND NEW.read = false THEN
+		UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
+	END IF;
+	IF TG_OP = 'UPDATE' AND OLD.read <> NEW.read AND NEW.read = true THEN
+		UPDATE feed SET nb_unread = nb_unread - 1 WHERE id = new.feed_id;
+	END IF;
+	RETURN NEW;
+END
+$eof$
+LANGUAGE plpgsql;
+			
+CREATE TRIGGER trigger_update_article_unread
+    BEFORE UPDATE ON article
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_article_unread();
+
+CREATE TRIGGER trigger_insert_article_unread
+    BEFORE INSERT ON article
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_article_unread();
+
+
+
+
+    
