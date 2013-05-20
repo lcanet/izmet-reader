@@ -3,19 +3,6 @@ var db = require('../db/db.js'),
     promise = require("promises-a");
 
 
-function execSql(query, params) {
-    var def = promise();
-    db.client.query(query, params, function(err,res){
-        if (err) {
-            console.log("SQL Error", err);
-            def.reject(err);
-        } else {
-            def.fulfill(res);
-        }
-    });
-    return def.promise;
-}
-
 var findByFeed = {
     'spec': {
         "description" : "Find all articles of a feed",
@@ -38,7 +25,7 @@ var findByFeed = {
         if (!feedId) {
             throw swagger.errors.invalid('id');
         }
-        execSql('SELECT * FROM feed where id = $1', [feedId]).then(function(result) {
+        db.execSql('SELECT * FROM feed where id = $1', [feedId]).then(function(result) {
             if (result.rows.length == 0){
                 swagger.errors.notFound('feed', res);
                 throw 0;
@@ -53,7 +40,7 @@ var findByFeed = {
                 }
                 q += " order by id desc";
                 q += " limit $2 offset $3";
-                return execSql(q, p);
+                return db.execSql(q, p);
             }
         }).then(function(result){
             res.send(JSON.stringify(result.rows));
@@ -88,7 +75,7 @@ var findArticles = {
         }
         q += " order by id desc";
         q += " limit $1 offset $2";
-        execSql(q, p).then(function(result){
+        db.execSql(q, p).then(function(result){
             res.send(JSON.stringify(result.rows));
         });
     }
@@ -139,13 +126,13 @@ var addArticle = {
             queryParams = [feedId, new Date(article.article_date), article.title];
         }
 
-        execSql(queryExists, queryParams)
+        db.execSql(queryExists, queryParams)
             .then(function(result){
                 var nb = result.rows[0].nb;
 
                 if (nb == 0){
                     // add article
-                    return execSql("insert into article (feed_id, fetch_date, article_date, title, content, url, article_id, read)" +
+                    return db.execSql("insert into article (feed_id, fetch_date, article_date, title, content, url, article_id, read)" +
                         "values ($1, $2, $3, $4, $5, $6, $7, $8)",
                         [feedId,
                           new Date(article.fetch_date),
@@ -195,13 +182,13 @@ function updateArticles(articlesState) {
     var p = def.promise;
     if (idsRead.length > 0){
         p = p.then(function(){
-            return execSql("update article set read = true where id in " + buildQueryPlaceholder(idsRead.length),
+            return db.execSql("update article set read = true where id in " + buildQueryPlaceholder(idsRead.length),
                 idsRead);
         });
     }
     if (idsUnread.length > 0){
         p = p.then(function(){
-            return execSql("update article set read = false where id in " + buildQueryPlaceholder(idsUnread.length),
+            return db.execSql("update article set read = false where id in " + buildQueryPlaceholder(idsUnread.length),
                 idsUnread);
         });
     }

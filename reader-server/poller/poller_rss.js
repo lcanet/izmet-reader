@@ -27,7 +27,7 @@ function processFeedArticle(feed, article, callback) {
         fetch_date: new Date().getTime(),
         content: article.description,
         url: article.link,
-        title: article.summary,
+        title: article.title,
         article_id: null
     };
 
