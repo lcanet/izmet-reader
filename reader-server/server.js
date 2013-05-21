@@ -14,7 +14,7 @@ var app = express();
 
 
 // all environments
-app.use(express.logger('dev'));
+app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.errorHandler());
