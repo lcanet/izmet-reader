@@ -7,6 +7,7 @@ var express = require('express')
     , path = require('path')
     , services = require('./services')
     , poller = require('./poller/poller.js')
+    , middleware = require('./middleware')
     , config = require('./config/config.js')
     , swagger = require('swagger-node-express');
 
@@ -18,9 +19,10 @@ app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.errorHandler());
+app.use(middleware.cacheHandler());
 
 // cors
-app.options("*", services.allowCrossDomain);
+app.options("*", middleware.allowCrossDomain);
 
 swagger.setAppHandler(app);
 swagger.addModels(services.models);
