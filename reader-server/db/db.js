@@ -2,14 +2,10 @@ var pg = require('pg'),
     promise = require("promises-a"),
     config = require('../config/config.js');
 
-var client = new pg.Client(config.pgUrl);
-client.connect(function(err) {
-    console.log("Postgres Client connected");
-    if (err){
-        console.log("Achtung: error ", err);
-    }
-});
-
+/**
+ * Get a connection from the pool . callback(client) will be called only if a connection suceeded
+ * @param callback
+ */
 var getConnection = function(callback) {
     pg.connect(config.pgUrl, function(err, client, done) {
         try {
@@ -39,7 +35,6 @@ var execSql = function(query, params) {
     return def.promise;
 };
 
-exports.client = client;
 exports.getConnection = getConnection;
 exports.execSql = execSql;
 

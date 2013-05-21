@@ -37,6 +37,8 @@ function processTweets(feed, tweets) {
     var proceedNext = function() {
         if (tweets.length > 0) {
             processTweet(feed, tweets.shift(), proceedNext);
+        } else {
+            console.log("Finished processing tweet source " + feed.name);
         }
     };
     proceedNext();
