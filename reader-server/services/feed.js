@@ -124,18 +124,16 @@ var updateFeed = {
         var id = parseInt(req.params.id);
         var feedData = req.body;
 
-        db.getConnection(function(client) {
-            client.query("update feed set last_poll = $1 where id = $2", [ new Date(feedData.last_poll), id],
-                function(err, result){
-                    if (err) {
-                        res.send({"code": 500, "description": 'feed cannot be updated'}, 500);
-                    } else if (result.rowCount != 1) {
-                        swagger.errors.notFound('feed', res);
-                    } else {
-                        res.send("");
-                    }
-                });
-        });
+        db.execSql("update feed set last_poll = $1 where id = $2", [ new Date(feedData.last_poll), id])
+            .then(function(result){
+                if (result.rowCount != 1) {
+                    swagger.errors.notFound('feed', res);
+                } else {
+                    res.send({code: 200, description: 'Feed updated'}, 200);
+                }
+            }, function(err){
+                res.send({"code": 500, "description": 'feed cannot be updated'}, 500);
+            });
     }
 };
 
@@ -173,7 +171,7 @@ var addFeed = {
                     request(feed.url)
                         .pipe(new FeedParser({feedurl: feed.url}))
                         .on('error', function(err) {
-                            console.log("Error polling feed " + feed.name, err);
+                            console.log("Error getting feed " + feed.name, err);
                         })
                         .on('meta', function(meta){
                             if (meta.image && meta.image.url) {

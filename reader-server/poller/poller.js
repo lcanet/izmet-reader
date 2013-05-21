@@ -46,7 +46,7 @@ function markFeedUpdated(feed){
         last_poll: new Date().getTime()
     };
 
-    var opts = url.parse(config.apiUrl + '/feed/' + feed.id);
+    var opts = url.parse(config.apiLocalUrl + '/feed/' + feed.id);
     opts.method = 'PUT';
     opts.headers = {
         "Accept": "application/json",
@@ -72,7 +72,7 @@ function markFeedUpdated(feed){
 function doPoll() {
 
     // poll rest pi
-    http.get(config.apiUrl + '/feed',
+    http.get(config.apiLocalUrl + '/feed',
         function(res) {
             if (res.statusCode != 200) {
                 console.log("Error polling rest API (" + http.STATUS_CODES[res.statusCode]);
@@ -90,7 +90,7 @@ function doPoll() {
 }
 
 function startPoller() {
-    new cronJob('00 * * * * *', doPoll).start();
+    new cronJob('00 */5 * * * *', doPoll).start();
     // poll on start, for debug
     doPoll();
 }

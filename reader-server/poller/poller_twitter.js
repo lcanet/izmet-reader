@@ -59,7 +59,7 @@ function processTweet(feed, tweet, endCallback) {
 
     // create http request for posting article
     // backend will check if article doesn't already exists
-    var opts = url.parse(config.apiUrl + '/feed/' + feed.id + '/article');
+    var opts = url.parse(config.apiLocalUrl + '/feed/' + feed.id + '/article');
     opts.method = 'POST';
     opts.headers = {
         "Accept": "application/json",
