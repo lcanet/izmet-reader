@@ -89,10 +89,12 @@ function doPoll() {
         });
 }
 
-function startPoller() {
+function startPoller(devMode) {
     new cronJob('00 */5 * * * *', doPoll).start();
     // poll on start, for debug
-    doPoll();
+    if (devMode){
+        doPoll();
+    }
 }
 
 exports.startPoller = startPoller;

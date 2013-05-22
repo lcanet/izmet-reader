@@ -13,12 +13,16 @@ var express = require('express')
 
 var app = express();
 
+console.log("Starting in mode " + app.get('env'));
+// specific to dev
+if ('development' == app.get('env')) {
+    app.use(express.errorHandler());
+}
 
 // all environments
-app.use(express.logger());
+app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.errorHandler());
 app.use(middleware.cacheHandler());
 
 // cors
@@ -44,5 +48,5 @@ swagger.configure(config.apiUrl, "0.1");
 app.listen(config.serverPort);
 console.log("Server launched on port " + config.serverPort);
 
-poller.startPoller();
+poller.startPoller('development' == app.get('env'));
 console.log("Poller launched");
