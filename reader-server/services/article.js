@@ -1,5 +1,7 @@
 var db = require('../db/db.js'),
     swagger = require('swagger-node-express'),
+    utils = require('../utils/utils.js'),
+    und = require('underscore'),
     promise = require("promises-a");
 
 
@@ -61,14 +63,18 @@ var findArticles = {
             swagger.queryParam("offset", "offset of Limit articles", "int")
         ],
         "method": "GET",
-        "responseClass" : "Array[Article]",
+        "responseClass" : "Array[ArticleWithFeed]",
         "nickname" : "findArticles"
     },
     'action': function (req,res) {
         var limit = parseInt(req.query.limit) || 100;
         var offset = parseInt(req.query.offset) || 0;
 
-        var q = 'SELECT id,fetch_date,article_date,title,content,url,read FROM article where 1=1';
+        var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,' +
+            'f.id as feedid, f.name,f.description,f.url,f.type ' +
+            'FROM article a ' +
+            'INNER JOIN feed f on f.id = a.feed_id ' +
+            'where 1=1';
         var p = [limit, offset];
         if (req.query.read) {
             q += " and read = false";
@@ -76,6 +82,13 @@ var findArticles = {
         q += " order by id desc";
         q += " limit $1 offset $2";
         db.execSql(q, p).then(function(result){
+            und.each(result.rows, function(elt){
+                // replace "feed" object
+                utils.objectify(elt, "feed", "name","description", "url", "type", "feedid");
+                // some manual changes
+                elt.feed.id = elt.feed.feedid;
+                delete elt.feed.feedid;
+            });
             res.send(JSON.stringify(result.rows));
         });
     }
