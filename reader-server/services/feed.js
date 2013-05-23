@@ -87,7 +87,7 @@ var findAll = {
     },
     'action': function (req,res) {
         db.getConnection(function(client) {
-            client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread FROM feed', function(err, result) {
+            client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread FROM feed order by id', function(err, result) {
                 res.send(JSON.stringify(result.rows));
             });
         });
