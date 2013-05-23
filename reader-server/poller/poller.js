@@ -29,6 +29,7 @@ function processFeeds(feeds) {
 
         if (nbFeedProcessed > config.maxFeedsPerPoll){
             console.log("Stopping poll ... max feeds exceeded");
+            break;
         }
     }
 }
