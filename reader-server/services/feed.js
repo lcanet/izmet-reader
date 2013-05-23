@@ -3,6 +3,7 @@ var db = require('../db/db.js'),
     request = require('request'),
     http = require('http'),
     fs = require('fs'),
+    url = require('url'),
     swagger = require('swagger-node-express');
 
 
@@ -159,36 +160,96 @@ var addFeed = {
     },
     'action': function (req,res) {
         var feed = req.body;
-        db.getConnection(function(client) {
-            client.query("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
-                [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency],
-                function(err, result){
-                    var genId = result.rows[0].id;
-                    feed.id = genId;
-                    res.send(feed);
 
-                    // get feed image
-                    request(feed.url)
-                        .pipe(new FeedParser({feedurl: feed.url}))
-                        .on('error', function(err) {
-                            console.log("Error getting feed " + feed.name, err);
-                        })
-                        .on('meta', function(meta){
-                            if (meta.image && meta.image.url) {
-                                addImageForFeed(feed, meta.image.url);
-                            }
-                        })
-                    ;
-                });
-        });
+        // get feed data
+        var feedOk = true;
+        var feedImageUrl = null;
+
+        request(feed.url)
+            .pipe(new FeedParser({feedurl: feed.url}))
+            .on('error', function(err) {
+                console.log("Error getting feed " + feed.url, err);
+                feedOk = false;
+                res.send({code: 500, description: 'Error getting feed'}, 500);
+            })
+            .on('meta', function(meta){
+                if (meta.image && meta.image.url) {
+                    feedImageUrl = meta.image.url;
+
+                }
+
+                // use provided feed description
+                if (!feed.name && meta.title) {
+                    feed.name = meta.title;
+                }
+                if (!feed.description && meta.description) {
+                    feed.description = meta.description;
+                }
+            })
+            .on('end', function(err){
+                if (feedOk) {
+                    db.getConnection(function(client) {
+                        client.query("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
+                            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency],
+                            function(err, result){
+                                if (err) {
+                                    res.send({code: 500, description: 'Error adding feed'}, 500);
+                                    return;
+                                }
+                                var genId = result.rows[0].id;
+                                feed.id = genId;
+                                res.send(feed);
+
+                                // add feed image
+                                if (feedImageUrl != null){
+                                    console.log("Downloading image for feed " + feed.name +  " on " + feedImageUrl);
+                                    addImageForFeed(feed, feedImageUrl);
+                                }
+
+                                // also add favicon if there is any
+                                addIconForFeed(feed);
+                            });
+                    });
+                }
+            })
+        ;
+
     }
 };
+
+function isImage(response) {
+    var content = response.headers['content-type'];
+    return content && content.toLowerCase().indexOf('image/') == 0;
+}
+
+function addIconForFeed(feed) {
+    var opts = url.parse(feed.url);
+    // erase path
+    opts.path = opts.pathname = '/favicon.ico';
+
+    request({url: url.format(opts), encoding: null}, function(err, response, body){
+        if (!err && response.statusCode == 200 && isImage(response)) {
+            console.log("Updating image for feed " + feed.name);
+            db.getConnection(function(client) {
+                client.query("update feed set icon = $2 where id = $1",
+                    [feed.id, body.toString('base64')],
+                    function(err, result){
+                        if (err) {
+                            console.log("Cannot update feed icon", err);
+                        }
+                    });
+            });
+        }
+    });
+
+}
 
 function addImageForFeed(feed, imageurl) {
 
     // poll rest pi
     request({url: imageurl, encoding: null}, function(err, response, body){
-        if (!err && response.statusCode == 200) {
+        if (!err && response.statusCode == 200 && isImage(response)) {
+            console.log("Updating image for feed " + feed.name);
             db.getConnection(function(client) {
                 client.query("update feed set image = $2 where id = $1",
                     [feed.id, body.toString('base64')],

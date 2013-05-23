@@ -23,7 +23,7 @@ function pollFeedRSS(feed) {
 function processFeedArticle(feed, article, callback) {
     // push the article
     var articleData = {
-        article_date: article.date.getTime(),
+        article_date: article.date != null ? article.date.getTime() : new Date().getTime(),
         fetch_date: new Date().getTime(),
         content: article.description,
         url: article.link,
