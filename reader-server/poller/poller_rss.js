@@ -4,24 +4,29 @@ var
     FeedParser  = require('feedparser'),
     request = require('request'),
     url = require('url'),
+    utils = require('../utils/utils.js'),
     moment = require('moment');
 
-function pollFeedRSS(feed) {
+function pollFeedRSS(feed, callback) {
     console.log("Polling feed " + feed.name);
+
+    var articles = [];
+
     request(feed.url)
         .pipe(new FeedParser({feedurl: feed.url}))
         .on('error', function(err) {
             console.log("Error polling feed " + feed.name, err);
         })
         .on('article', function(article){
-            processFeedArticle(feed, article);
+            articles.push(transformArticleData(article));
+        })
+        .on('end', function(){
+            processArticles(feed, articles, callback);
         })
     ;
 }
 
-
-function processFeedArticle(feed, article, callback) {
-    // push the article
+function transformArticleData(article){
     var articleData = {
         article_date: article.date != null ? article.date.getTime() : new Date().getTime(),
         fetch_date: new Date().getTime(),
@@ -31,6 +36,17 @@ function processFeedArticle(feed, article, callback) {
         article_id: null
     };
 
+    return articleData;
+}
+
+function processArticles(feed, articles, callback) {
+    utils.processQueue(articles, function(article, done){
+        pushFeedArticle(feed, article, done);
+    }, callback);
+}
+
+function pushFeedArticle(feed, articleData, callback) {
+    // push the article
     // create http request for posting article
     // backend will check if article doesn't already exists
     var opts = url.parse(config.apiLocalUrl + '/feed/' + feed.id + '/article');

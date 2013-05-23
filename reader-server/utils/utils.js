@@ -16,4 +16,29 @@ var objectify = function(object, subObjectName) {
     object[subObjectName] = subObject;
 };
 
+/**
+ * Process an array of object
+ * @param stack array of object
+ * @param processor function(object, done)
+ */
+var processQueue = function(stack, processor, finalCallback) {
+    var proceedNext = function(){
+        if (stack != null && stack.length > 0) {
+            var next = stack.shift();
+            try {
+                processor(next, proceedNext);
+            } catch (e) {
+                console.log("Caught exception in processor workqueue", e)
+                proceedNext();
+            }
+        } else {
+            if (finalCallback) {
+                finalCallback();
+            }
+        }
+    };
+    proceedNext();
+};
+
 exports.objectify = objectify;
+exports.processQueue = processQueue;

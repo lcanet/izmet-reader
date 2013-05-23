@@ -4,6 +4,8 @@ var cronJob = require('cron').CronJob,
     url = require('url'),
     moment = require('moment'),
     rss = require('./poller_rss.js'),
+    und = require('underscore'),
+    utils = require('../utils/utils.js'),
     twitter = require('./poller_twitter.js');
 
 var pollers = {
@@ -12,26 +14,23 @@ var pollers = {
 };
 
 function processFeeds(feeds) {
-    var nbFeedProcessed = 0;
-    for (var i = 0; i < feeds.length; i++) {
-        if (shouldPollFeed(feeds[i])){
 
-            var poller = pollers[feeds[i].type];
-            if (poller) {
-                poller(feeds[i]);
-                nbFeedProcessed++;
-            } else{
-                console.log("Cannot find poller for feed type " + feeds[i].type);
-            }
+    // filter feeds
+    var feedsToProcess = und.filter(feeds, shouldPollFeed);
+    feedsToProcess = feedsToProcess.slice(0, Math.min(feedsToProcess.length, config.maxFeedsPerPoll));
 
-            markFeedUpdated(feeds[i]);
+    utils.processQueue(feedsToProcess, function(nextFeed, done){
+        var poller = pollers[nextFeed.type];
+        if (poller) {
+            markFeedUpdated(nextFeed);
+            poller(nextFeed, done);
+        } else{
+            console.log("Cannot find poller for feed type " + nextFeed.type);
+            done();
         }
-
-        if (nbFeedProcessed > config.maxFeedsPerPoll){
-            console.log("Stopping poll ... max feeds exceeded");
-            break;
-        }
-    }
+    }, function(){
+        console.log('Polling done.');
+    });
 }
 
 function shouldPollFeed(feed) {
@@ -79,9 +78,9 @@ function doPoll() {
                 console.log("Error polling rest API (" + http.STATUS_CODES[res.statusCode]);
                 return;
             }
-            var chunks = [];
+            var chunks = "";
             res.on("data", function(data){
-                chunks.push(data);
+                chunks += data;
             });
             res.on("end", function(){
                 var resp = JSON.parse(chunks.toString());
