@@ -1,0 +1,9 @@
+<ul ng-controller="FeedsCtrl">
+    <li ng-repeat="feed in feeds">
+        <a href="#/{{feed.id}}" title="{{feed.description}}" ng-click="selectFeed(feed)">
+            {{feed.name}}
+        </a>
+    </li>
+
+
+</ul>

@@ -1,13 +1,10 @@
 'use strict';
 
-angular.module('foApp', [])
-  .config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  });
+angular.module('izmet', [])
+    .config(function ($routeProvider) {
+        $routeProvider.when('/:feedId', {
+            templateUrl: 'views/articles.html',
+            controller: 'ArticlesCtrl'
+        });
+        $routeProvider.otherwise({redirectTo: '/'});
+    });
