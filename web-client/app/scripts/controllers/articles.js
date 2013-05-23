@@ -29,5 +29,6 @@ angular.module('izmet')
             if (!article.read) {
                 return 'unread';
             }
+            return null;
         }
     });
