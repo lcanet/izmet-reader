@@ -22,7 +22,7 @@ var getConnection = function(callback) {
 
 var execSql = function(query, params) {
     var def = promise();
-    console.log("[SQL] '" + query + "' with params", params);
+    // console.log("[SQL] '" + query + "' with params", params);
     getConnection(function(client){
         client.query(query, params, function(err,res){
             if (err) {
