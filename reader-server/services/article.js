@@ -23,6 +23,8 @@ var findByFeed = {
         "nickname" : "findAllArticples"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
+
         var feedId = req.params.id;
         if (!feedId) {
             throw swagger.errors.invalid('id');
@@ -67,6 +69,7 @@ var findArticles = {
         "nickname" : "findArticles"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         var limit = parseInt(req.query.limit) || 100;
         var offset = parseInt(req.query.offset) || 0;
 
@@ -121,6 +124,7 @@ var addArticle = {
         "nickname" : "addArticle"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         var feedId = req.params.id;
         if (!feedId) {
             throw swagger.errors.invalid('feedId');
@@ -232,15 +236,16 @@ var markArticle = {
         "nickname" : "markArticle"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         var articleId = req.params.articleId;
         if (!articleId) {
             throw swagger.errors.invalid('articleId');
         }
         var state = req.body;
-        var p = updateArticles([{
+        updateArticles([{
             id: articleId,
             read: state.read
-        }]).then(function(result){
+        }]).then(function(){
             res.send("");
         });
     }
@@ -266,6 +271,7 @@ var markArticles = {
         "nickname" : "markArticles"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         var state = req.body;
         updateArticles(req.body).then(function(result){
            res.send("");

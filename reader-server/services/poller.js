@@ -18,6 +18,7 @@ var forcePollAll = {
         "nickname" : "forcePollAll"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         poller.pollAllFeeds();
         res.send({"code": 200, description: "OK"});
     }
@@ -41,12 +42,11 @@ var forcePoll = {
         "nickname" : "updateFeed"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         if (!req.params.id) {
             throw swagger.errors.invalid('id');
         }
         var id = parseInt(req.params.id);
-        var feedData = req.body;
-
         db.execSql("select * from feed where id = $1", [id])
             .then(function(result){
                 if (result.rows == null || result.rows.length === 0) {

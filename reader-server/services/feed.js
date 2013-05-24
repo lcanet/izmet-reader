@@ -21,6 +21,7 @@ var findById = {
         "nickname" : "getFeedById"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         if (!req.params.id) {
             throw swagger.errors.invalid('id');
         }
@@ -64,18 +65,68 @@ var getImage = {
             function(err, result){
                 if (err) {
                     console.log("Cannot get image", err);
+                    res.header("Content-Type", "application/json; charset=utf-8");
                     res.send({code: 500, description: 'Cannot get image'});
                 } else if (result.rows == null || result.rows.length == 0 || result.rows[0].image == null) {
+                    res.header("Content-Type", "application/json; charset=utf-8");
                     swagger.errors.notFound('feed', res);
                 } else {
                     var image = new Buffer(result.rows[0].image, 'base64');
-                    res.setHeader("Content-Type: image/jpeg");
+                    res.setHeader("Content-Type", "image/jpeg");
                     res.send(image);
                 }
             });
         });
     }
 };
+
+
+var getIcon = {
+    'spec': {
+        "description" : "Get a feed icon",
+        "path" : "/feed/{id}/icon",
+        "notes" : "Returns the icon of a feed",
+        "summary" : "Get a feed icon",
+        "method": "GET",
+        "params" : [swagger.pathParam("id", "ID of the feed", "string")],
+        "responseClass" : "void",
+        "errorResponses" : [swagger.errors.invalid('id'), swagger.errors.notFound('feed')],
+        "nickname" : "getImage"
+    },
+    'action': function (req,res) {
+        if (!req.params.id) {
+            throw swagger.errors.invalid('id');
+        }
+        var id = parseInt(req.params.id);
+        db.getConnection(function(client) {
+            client.query('select icon from feed where id = $1', [id],
+                function(err, result){
+                    if (err) {
+                        console.log("Cannot get image", err);
+                        res.header("Content-Type", "application/json; charset=utf-8");
+                        res.send({code: 500, description: 'Cannot get image'});
+                    } else if (result.rows == null || result.rows.length == 0 || result.rows[0].icon == null) {
+                        // send default icon
+                        fs.readFile('resources/rss.png', function(err, data){
+                            if (err) {
+                                res.header("Content-Type", "application/json; charset=utf-8");
+                                res.send({code: 500, description: 'Cannot get image'});
+                            } else {
+                                res.setHeader("Content-Type", "image/png");
+                                res.send(data);
+                            }
+                        });
+                    } else {
+                        var image = new Buffer(result.rows[0].icon, 'base64');
+                        res.setHeader("Content-Type", "image/jpeg");
+                        res.send(image);
+                    }
+                });
+        });
+    }
+};
+
+
 var findAll = {
     'spec': {
         "description" : "Find all feeds",
@@ -87,6 +138,7 @@ var findAll = {
         "nickname" : "findAllFeeds"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         db.getConnection(function(client) {
             client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread FROM feed order by id', function(err, result) {
                 res.send(JSON.stringify(result.rows));
@@ -119,6 +171,7 @@ var updateFeed = {
         "nickname" : "updateFeed"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         if (!req.params.id) {
             throw swagger.errors.invalid('id');
         }
@@ -159,6 +212,7 @@ var addFeed = {
         "nickname" : "addFeed"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         var feed = req.body;
 
         // get feed data
@@ -196,8 +250,7 @@ var addFeed = {
                                     res.send({code: 500, description: 'Error adding feed'}, 500);
                                     return;
                                 }
-                                var genId = result.rows[0].id;
-                                feed.id = genId;
+                                feed.id = result.rows[0].id;
 
                                 // add feed image
                                 if (feedImageUrl != null){
@@ -285,29 +338,30 @@ var deleteFeed = {
         "nickname" : "deleteFeed"
     },
     'action': function (req,res) {
+        res.header("Content-Type", "application/json; charset=utf-8");
         if (!req.params.id) {
             throw swagger.errors.invalid('id');
         }
         var id = parseInt(req.params.id);
         db.getConnection(function(client) {
             client.query("delete from article where feed_id = $1", [id],
-                function(err, result){
+                function(err){
                     if (err) {
                         console.log("Cannot delete articles", err);
                         res.send({code: 500, description: "Cannot delete articles"});
-                        return null;
+                    } else {
+                        db.getConnection(function(client) {
+                            client.query("delete from feed where id = $1", [id],
+                                function(err){
+                                    if (err) {
+                                        console.log("Cannot delete feed", err);
+                                        res.send({code: 500, description: "Cannot delete feed"});
+                                    } else {
+                                        res.send("");
+                                    }
+                                });
+                        });
                     }
-                    db.getConnection(function(client) {
-                        client.query("delete from feed where id = $1", [id],
-                            function(err, result){
-                                if (err) {
-                                    console.log("Cannot delete feed", err);
-                                    res.send({code: 500, description: "Cannot delete feed"});
-                                    return null;
-                                }
-                                res.send("");
-                            });
-                    });
                 });
         });
     }
@@ -315,6 +369,7 @@ var deleteFeed = {
 
 
 exports.getImage = getImage;
+exports.getIcon = getIcon;
 exports.findById = findById;
 exports.findAll = findAll;
 exports.updateFeed = updateFeed;

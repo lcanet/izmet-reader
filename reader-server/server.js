@@ -30,11 +30,19 @@ app.use(middleware.cacheHandler());
 app.options("*", middleware.allowCrossDomain);
 
 swagger.setAppHandler(app);
+swagger.setHeaders = function setHeaders(res) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
+    res.header("Access-Control-Allow-Headers", "Content-Type, X-API-KEY");
+//    res.header("Content-Type", "application/json; charset=utf-8");
+};
+
 swagger.addModels(services.models);
 // swagger services
 swagger.addGet(services.feed.findById);
 swagger.addGet(services.feed.findAll);
 swagger.addGet(services.feed.getImage);
+swagger.addGet(services.feed.getIcon);
 swagger.addPut(services.feed.updateFeed);
 swagger.addPost(services.feed.addFeed);
 swagger.addDelete(services.feed.deleteFeed);
