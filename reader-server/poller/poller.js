@@ -38,7 +38,6 @@ function pollFeed(feed, callback) {
         console.log("Cannot find poller for feed type " + feed.type);
         callback();
     }
-
 }
 
 function shouldPollFeed(feed) {
@@ -108,7 +107,7 @@ function startPoller(devMode) {
     new cronJob('00 */5 * * * *', cronPollHandler).start();
     // poll on start, for debug
     if (devMode){
-        doPoll(config.maxFeedsPerPoll);
+        // doPoll(config.maxFeedsPerPoll);
     }
 }
 

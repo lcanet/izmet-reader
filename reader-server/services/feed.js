@@ -4,6 +4,7 @@ var db = require('../db/db.js'),
     http = require('http'),
     fs = require('fs'),
     url = require('url'),
+    poller = require('../poller/poller.js'),
     swagger = require('swagger-node-express');
 
 
@@ -197,7 +198,6 @@ var addFeed = {
                                 }
                                 var genId = result.rows[0].id;
                                 feed.id = genId;
-                                res.send(feed);
 
                                 // add feed image
                                 if (feedImageUrl != null){
@@ -207,6 +207,12 @@ var addFeed = {
 
                                 // also add favicon if there is any
                                 addIconForFeed(feed);
+
+                                // initial poll
+                                poller.pollFeed(feed, function(){
+                                    res.send(feed);
+                                });
+
                             });
                     });
                 }
