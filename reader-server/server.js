@@ -43,6 +43,8 @@ swagger.addPost(services.article.addArticle);
 swagger.addPut(services.article.markArticle);
 swagger.addPut(services.article.markArticles);
 swagger.addGet(services.article.findArticles);
+swagger.addPost(services.poller.forcePoll);
+swagger.addPost(services.poller.forcePollAll);
 swagger.configureSwaggerPaths("", "/api-docs", "");
 swagger.configure(config.apiUrl, "0.1");
 

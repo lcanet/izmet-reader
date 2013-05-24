@@ -8,7 +8,7 @@ var
     moment = require('moment');
 
 function pollFeedRSS(feed, callback) {
-    console.log("Polling feed " + feed.name);
+    console.log("Polling feed " + feed.name + " using rss @ " + feed.url);
 
     var articles = [];
 

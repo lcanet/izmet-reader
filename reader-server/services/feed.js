@@ -94,7 +94,6 @@ var findAll = {
     }
 };
 
-
 var updateFeed = {
     'spec': {
         "description" : "Update a feed",

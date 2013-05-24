@@ -13,24 +13,32 @@ var pollers = {
     'twitter': twitter.poll
 };
 
-function processFeeds(feeds) {
+function processFeeds(feeds, limit) {
 
     // filter feeds
     var feedsToProcess = und.filter(feeds, shouldPollFeed);
-    feedsToProcess = feedsToProcess.slice(0, Math.min(feedsToProcess.length, config.maxFeedsPerPoll));
+    if (limit > 0) {
+        feedsToProcess = feedsToProcess.slice(0, Math.min(feedsToProcess.length, limit));
+    }
+    console.log("Processing " + feedsToProcess.length + "/" + feeds.length + " feeds");
 
     utils.processQueue(feedsToProcess, function(nextFeed, done){
-        var poller = pollers[nextFeed.type];
-        if (poller) {
-            markFeedUpdated(nextFeed);
-            poller(nextFeed, done);
-        } else{
-            console.log("Cannot find poller for feed type " + nextFeed.type);
-            done();
-        }
+        pollFeed(nextFeed, done);
     }, function(){
         console.log('Polling done.');
     });
+}
+
+function pollFeed(feed, callback) {
+    var poller = pollers[feed.type];
+    if (poller) {
+        markFeedUpdated(feed);
+        poller(feed, callback);
+    } else{
+        console.log("Cannot find poller for feed type " + feed.type);
+        callback();
+    }
+
 }
 
 function shouldPollFeed(feed) {
@@ -68,8 +76,7 @@ function markFeedUpdated(feed){
     req.end();
 
 }
-
-function doPoll() {
+function doPoll(limit) {
 
     // poll rest pi
     http.get(config.apiLocalUrl + '/feed',
@@ -84,18 +91,27 @@ function doPoll() {
             });
             res.on("end", function(){
                 var resp = JSON.parse(chunks.toString());
-                processFeeds(resp);
+                processFeeds(resp, limit);
             });
         });
 }
 
+function pollAllFeeds() {
+    doPoll(0);
+}
+
+function cronPollHandler() {
+    doPoll(config.maxFeedsPerPoll);
+}
+
 function startPoller(devMode) {
-    new cronJob('00 */5 * * * *', doPoll).start();
+    new cronJob('00 */5 * * * *', cronPollHandler).start();
     // poll on start, for debug
     if (devMode){
-        doPoll();
+        doPoll(config.maxFeedsPerPoll);
     }
 }
 
 exports.startPoller = startPoller;
-
+exports.pollAllFeeds = pollAllFeeds;
+exports.pollFeed = pollFeed;
