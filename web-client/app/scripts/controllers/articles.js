@@ -4,7 +4,6 @@ angular.module('izmet')
     .controller('ArticlesCtrl', function ($http, $scope, $routeParams) {
 
         function getArticlesOfFeed(feed){
-            // TODO: use angular resource
             $http.get("/feed/" + feed.id + "/article")
                 .success(function(result){
                     $scope.articles = result;

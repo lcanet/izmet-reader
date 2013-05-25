@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('izmet', [])
+angular.module('izmet', ['ngResource'])
     .config(function ($routeProvider) {
         $routeProvider.when('/:feedId', {
             templateUrl: 'views/articles.html',
