@@ -1,8 +1,10 @@
-<ul ng-controller="FeedsCtrl">
+<ul ng-controller="FeedsCtrl" class="feed-list">
     <li ng-repeat="feed in feeds">
-        <a href="#/{{feed.id}}" title="{{feed.description}}" ng-click="selectFeed(feed)">
-            <img ng-src="/feed/{{feed.id}}/icon" height="16" class="feed-icon"/>
+        <a href="#/{{feed.id}}" title="{{feed.description}}" ng-click="selectFeed(feed)"
+                ng-class="getClassForFeed(feed)">
+            <img ng-src="/feed/{{feed.id}}/icon" height="16" class="icon"/>
             {{feed.name}}
+            <span ng-show="feed.nb_unread > 0">({{feed.nb_unread}})</span>
         </a>
     </li>
 

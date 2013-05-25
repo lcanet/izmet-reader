@@ -6,4 +6,7 @@ angular.module('izmet')
             $scope.feeds = result;
         });
 
+        $scope.getClassForFeed = function(feed){
+            return feed.nb_unread > 0 ? 'unread' : '';
+        }
     });
