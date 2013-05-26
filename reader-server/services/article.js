@@ -4,7 +4,6 @@ var db = require('../db/db.js'),
     und = require('underscore'),
     promise = require("promises-a");
 
-
 var findByFeed = {
     'spec': {
         "description" : "Find all articles of a feed",
