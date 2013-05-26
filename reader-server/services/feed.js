@@ -32,7 +32,7 @@ var findById = {
                 'SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread FROM feed where id = $1',
                 [id],
                 function(err, result) {
-                    if (result.rows.length == 0) {
+                    if (!result.rows || result.rows.length == 0) {
                         swagger.errors.notFound('feed', res);
                     } else {
                         res.send(JSON.stringify(result.rows[0]));
