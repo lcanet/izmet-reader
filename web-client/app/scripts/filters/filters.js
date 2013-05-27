@@ -1,7 +1,8 @@
-/* Filters */
+/* global moment */
 angular.module('izmet')
-    .filter('ago', function() {
-        return function(arg) {
+    .filter('ago', function () {
+        'use strict';
+        return function (arg) {
             // don't print 'ago' if more than 1 day
             var m = moment(arg);
             if (m.isBefore(moment().subtract('d', 10))) {
@@ -9,7 +10,5 @@ angular.module('izmet')
             } else {
                 return m.fromNow();
             }
-
-
-        }
+        };
     });

@@ -4,7 +4,7 @@ angular.module('izmet')
     .controller('ArticlesCtrl', function ($http, $scope, $routeParams) {
 
         function getArticlesOfFeed(feed){
-            $http.get("/feed/" + feed.id + "/article")
+            $http.get('/feed/' + feed.id + '/article')
                 .success(function(result){
                     $scope.articles = result;
                 });
@@ -17,7 +17,7 @@ angular.module('izmet')
             $scope.articles = [];
             $scope.currentArticle = null;
 
-            $http.get("/feed/" + $routeParams.feedId).success(function(result){
+            $http.get('/feed/' + $routeParams.feedId).success(function(result){
                 $scope.selectedFeed = result;
                 getArticlesOfFeed(result);
             });

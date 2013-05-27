@@ -326,71 +326,6 @@ FileETag None
 # </IfModule>
 
 
-# ----------------------------------------------------------------------
-# Start rewrite engine
-# ----------------------------------------------------------------------
-
-# Turning on the rewrite engine is necessary for the following rules and
-# features. FollowSymLinks must be enabled for this to work.
-
-# Some cloud hosting services require RewriteBase to be set: goo.gl/HOcPN
-# If using the h5bp in a subdirectory, use `RewriteBase /foo` instead where
-# 'foo' is your directory.
-
-# If your web host doesn't allow the FollowSymlinks option, you may need to
-# comment it out and use `Options +SymLinksOfOwnerMatch`, but be aware of the
-# performance impact: http://goo.gl/Mluzd
-
-<IfModule mod_rewrite.c>
-  Options +FollowSymlinks
-# Options +SymLinksIfOwnerMatch
-  Options +FollowSymlinks
-  RewriteEngine On
-# RewriteBase /
-</IfModule>
-
-
-# ----------------------------------------------------------------------
-# Suppress or force the "www." at the beginning of URLs
-# ----------------------------------------------------------------------
-
-# The same content should never be available under two different URLs -
-# especially not with and without "www." at the beginning, since this can cause
-# SEO problems (duplicate content). That's why you should choose one of the
-# alternatives and redirect the other one.
-
-# By default option 1 (no "www.") is activated.
-# no-www.org/faq.php?q=class_b
-
-# If you'd prefer to use option 2, just comment out all option 1 lines
-# and uncomment option 2.
-
-# IMPORTANT: NEVER USE BOTH RULES AT THE SAME TIME!
-
-# ----------------------------------------------------------------------
-
-# Option 1:
-# Rewrite "www.example.com -> example.com".
-
-<IfModule mod_rewrite.c>
-  RewriteCond %{HTTPS} !=on
-  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-  RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
-</IfModule>
-
-# ----------------------------------------------------------------------
-
-# Option 2:
-# Rewrite "example.com -> www.example.com".
-# Be aware that the following rule might not be a good idea if you use "real"
-# subdomains for certain parts of your website.
-
-# <IfModule mod_rewrite.c>
-#   RewriteCond %{HTTPS} !=on
-#   RewriteCond %{HTTP_HOST} !^www\..+$ [NC]
-#   RewriteRule ^ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-# </IfModule>
-
 
 # ----------------------------------------------------------------------
 # Built-in filename-based cache busting
@@ -424,17 +359,6 @@ FileETag None
 
 
 # ----------------------------------------------------------------------
-# Prevent 404 errors for non-existing redirected folders
-# ----------------------------------------------------------------------
-
-# without -MultiViews, Apache will give a 404 for a rewrite if a folder of the
-# same name does not exist.
-# webmasterworld.com/apache/3808792.htm
-
-Options -MultiViews
-
-
-# ----------------------------------------------------------------------
 # Custom 404 page
 # ----------------------------------------------------------------------
 
@@ -455,24 +379,6 @@ AddDefaultCharset utf-8
 AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
 
 
-# ----------------------------------------------------------------------
-# A little more security
-# ----------------------------------------------------------------------
-
-# To avoid displaying the exact version number of Apache being used, add the
-# following to httpd.conf (it will not work in .htaccess):
-# ServerTokens Prod
-
-# "-Indexes" will have Apache block users from browsing folders without a
-# default document Usually you should leave this activated, because you
-# shouldn't allow everybody to surf through every folder on your server (which
-# includes rather private places like CMS system folders).
-<IfModule mod_autoindex.c>
-  Options -Indexes
-</IfModule>
-
-# Block access to "hidden" directories or files whose names begin with a
-# period. This includes directories used by version control systems such as
 # Subversion or Git.
 <IfModule mod_rewrite.c>
   RewriteCond %{SCRIPT_FILENAME} -d [OR]
@@ -547,7 +453,3 @@ AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
 # Don't prepend to error (doesn't accept empty string, use whitespace if you need)
 # php_value error_append_string " "
 
-# Increase cookie security
-<IfModule php5_module>
-  php_value session.cookie_httponly true
-</IfModule>
