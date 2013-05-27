@@ -4,7 +4,6 @@ var db = require('../db/db.js'),
     und = require('underscore'),
     promise = require("promises-a");
 
-
 function getArticles(res, feedId, read, limit, offset) {
     res.header("Content-Type", "application/json; charset=utf-8");
 

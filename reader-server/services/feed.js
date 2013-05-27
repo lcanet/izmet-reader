@@ -103,15 +103,15 @@ var getIcon = {
             client.query('select icon from feed where id = $1', [id],
                 function(err, result){
                     if (err) {
-                        console.log("Cannot get image", err);
+                        console.log("Cannot get icon", err);
                         res.header("Content-Type", "application/json; charset=utf-8");
-                        res.send({code: 500, description: 'Cannot get image'});
+                        res.send({code: 500, description: 'Cannot get icon'}, 500);
                     } else if (result.rows == null || result.rows.length == 0 || result.rows[0].icon == null) {
                         // send default icon
                         fs.readFile('resources/rss.png', function(err, data){
                             if (err) {
                                 res.header("Content-Type", "application/json; charset=utf-8");
-                                res.send({code: 500, description: 'Cannot get image'});
+                                res.send({code: 500, description: 'Cannot get icon'}, 500);
                             } else {
                                 res.setHeader("Content-Type", "image/png");
                                 res.setHeader('Cache-Control', 'public,max-age=864000');
