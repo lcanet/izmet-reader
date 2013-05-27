@@ -15,6 +15,7 @@ angular.module('izmet')
         if ($routeParams.feedId) {
             // reset articles
             $scope.articles = [];
+            $scope.currentArticle = null;
 
             $http.get("/feed/" + $routeParams.feedId).success(function(result){
                 $scope.selectedFeed = result;
@@ -24,10 +25,17 @@ angular.module('izmet')
 
         // styles
 
-        $scope.getClassForArticle = function(article) {
+        $scope.getClassForArticleHeader = function(article) {
             if (!article.read) {
                 return 'unread';
+            } else {
+                return 'read';
             }
-            return null;
-        }
+        };
+        $scope.selectArticle = function(article) {
+            $scope.currentArticle = article;
+            article.read = true;
+            // TODO: persist read state
+        };
+
     });

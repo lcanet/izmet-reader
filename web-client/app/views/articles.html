@@ -6,7 +6,8 @@
 
     <div class="articles-list">
         <div ng-repeat="article in articles" class="article">
-            <div class="header row" ng-class="getClassForArticle(article)">
+            <div class="header row" ng-class="getClassForArticleHeader(article)"
+                 ng-click="selectArticle(article)">
                 <div class="span3">
                     {{article.feed.name}}
 
@@ -15,9 +16,17 @@
                     {{article.title}}
                 </div>
                 <div class="span2">
-                    <!--TODO: use 'xx ago' syntax for < 24 h -->
-                    {{article.article_date | date:'short' }}
+                    {{article.article_date | ago }}
                 </div>
+            </div>
+            <div class="content row" ng-show="article == currentArticle">
+                <h3>{{article.title}}</h3>
+                <span>
+                    {{article.article_date | date:'medium' }}
+                </span>
+
+                <span ng-bind-html-unsafe="article.content"></span>
+
             </div>
 
         </div>
