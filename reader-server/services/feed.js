@@ -72,6 +72,7 @@ var getImage = {
                     swagger.errors.notFound('feed', res);
                 } else {
                     var image = new Buffer(result.rows[0].image, 'base64');
+                    res.setHeader('Cache-Control', 'public,max-age=864000');
                     res.setHeader("Content-Type", "image/jpeg");
                     res.send(image);
                 }
@@ -113,12 +114,14 @@ var getIcon = {
                                 res.send({code: 500, description: 'Cannot get image'});
                             } else {
                                 res.setHeader("Content-Type", "image/png");
+                                res.setHeader('Cache-Control', 'public,max-age=864000');
                                 res.send(data);
                             }
                         });
                     } else {
                         var image = new Buffer(result.rows[0].icon, 'base64');
                         res.setHeader("Content-Type", "image/jpeg");
+                        res.setHeader('Cache-Control', 'public,max-age=864000');
                         res.send(image);
                     }
                 });
