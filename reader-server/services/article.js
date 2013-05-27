@@ -5,6 +5,38 @@ var db = require('../db/db.js'),
     promise = require("promises-a");
 
 
+function getArticles(res, feedId, read, limit, offset) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var p = [limit, offset];
+
+    var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,' +
+        'f.id as feedid, f.name,f.description,f.url,f.type ' +
+        'FROM article a ' +
+        'INNER JOIN feed f on f.id = a.feed_id ' +
+        'where 1=1 ';
+    if (feedId != null){
+        q += ' and a.feed_id = $3';
+        p.push(feedId);
+    }
+    if (read) {
+        q += " and read = false";
+    }
+    q += " order by article_date desc";
+    q += " limit $1 offset $2";
+    db.execSql(q, p).then(function(result){
+        und.each(result.rows, function(elt){
+            // replace "feed" object
+            utils.objectify(elt, "feed", "name","description", "url", "type", "feedid");
+            // some manual changes
+            elt.feed.id = elt.feed.feedid;
+            delete elt.feed.feedid;
+        });
+        res.send(JSON.stringify(result.rows));
+    });
+
+}
+
 var findByFeed = {
     'spec': {
         "description" : "Find all articles of a feed",
@@ -29,26 +61,9 @@ var findByFeed = {
         if (!feedId) {
             throw swagger.errors.invalid('id');
         }
-        db.execSql('SELECT * FROM feed where id = $1', [feedId]).then(function(result) {
-            if (result.rows.length == 0){
-                swagger.errors.notFound('feed', res);
-                throw 0;
-            } else {
-                var limit = parseInt(req.query.limit) || 100;
-                var offset = parseInt(req.query.offset) || 0;
-
-                var q = 'SELECT id,fetch_date,article_date,title,content,url,read FROM article where feed_id = $1';
-                var p = [feedId, limit, offset];
-                if (req.query.read) {
-                    q += " and read = false";
-                }
-                q += " order by id desc";
-                q += " limit $2 offset $3";
-                return db.execSql(q, p);
-            }
-        }).then(function(result){
-            res.send(JSON.stringify(result.rows));
-        });
+        var limit = parseInt(req.query.limit) || 100;
+        var offset = parseInt(req.query.offset) || 0;
+        getArticles(res, feedId, req.query.read, limit, offset);
     }
 };
 
@@ -73,27 +88,7 @@ var findArticles = {
         var limit = parseInt(req.query.limit) || 100;
         var offset = parseInt(req.query.offset) || 0;
 
-        var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,' +
-            'f.id as feedid, f.name,f.description,f.url,f.type ' +
-            'FROM article a ' +
-            'INNER JOIN feed f on f.id = a.feed_id ' +
-            'where 1=1';
-        var p = [limit, offset];
-        if (req.query.read) {
-            q += " and read = false";
-        }
-        q += " order by id desc";
-        q += " limit $1 offset $2";
-        db.execSql(q, p).then(function(result){
-            und.each(result.rows, function(elt){
-                // replace "feed" object
-                utils.objectify(elt, "feed", "name","description", "url", "type", "feedid");
-                // some manual changes
-                elt.feed.id = elt.feed.feedid;
-                delete elt.feed.feedid;
-            });
-            res.send(JSON.stringify(result.rows));
-        });
+        getArticles(res, null, req.query.read, limit, offset);
     }
 };
 
