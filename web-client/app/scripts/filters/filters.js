@@ -1,6 +1,7 @@
 /* global moment */
 
 function agoCalc(arg) {
+    'use strict';
     // don't print 'ago' if more than 1 day
     var m = moment(arg);
     if (m.isBefore(moment().subtract('d', 10))) {
@@ -15,7 +16,7 @@ angular.module('izmet')
         'use strict';
         return function (arg, prop) {
             // lazy evaluation
-            if (arg.__cache_ago == null) {
+            if (arg.__cache_ago === null) {
                 arg.__cache_ago = agoCalc(arg[prop]);
             }
             return arg.__cache_ago;

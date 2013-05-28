@@ -53,7 +53,7 @@ angular.module('izmet')
         $scope.getNextPage = function () {
             if (!endOfFeed) {
                 lastOffset += pageSize;
-                if ($scope.selectedFeed != null) {
+                if ($scope.selectedFeed !== null) {
                     getArticlesOfFeed($scope.selectedFeed);
                 } else {
                     getAllArticles();
