@@ -18,18 +18,23 @@
                     {{article.title}}
                 </div>
                 <div class="span2">
-                    {{article.article_date | ago }}
+                    {{article | ago:'article_date' }}
                 </div>
             </div>
-            <div class="content row" ng-show="article == currentArticle">
-                <h3>{{article.title}}</h3>
-                <span>
-                    {{article.article_date | date:'medium' }}
-                </span>
+            <detailbox detailbox-show="currentArticle == article"
+                       detailbox-content="detail-box"
+                        class="content row">
+            </detailbox>
 
-                <span ng-bind-html="article.content"></span>
-            </div>
+        </div>
 
+        <div id="detail-box">
+            <h3>{{currentArticle.title}}</h3>
+            <span>
+                {{currentArticle.article_date | date:'medium' }}
+            </span>
+
+            <span ng-bind-html="currentArticle.content"></span>
         </div>
     </div>
 </div>

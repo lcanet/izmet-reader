@@ -50,8 +50,6 @@ angular.module('izmet')
             }
         }
 
-
-
         $scope.getNextPage = function () {
             if (!endOfFeed) {
                 lastOffset += pageSize;
