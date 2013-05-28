@@ -7,29 +7,32 @@ angular.module('izmet')
         var pageSize ;
         var lastOffset ;
         var endOfFeed;      // marker of end of feed
+        var currentFeedId;
 
-        function getArticlesOfFeed(feed){
-            $http.get('/feed/' + feed.id + '/article', {params: {limit: pageSize, offset:lastOffset}})
-                .success(function(result){
-                    if (result.length < pageSize) {
-                        endOfFeed = true;
-                    }
+        // don't do another request when scrolling events fire in reaction of page change
+        var requestInflight = false;
 
-                    $scope.articles = $scope.articles.concat( result);
-                });
-        }
+        function getPage() {
+            var resultHandler= function(result) {
+                if (result.length < pageSize) {
+                    endOfFeed = true;
+                }
+                $scope.articles = $scope.articles.concat( result);
+                requestInflight = false;
+            };
 
-        function getAllArticles(){
-            $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
-                .success(function(result){
-                    if (result.length < pageSize) {
-                        endOfFeed = true;
-                    }
-                    $scope.articles = $scope.articles.concat( result);
-                });
+            if (currentFeedId != null) {
+                $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset}})
+                    .success(resultHandler);
+            } else {
+                $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
+                    .success(resultHandler);
+            }
+            requestInflight = true;
         }
 
         // initialisation
+
 
         if ($routeParams.feedId) {
             // reset articles
@@ -39,25 +42,25 @@ angular.module('izmet')
             lastOffset = 0;
             endOfFeed = false;
 
-            if ($routeParams.feedId !== 'all'){
-                $http.get('/feed/' + $routeParams.feedId).success(function(result){
-                    $scope.selectedFeed = result;
-                    getArticlesOfFeed(result);
-                });
-            } else {
-                $scope.selectFeed = null;
-                getAllArticles();
+            currentFeedId = $routeParams.feedId;
+            if (currentFeedId == 'all') {
+                currentFeedId = null;
             }
+            console.log("InitRP " + currentFeedId);
+
+            $scope.selectFeed = null;
+            if (currentFeedId != null) {
+                $http.get('/feed/' + currentFeedId).success(function(result){
+                    $scope.selectedFeed = result;
+                });
+            }
+            getPage();
         }
 
         $scope.getNextPage = function () {
-            if (!endOfFeed) {
+            if (!endOfFeed && !requestInflight) {
                 lastOffset += pageSize;
-                if ($scope.selectedFeed !== null) {
-                    getArticlesOfFeed($scope.selectedFeed);
-                } else {
-                    getAllArticles();
-                }
+                getPage();
             }
         };
 

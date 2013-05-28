@@ -16,7 +16,7 @@ angular.module('izmet')
         'use strict';
         return function (arg, prop) {
             // lazy evaluation
-            if (arg.__cache_ago === null) {
+            if (!arg.__cache_ago) {
                 arg.__cache_ago = agoCalc(arg[prop]);
             }
             return arg.__cache_ago;
