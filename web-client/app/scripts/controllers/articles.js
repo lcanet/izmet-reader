@@ -6,10 +6,15 @@ angular.module('izmet')
         // pagination parameters
         var pageSize ;
         var lastOffset ;
+        var endOfFeed;      // marker of end of feed
 
         function getArticlesOfFeed(feed){
             $http.get('/feed/' + feed.id + '/article', {params: {limit: pageSize, offset:lastOffset}})
                 .success(function(result){
+                    if (result.length < pageSize) {
+                        endOfFeed = true;
+                    }
+
                     $scope.articles = $scope.articles.concat( result);
                 });
         }
@@ -17,6 +22,9 @@ angular.module('izmet')
         function getAllArticles(){
             $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
                 .success(function(result){
+                    if (result.length < pageSize) {
+                        endOfFeed = true;
+                    }
                     $scope.articles = $scope.articles.concat( result);
                 });
         }
@@ -29,6 +37,7 @@ angular.module('izmet')
             $scope.currentArticle = null;
             pageSize = 100;
             lastOffset = 0;
+            endOfFeed = false;
 
             if ($routeParams.feedId !== 'all'){
                 $http.get('/feed/' + $routeParams.feedId).success(function(result){
@@ -44,12 +53,13 @@ angular.module('izmet')
 
 
         $scope.getNextPage = function () {
-            console.log("GNP", lastOffset);
-            lastOffset += pageSize;
-            if ($scope.selectedFeed != null) {
-                getArticlesOfFeed($scope.selectedFeed);
-            } else {
-                getAllArticles();
+            if (!endOfFeed) {
+                lastOffset += pageSize;
+                if ($scope.selectedFeed != null) {
+                    getArticlesOfFeed($scope.selectedFeed);
+                } else {
+                    getAllArticles();
+                }
             }
         };
 
