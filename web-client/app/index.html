@@ -30,18 +30,23 @@
 <script src="components/json3/lib/json3.min.js"></script>
 <![endif]-->
 
-<!-- Add your site or application content here -->
     <div class="row row-fluid">
         <div class="span3">
+            <header class="app-title">
+                <h1>
+                    IZMET
+                    <img src="img/ajax-loader.gif" id="ajax-loader" alt="loader"/>
+                </h1>
+            </header>
             <ng-include src="'views/feeds.html'"></ng-include>
-
         </div>
         <div class="span9" ng-view>
         </div>
-
     </div>
 
 <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+
+<!-- build:js scripts/libs.js -->
 <script src="components/angular/angular.js"></script>
 <script src="components/angular-resource/angular-resource.js"></script>
 <script src="components/angular-cookies/angular-cookies.js"></script>
@@ -49,6 +54,7 @@
 <script src="components/moment/moment.js"></script>
 <script src="components/underscore/underscore.js"></script>
 <script src="components/ngInfiniteScroll/ng-infinite-scroll.js"></script>
+<!-- endbuild -->
 
 <!-- build:js scripts/scripts.js -->
 <script src="scripts/app.js"></script>

@@ -21,3 +21,14 @@
 .feed-list .unread {
   font-weight: bold;
 }
+
+.app-title {
+  padding-left: 25px;
+}
+.app-title h1 {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+#ajax-loader {
+  display: none;
+}

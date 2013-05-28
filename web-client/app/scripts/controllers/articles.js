@@ -24,7 +24,7 @@ angular.module('izmet')
             $scope.articles = [];
             $scope.currentArticle = null;
 
-            if ($routeParams.feedId != 'all'){
+            if ($routeParams.feedId !== 'all'){
                 $http.get('/feed/' + $routeParams.feedId).success(function(result){
                     $scope.selectedFeed = result;
                     getArticlesOfFeed(result);

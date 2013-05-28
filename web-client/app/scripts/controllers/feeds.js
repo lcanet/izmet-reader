@@ -1,4 +1,5 @@
 'use strict';
+/* global _ */
 
 angular.module('izmet')
     .controller('FeedsCtrl', function ($scope, $http, $rootScope) {
@@ -21,5 +22,5 @@ angular.module('izmet')
         };
         $scope.getClassForAllArticles = function () {
             return $scope.totalUnread > 0 ? 'unread' : '';
-        }
+        };
     });

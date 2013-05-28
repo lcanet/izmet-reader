@@ -1,10 +1,32 @@
 'use strict';
 
 angular.module('izmet', ['ngResource'])
-    .config(function ($routeProvider) {
+    .config(function ($routeProvider, $httpProvider) {
         $routeProvider.when('/:feedId', {
             templateUrl: 'views/articles.html',
             controller: 'ArticlesCtrl'
         });
         $routeProvider.otherwise({redirectTo: '/'});
+
+        $httpProvider.defaults.transformRequest.push(function(d){
+            $("#ajax-loader").show();
+            return d;
+        });
+        $httpProvider.responseInterceptors.push(function($q){
+            return function(promise){
+                return promise.then(function(res){
+                    $("#ajax-loader").hide();
+                    if (res.data.error === true) {
+                        alert(res.data.message);
+                        return $q.reject(res);
+                    }
+                    return res;
+                }, function(res){
+                    $("#ajax-loader").hide();
+                    alert("Network error");
+                    return $q.reject(res);
+                });
+            }
+        });
+
     });
