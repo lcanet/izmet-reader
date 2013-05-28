@@ -3,17 +3,21 @@
 angular.module('izmet')
     .controller('ArticlesCtrl', function ($http, $scope, $routeParams) {
 
+        // pagination parameters
+        var pageSize ;
+        var lastOffset ;
+
         function getArticlesOfFeed(feed){
-            $http.get('/feed/' + feed.id + '/article')
+            $http.get('/feed/' + feed.id + '/article', {params: {limit: pageSize, offset:lastOffset}})
                 .success(function(result){
-                    $scope.articles = result;
+                    $scope.articles = $scope.articles.concat( result);
                 });
         }
 
         function getAllArticles(){
-            $http.get('/article')
+            $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
                 .success(function(result){
-                    $scope.articles = result;
+                    $scope.articles = $scope.articles.concat( result);
                 });
         }
 
@@ -23,6 +27,8 @@ angular.module('izmet')
             // reset articles
             $scope.articles = [];
             $scope.currentArticle = null;
+            pageSize = 100;
+            lastOffset = 0;
 
             if ($routeParams.feedId !== 'all'){
                 $http.get('/feed/' + $routeParams.feedId).success(function(result){
@@ -30,9 +36,22 @@ angular.module('izmet')
                     getArticlesOfFeed(result);
                 });
             } else {
+                $scope.selectFeed = null;
                 getAllArticles();
             }
         }
+
+
+
+        $scope.getNextPage = function () {
+            console.log("GNP", lastOffset);
+            lastOffset += pageSize;
+            if ($scope.selectedFeed != null) {
+                getArticlesOfFeed($scope.selectedFeed);
+            } else {
+                getAllArticles();
+            }
+        };
 
         // styles
 
@@ -44,9 +63,16 @@ angular.module('izmet')
             }
         };
         $scope.selectArticle = function(article) {
-            $scope.currentArticle = article;
-            article.read = true;
-            // TODO: persist read state
+            if ($scope.currentArticle === article ){
+                // unselect article
+                $scope.currentArticle = null;
+            } else {
+                $scope.currentArticle = article;
+                if (article && !article.read) {
+                    article.read = true;
+                    // TODO: persist read state
+                }
+            }
         };
 
     });

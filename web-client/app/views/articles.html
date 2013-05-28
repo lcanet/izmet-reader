@@ -4,7 +4,9 @@
         selected feed: {{selectedFeed.name}}
     </header>
 
-    <div class="articles-list">
+    <div class="articles-list" infinite-scroll-distance="3"
+         infinite-scroll-immediate-check="false"
+         infinite-scroll="getNextPage()">
         <div ng-repeat="article in articles" class="article">
             <div class="header row" ng-class="getClassForArticleHeader(article)"
                  ng-click="selectArticle(article)">
@@ -26,7 +28,6 @@
                 </span>
 
                 <span ng-bind-html="article.content"></span>
-
             </div>
 
         </div>

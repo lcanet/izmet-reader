@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('izmet', ['ngResource'])
+angular.module('izmet', ['ngResource', 'infinite-scroll'])
     .config(function ($routeProvider, $httpProvider) {
         $routeProvider.when('/:feedId', {
             templateUrl: 'views/articles.html',
