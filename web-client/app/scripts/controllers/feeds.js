@@ -10,12 +10,10 @@ angular.module('izmet')
         });
 
         $scope.$on('updateTotalUnread', function(){
-            // TODO: use underscore
-            var total = 0;
-            for (var i = 0; i < $scope.feeds.length; i++) {
-                total += $scope.feeds[i].nb_unread;
-            }
-            $scope.totalUnread = total;
+            $scope.totalUnread = _.reduce($scope.feeds,
+                function(sum, feed) {
+                    return sum + feed.nb_unread;
+                }, 0);
         });
 
         $scope.getClassForFeed = function (feed) {
