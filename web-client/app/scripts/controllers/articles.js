@@ -10,6 +10,13 @@ angular.module('izmet')
                 });
         }
 
+        function getAllArticles(){
+            $http.get('/article')
+                .success(function(result){
+                    $scope.articles = result;
+                });
+        }
+
         // initialisation
 
         if ($routeParams.feedId) {
@@ -17,10 +24,14 @@ angular.module('izmet')
             $scope.articles = [];
             $scope.currentArticle = null;
 
-            $http.get('/feed/' + $routeParams.feedId).success(function(result){
-                $scope.selectedFeed = result;
-                getArticlesOfFeed(result);
-            });
+            if ($routeParams.feedId != 'all'){
+                $http.get('/feed/' + $routeParams.feedId).success(function(result){
+                    $scope.selectedFeed = result;
+                    getArticlesOfFeed(result);
+                });
+            } else {
+                getAllArticles();
+            }
         }
 
         // styles
