@@ -7,6 +7,8 @@ angular.module('izmet')
         var pageSize ;
         var lastOffset ;
         var endOfFeed;      // marker of end of feed
+
+        // mode
         var currentFeedId;
 
         // don't do another request when scrolling events fire in reaction of page change
@@ -21,20 +23,22 @@ angular.module('izmet')
                 requestInflight = false;
             };
 
-            if (currentFeedId != null) {
-                $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset}})
-                    .success(resultHandler);
-            } else {
+            if (currentFeedId === 'all') {
                 $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
                     .success(resultHandler);
+                requestInflight = true;
+            } else if (currentFeedId != null) {
+                $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset}})
+                    .success(resultHandler);
+                requestInflight = true;
             }
-            requestInflight = true;
         }
 
         // initialisation
-
+        currentFeedId = null;
 
         if ($routeParams.feedId) {
+
             // reset articles
             $scope.articles = [];
             $scope.currentArticle = null;
@@ -43,12 +47,7 @@ angular.module('izmet')
             endOfFeed = false;
 
             currentFeedId = $routeParams.feedId;
-            if (currentFeedId == 'all') {
-                currentFeedId = null;
-            }
-            console.log("InitRP " + currentFeedId);
-
-            $scope.selectFeed = null;
+            $scope.selectedFeed = null;
             if (currentFeedId != null) {
                 $http.get('/feed/' + currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
