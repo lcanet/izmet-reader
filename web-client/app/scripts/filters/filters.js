@@ -21,4 +21,18 @@ angular.module('izmet')
             }
             return arg.__cache_ago;
         };
+    })
+    .filter('iconLink', function () {
+        'use strict';
+        return function (arg) {
+            if (arg && arg.links) {
+                for (var i = 0; i < arg.links.length ; i++) {
+                    var l = arg.links[i];
+                    if (l.type === 'icon') {
+                        return l.href;
+                    }
+                }
+            }
+            return null;
+        };
     });
