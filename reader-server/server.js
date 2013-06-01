@@ -50,12 +50,11 @@ app.get('/article', services.article.findArticles);
 app.put('/article', services.article.markArticles);
 app.put('/article/:articleId', services.article.markArticle);
 
-
 app.listen(config.serverPort);
 console.log("Server launched on port " + config.serverPort);
 
 process.on('uncaughtException', function(e){
-    console.log("UNCAUGHT", e);
+    console.trace("UNCAUGHT", e);
 
 });
 
