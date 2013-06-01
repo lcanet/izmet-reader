@@ -1,9 +1,11 @@
+var configDev = require('./config.dev.js'),
+    configProd = require('./config.prod.js');
 
-module.exports = {
-    serverPort: 8080,
-    apiUrl: 'http://localhost:8080',
-    apiLocalUrl: 'http://localhost:8080',
-    pgUrl: 'postgres://reader:reader@localhost/reader',
+console.log("Environment: " + process.env.NODE_ENV);
 
-    maxFeedsPerPoll: 10
-};
+if (process.env.NODE_ENV == 'production') {
+    module.exports = configProd;
+} else {
+    module.exports = configDev;
+}
+
