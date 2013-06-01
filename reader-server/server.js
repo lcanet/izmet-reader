@@ -54,5 +54,10 @@ app.put('/article/:articleId', services.article.markArticle);
 app.listen(config.serverPort);
 console.log("Server launched on port " + config.serverPort);
 
+process.on('uncaughtException', function(e){
+    console.log("UNCAUGHT", e);
+
+});
+
 poller.startPoller('development' == app.get('env'));
 console.log("Poller launched");

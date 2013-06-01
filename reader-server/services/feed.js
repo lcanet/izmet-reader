@@ -104,7 +104,7 @@ var getDefaultIcon = function (req, res) {
 var findAll = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     db.getConnection(function (client) {
-        client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is null as imagePresent, icon is null as iconPresent ' +
+        client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is not null as imagePresent, icon is not null as iconPresent ' +
             'FROM feed order by id', function (err, result) {
             und.each(result.rows, function(f){
                 var links = [];
