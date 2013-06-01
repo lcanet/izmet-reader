@@ -9,7 +9,7 @@ var express = require('express')
     , poller = require('./poller/poller.js')
     , middleware = require('./middleware')
     , config = require('./config/config.js')
-    , swagger = require('swagger-node-express');
+;
 
 var app = express();
 
@@ -30,33 +30,24 @@ app.use("/web-client", express.static(__dirname + '/web-client'));
 // cors
 app.options("*", middleware.allowCrossDomain);
 
-
-swagger.setAppHandler(app);
-swagger.setHeaders = function setHeaders(res) {
-    res.header('Access-Control-Allow-Origin', "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
-    res.header("Access-Control-Allow-Headers", "Content-Type, X-API-KEY");
-//    res.header("Content-Type", "application/json; charset=utf-8");
-};
-
-swagger.addModels(services.models);
 // swagger services
-swagger.addGet(services.feed.findById);
-swagger.addGet(services.feed.findAll);
-swagger.addGet(services.feed.getImage);
-swagger.addGet(services.feed.getIcon);
-swagger.addPut(services.feed.updateFeed);
-swagger.addPost(services.feed.addFeed);
-swagger.addDelete(services.feed.deleteFeed);
-swagger.addGet(services.article.findByFeed);
-swagger.addPost(services.article.addArticle);
-swagger.addPut(services.article.markArticle);
-swagger.addPut(services.article.markArticles);
-swagger.addGet(services.article.findArticles);
-swagger.addPost(services.poller.forcePoll);
-swagger.addPost(services.poller.forcePollAll);
-swagger.configureSwaggerPaths("", "/api-docs", "");
-swagger.configure(config.apiUrl, "0.1");
+
+app.get('/feed/:id', services.feed.findById);
+app.get('/feed', services.feed.findAll);
+app.get('/feed/:id/image', services.feed.getImage);
+app.get('/feed/:id/icon', services.feed.getIcon);
+app.put('/feed/:id', services.feed.updateFeed);
+app.post('/feed', services.feed.addFeed);
+app.delete('/feed/:id', services.feed.deleteFeed);
+
+app.get('/feed/:id/article', services.article.findByFeed);
+app.post('/feed/:id/article', services.article.addArticle);
+app.put('/article/:articleId', services.article.markArticle);
+app.put('/article', services.article.markArticles);
+app.get('/article', services.article.findArticles);
+
+app.post('/feed/:id/poll', services.poller.forcePoll);
+app.post('/feed/poll_all', services.poller.forcePollAll);
 
 app.listen(config.serverPort);
 console.log("Server launched on port " + config.serverPort);
