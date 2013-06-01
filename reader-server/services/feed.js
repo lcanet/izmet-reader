@@ -4,6 +4,7 @@ var db = require('../db/db.js'),
     http = require('http'),
     fs = require('fs'),
     url = require('url'),
+    und = require('underscore'),
     poller = require('../poller/poller.js');
 
 
@@ -56,6 +57,7 @@ var getImage = function (req, res) {
 };
 
 
+
 var getIcon = function (req, res) {
     if (!req.params.id) {
         res.send({code: 400, description: 'Invalid parameter id'}, 400);
@@ -69,18 +71,9 @@ var getIcon = function (req, res) {
                     console.log("Cannot get icon", err);
                     res.header("Content-Type", "application/json; charset=utf-8");
                     res.send({code:500, description:'Cannot get icon'}, 500);
-                } else if (result.rows == null || result.rows.length == 0 || result.rows[0].icon == null) {
-                    // send default icon
-                    fs.readFile('resources/rss.png', function (err, data) {
-                        if (err) {
-                            res.header("Content-Type", "application/json; charset=utf-8");
-                            res.send({code:500, description:'Cannot get icon'}, 500);
-                        } else {
-                            res.setHeader("Content-Type", "image/png");
-                            res.setHeader('Cache-Control', 'public,max-age=864000');
-                            res.send(data);
-                        }
-                    });
+                } else if (result.rows == null ||result.rows.length == 0 || result.rows[0].icon == null) {
+                    res.header("Content-Type", "application/json; charset=utf-8");
+                    res.send({code:404, description:'Cannot get icon'}, 404);
                 } else {
                     var image = new Buffer(result.rows[0].icon, 'base64');
                     res.setHeader("Content-Type", "image/jpeg");
@@ -92,11 +85,44 @@ var getIcon = function (req, res) {
 };
 
 
+
+var getDefaultIcon = function (req, res) {
+    // send default icon
+    fs.readFile('resources/rss.png', function (err, data) {
+        if (err) {
+            res.header("Content-Type", "application/json; charset=utf-8");
+            res.send({code:500, description:'Cannot get icon'}, 500);
+        } else {
+            res.setHeader("Content-Type", "image/png");
+            res.setHeader('Cache-Control', 'public,max-age=864000');
+            res.send(data);
+        }
+    });
+};
+
+
 var findAll = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     db.getConnection(function (client) {
-        client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread FROM feed order by id', function (err, result) {
-            res.send(JSON.stringify(result.rows));
+        client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is null as imagePresent, icon is null as iconPresent ' +
+            'FROM feed order by id', function (err, result) {
+            und.each(result.rows, function(f){
+                var links = [];
+                if (f.imagepresent) {
+                    links.push({type: 'image', href:'/feed/' + f.id + '/image'});
+                }
+                if (f.iconpresent) {
+                    links.push({type: 'icon', href:'/feed/' + f.id + '/icon'});
+                } else {
+                    links.push({type: 'icon', href:'/feed/icon/default'});
+                }
+
+                delete f.imagepresent;
+                delete f.iconpresent;
+                f.links = links;
+            });
+
+            res.send(result.rows);
         });
     });
 };
@@ -271,3 +297,4 @@ exports.findAll = findAll;
 exports.updateFeed = updateFeed;
 exports.addFeed = addFeed;
 exports.deleteFeed = deleteFeed;
+exports.getDefaultIcon = getDefaultIcon;
