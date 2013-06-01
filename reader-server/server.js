@@ -25,9 +25,11 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(middleware.cacheHandler());
+app.use("/web-client", express.static(__dirname + '/web-client'));
 
 // cors
 app.options("*", middleware.allowCrossDomain);
+
 
 swagger.setAppHandler(app);
 swagger.setHeaders = function setHeaders(res) {
