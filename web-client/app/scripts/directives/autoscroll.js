@@ -1,8 +1,7 @@
 'use strict';
-/* global $ */
 
 angular.module('izmet')
-    .directive('autoscroll', function($rootScope, $compile) {
+    .directive('autoscroll', function() {
         return {
             restrict: 'A',
             replace: false,

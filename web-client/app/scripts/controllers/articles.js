@@ -19,7 +19,7 @@ angular.module('izmet')
                 if (result.length < pageSize) {
                     endOfFeed = true;
                 }
-                if ($scope.articles == null) {
+                if (!$scope.articles) {
                     $scope.articles = [];
                 }
                 $scope.articles = $scope.articles.concat( result);
@@ -30,7 +30,7 @@ angular.module('izmet')
                 $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
                     .success(resultHandler);
                 requestInflight = true;
-            } else if (currentFeedId != null) {
+            } else if (currentFeedId !== null) {
                 $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset}})
                     .success(resultHandler);
                 requestInflight = true;
@@ -51,7 +51,7 @@ angular.module('izmet')
 
             currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
-            if (currentFeedId != null) {
+            if (currentFeedId !== null) {
                 $http.get('/feed/' + currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
                 });
@@ -85,7 +85,7 @@ angular.module('izmet')
                     article.read = true;
                     // update status on server
                     $http.put('/article/' + article.id, { read: true })
-                        .success(function(result){
+                        .success(function(){
                             $rootScope.$broadcast('updateUnread', article.feed.id, - 1);
                         });
                 }
