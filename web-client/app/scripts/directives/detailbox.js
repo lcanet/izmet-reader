@@ -18,7 +18,6 @@ angular.module('izmet')
                     } else {
                         elt.hide();
                     }
-
                 });
             }
         };

@@ -89,6 +89,10 @@ angular.module('izmet')
                             $rootScope.$broadcast('updateUnread', article.feed.id, - 1);
                         });
                 }
+                // scroll to article
+                if (article){
+                    $scope.$broadcast('autoscroll', article.id);
+                }
             }
         };
 
