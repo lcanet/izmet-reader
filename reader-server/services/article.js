@@ -17,7 +17,7 @@ function getArticles(res, feedId, read, limit, offset) {
         q += ' and a.feed_id = $3';
         p.push(feedId);
     }
-    if (read) {
+    if (!read) {
         q += " and read = false";
     }
     q += " order by article_date desc";
