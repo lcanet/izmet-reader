@@ -19,6 +19,9 @@ angular.module('izmet')
                 if (result.length < pageSize) {
                     endOfFeed = true;
                 }
+                if ($scope.articles == null) {
+                    $scope.articles = [];
+                }
                 $scope.articles = $scope.articles.concat( result);
                 requestInflight = false;
             };
@@ -40,7 +43,7 @@ angular.module('izmet')
         if ($routeParams.feedId) {
 
             // reset articles
-            $scope.articles = [];
+            $scope.articles = null;
             $scope.currentArticle = null;
             pageSize = 100;
             lastOffset = 0;

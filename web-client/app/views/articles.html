@@ -4,6 +4,11 @@
         selected feed: {{selectedFeed.name}}
     </header>
 
+    <div class="no-articles" ng-show="articles.length == 0">
+        No articles found
+
+    </div>
+
     <div class="articles-list" infinite-scroll-distance="3"
          infinite-scroll-immediate-check="false"
          infinite-scroll="getNextPage()">
