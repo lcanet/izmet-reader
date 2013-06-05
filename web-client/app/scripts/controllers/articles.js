@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('izmet')
-    .controller('ArticlesCtrl', function ($http, $scope, $routeParams) {
+    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope) {
 
         // pagination parameters
         var pageSize ;
@@ -80,7 +80,11 @@ angular.module('izmet')
                 $scope.currentArticle = article;
                 if (article && !article.read) {
                     article.read = true;
-                    // TODO: persist read state
+                    // update status on server
+                    $http.put('/article/' + article.id, { read: true })
+                        .success(function(result){
+                            $rootScope.$broadcast('updateUnread', article.feed.id, - 1);
+                        });
                 }
             }
         };
