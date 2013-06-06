@@ -316,6 +316,26 @@ var deleteFeed = function (req, res) {
 };
 
 
+
+var markAllAsRead = function (req, res) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+    if (!req.params.id) {
+        res.send({code: 400, description: 'Invalid parameter id'}, 400);
+        return;
+    }
+    var id = parseInt(req.params.id);
+    var feedData = req.body;
+
+    db.execSql("update article set read = true where feed_id = $1", [id])
+        .then(function (result) {
+            res.send({code:200, description:'Articles read'}, 200);
+        }, function (err) {
+            console.log("Cannot update articles", err);
+            res.send({"code":500, "description":'Server error cannot be updated'}, 500);
+        });
+};
+
+
 exports.getImage = getImage;
 exports.getIcon = getIcon;
 exports.findById = findById;
@@ -324,3 +344,4 @@ exports.updateFeed = updateFeed;
 exports.addFeed = addFeed;
 exports.deleteFeed = deleteFeed;
 exports.getDefaultIcon = getDefaultIcon;
+exports.markAllAsRead = markAllAsRead;

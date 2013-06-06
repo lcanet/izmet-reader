@@ -36,6 +36,7 @@ app.get('/feed', services.feed.findAll);
 app.post('/feed', services.feed.addFeed);
 app.get('/feed/:id', services.feed.findById);
 app.put('/feed/:id', services.feed.updateFeed);
+app.put('/feed/:id/mark', services.feed.markAllAsRead);
 app.delete('/feed/:id', services.feed.deleteFeed);
 app.get('/feed/:id/image', services.feed.getImage);
 app.get('/feed/:id/icon', services.feed.getIcon);

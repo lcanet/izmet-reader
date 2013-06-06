@@ -169,10 +169,25 @@ var markArticle = function (req, res) {
 
 var markArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
-    var state = req.body;
-    updateArticles(req.body).then(function (result) {
-        res.send("");
-    });
+    var cmd = req.body;
+    if (cmd && cmd.all){
+        db.execSql("update article set read=true", [])
+            .then(function(result){
+                res.send({code: 200, description: "Articles updated"});
+
+            },
+            function(error){
+                console.log("Cannot update articles")
+                res.send({code: 500, description: "Cannot update articles"}, 500);
+
+            });
+
+    } else {
+        updateArticles(cmd).then(function (result) {
+            res.send("");
+        });
+    }
+
 };
 
 
