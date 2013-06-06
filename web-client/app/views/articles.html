@@ -1,4 +1,8 @@
 <div class="articles-view">
+    <div class="btn-group" ng-show="selectedFeed != null">
+        <a class="btn btn-small" href="" ng-click="markAllAsRead()">Mark all as read</a>
+
+    </div>
 
     <header ng-show="selectedFeed != null">
         selected feed: {{selectedFeed.name}}

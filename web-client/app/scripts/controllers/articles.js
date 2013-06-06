@@ -75,6 +75,9 @@ angular.module('izmet')
                 return 'read';
             }
         };
+
+        // actions
+
         $scope.selectArticle = function(article) {
             if ($scope.currentArticle === article ){
                 // unselect article
@@ -86,13 +89,28 @@ angular.module('izmet')
                     // update status on server
                     $http.put('/article/' + article.id, { read: true })
                         .success(function(){
-                            $rootScope.$broadcast('updateUnread', article.feed.id, - 1);
+                            $rootScope.$broadcast('updateUnread', article.feed.id, { delta: -1 });
                         });
                 }
                 // scroll to article
                 if (article){
                     $scope.$broadcast('autoscroll', article.id);
                 }
+            }
+        };
+
+        $scope.markAllAsRead = function(){
+            if (currentFeedId === 'all') {
+                // TODO
+            } else if (currentFeedId != null) {
+                $http.put('/feed/' + currentFeedId + '/mark')
+                    .success(function(result){
+                        _.each($scope.articles, function(elt){
+                            elt.read = true;
+                        });
+                        $rootScope.$broadcast('updateUnread', currentFeedId, { value: 0 });
+
+                    });
             }
         };
 

@@ -10,13 +10,18 @@ angular.module('izmet')
             $rootScope.$broadcast('updateTotalUnread');
         });
 
-        $scope.$on('updateUnread', function(evt, feedId, delta) {
+        $scope.$on('updateUnread', function(evt, feedId, arg) {
             var feed = _.find($scope.feeds, function(elt) { return elt.id == feedId; });
             if (feed) {
-                feed.nb_unread += delta;
+                if (arg.delta) {
+                    feed.nb_unread += arg.delta;
+                } else {
+                    feed.nb_unread = arg.value;
+                }
                 $scope.$emit('updateTotalUnread');
             }
         });
+
 
         $scope.$on('updateTotalUnread', function(){
             $scope.totalUnread = _.reduce($scope.feeds,
