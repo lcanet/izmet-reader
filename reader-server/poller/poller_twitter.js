@@ -5,7 +5,7 @@ var
     url = require('url'),
     moment = require('moment');
 
-function pollFeedTwitter(feed) {
+function pollFeedTwitter(feed, callback) {
     console.log("Polling twitter feed " + feed.name);
     // use url as screen name
     var opts = url.parse('https://api.twitter.com/1/statuses/user_timeline.json?include_entities=false&include_rts=true&count=50&screen_name=' + feed.url);
@@ -18,6 +18,7 @@ function pollFeedTwitter(feed) {
         function(res){
             if (res.statusCode != 200){
                 console.log("Error polling twitter (code " + http.STATUS_CODES[res.statusCode] + ")");
+                callback();
                 return;
             }
             var chunks = "";
@@ -26,19 +27,20 @@ function pollFeedTwitter(feed) {
             });
             res.on("end", function(){
                 var body = JSON.parse(chunks.toString());
-                processTweets(feed, body);
+                processTweets(feed, body, callback);
             });
         }
     );
     req.end();
 }
 
-function processTweets(feed, tweets) {
+function processTweets(feed, tweets, callback) {
     var proceedNext = function() {
         if (tweets.length > 0) {
             processTweet(feed, tweets.shift(), proceedNext);
         } else {
             console.log("Finished processing tweet source " + feed.name);
+            callback();
         }
     };
     proceedNext();

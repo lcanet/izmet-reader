@@ -87,11 +87,13 @@ var getIcon = function (req, res) {
 
 
 var getDefaultIcon = function (req, res) {
+    var type = req.params.type;
+
     // send default icon
-    fs.readFile('resources/rss.png', function (err, data) {
+    fs.readFile('resources/' + type + '.png', function (err, data) {
         if (err) {
             res.header("Content-Type", "application/json; charset=utf-8");
-            res.send({code:500, description:'Cannot get icon'}, 500);
+            res.send({code:404, description:'Cannot get icon'}, 404);
         } else {
             res.setHeader("Content-Type", "image/png");
             res.setHeader('Cache-Control', 'public,max-age=864000');
@@ -114,7 +116,11 @@ var findAll = function (req, res) {
                 if (f.iconpresent) {
                     links.push({type: 'icon', href:'/feed/' + f.id + '/icon'});
                 } else {
-                    links.push({type: 'icon', href:'/feed/icon/default'});
+                    if (f.type == 'rss') {
+                        links.push({type: 'icon', href:'/feed/default-icons/rss'});
+                    } else if (f.type == 'twitter') {
+                        links.push({type: 'icon', href:'/feed/default-icons/twitter'});
+                    }
                 }
 
                 delete f.imagepresent;
@@ -157,57 +163,77 @@ var addFeed = function (req, res) {
     var feedOk = true;
     var feedImageUrl = null;
 
-    request(feed.url)
-        .pipe(new FeedParser({feedurl:feed.url}))
-        .on('error', function (err) {
-            console.log("Error getting feed " + feed.url, err);
-            feedOk = false;
-            res.send({code:500, description:'Error getting feed'}, 500);
-        })
-        .on('meta', function (meta) {
-            if (meta.image && meta.image.url) {
-                feedImageUrl = meta.image.url;
+    if (feed.type == 'rss') {
+        request(feed.url)
+            .pipe(new FeedParser({feedurl:feed.url}))
+            .on('error', function (err) {
+                console.log("Error getting feed " + feed.url, err);
+                feedOk = false;
+                res.send({code:500, description:'Error getting feed'}, 500);
+            })
+            .on('meta', function (meta) {
+                if (meta.image && meta.image.url) {
+                    feedImageUrl = meta.image.url;
+                }
+                // use provided feed description
+                if (!feed.name && meta.title) {
+                    feed.name = meta.title;
+                }
+                if (!feed.description && meta.description) {
+                    feed.description = meta.description;
+                }
+            })
+            .on('end', function (err) {
+                if (feedOk) {
+                    db.getConnection(function (client) {
+                        client.query("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
+                            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency],
+                            function (err, result) {
+                                if (err) {
+                                    res.send({code:500, description:'Error adding feed'}, 500);
+                                    return;
+                                }
+                                feed.id = result.rows[0].id;
 
-            }
+                                // add feed image
+                                if (feedImageUrl != null) {
+                                    console.log("Downloading image for feed " + feed.name + " on " + feedImageUrl);
+                                    addImageForFeed(feed, feedImageUrl);
+                                }
 
-            // use provided feed description
-            if (!feed.name && meta.title) {
-                feed.name = meta.title;
-            }
-            if (!feed.description && meta.description) {
-                feed.description = meta.description;
-            }
-        })
-        .on('end', function (err) {
-            if (feedOk) {
-                db.getConnection(function (client) {
-                    client.query("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
-                        [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency],
-                        function (err, result) {
-                            if (err) {
-                                res.send({code:500, description:'Error adding feed'}, 500);
-                                return;
-                            }
-                            feed.id = result.rows[0].id;
+                                // also add favicon if there is any
+                                addIconForFeed(feed);
 
-                            // add feed image
-                            if (feedImageUrl != null) {
-                                console.log("Downloading image for feed " + feed.name + " on " + feedImageUrl);
-                                addImageForFeed(feed, feedImageUrl);
-                            }
+                                // initial poll
+                                poller.pollFeed(feed, function () {
+                                    res.send(feed);
+                                });
 
-                            // also add favicon if there is any
-                            addIconForFeed(feed);
-
-                            // initial poll
-                            poller.pollFeed(feed, function () {
-                                res.send(feed);
                             });
-
-                        });
+                    });
+                }
+            });
+    } else if (feed.type == 'twitter') {
+        if (!feed.name) {
+            feed.name = feed.url;
+        }
+        feed.description = 'Twitter of ' + feed.name;
+        var pr = db.execSql("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
+            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency]);
+        pr.then(function(result){
+                feed.id = result.rows[0].id;
+                poller.pollFeed(feed, function () {
+                    res.send(feed);
                 });
-            }
-        });
+            },
+            function(error){
+                console.log("Cannot insert feed", error);
+                res.send({code:500, description:'Error adding feed'}, 500);
+            });
+
+    } else {
+        res.send({code:402, description:'Unknown feed type'}, 402);
+    }
 };
 
 function isImage(response) {

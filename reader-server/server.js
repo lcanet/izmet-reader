@@ -42,7 +42,7 @@ app.get('/feed/:id/icon', services.feed.getIcon);
 app.post('/feed/:id/poll', services.poller.forcePoll);
 app.get('/feed/:id/article', services.article.findByFeed);
 app.post('/feed/:id/article', services.article.addArticle);
-app.get('/feed/icon/default', services.feed.getDefaultIcon);
+app.get('/feed/default-icons/:type', services.feed.getDefaultIcon);
 
 app.post('/feed/poll_all', services.poller.forcePollAll);
 
