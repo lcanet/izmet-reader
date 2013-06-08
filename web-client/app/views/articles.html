@@ -1,7 +1,12 @@
 <div class="articles-view">
     <div class="btn-group" ng-show="articles.length > 0">
         <a class="btn btn-small" href="" ng-click="markAllAsRead()">Mark all as read</a>
-
+        <a class="btn btn-small" href="" ng-click="toggleUnread(true)" ng-show="unreadOnly == false">
+            Toggle unread
+        </a>
+        <a class="btn btn-small" href="" ng-click="toggleUnread(false)" ng-show="unreadOnly == true">
+            Toggle read
+        </a>
     </div>
 
     <header ng-show="selectedFeed != null">

@@ -14,6 +14,9 @@ angular.module('izmet')
         // don't do another request when scrolling events fire in reaction of page change
         var requestInflight = false;
 
+        // fetch only unread articles
+        $scope.unreadOnly = true;
+
         function getPage() {
             var resultHandler= function(result) {
                 if (result.length < pageSize) {
@@ -26,12 +29,13 @@ angular.module('izmet')
                 requestInflight = false;
             };
 
+            var unreadOnly = $scope.unreadOnly;
             if (currentFeedId === 'all') {
-                $http.get('/article', {params: {limit: pageSize, offset:lastOffset}})
+                $http.get('/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}})
                     .success(resultHandler);
                 requestInflight = true;
             } else if (currentFeedId !== null) {
-                $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset}})
+                $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
                     .success(resultHandler);
                 requestInflight = true;
             }
@@ -120,5 +124,18 @@ angular.module('izmet')
                     });
             }
         };
+
+        $scope.toggleUnread = function(val) {
+            $scope.unreadOnly = val;
+
+            // reset
+            $scope.articles = null;
+            $scope.currentArticle = null;
+            pageSize = 100;
+            lastOffset = 0;
+            endOfFeed = false;
+            getPage();
+        };
+
 
     });
