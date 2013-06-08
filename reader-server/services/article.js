@@ -3,7 +3,7 @@ var db = require('../db/db.js'),
     und = require('underscore'),
     promise = require("promises-a");
 
-function getArticles(res, feedId, read, limit, offset) {
+function getArticles(res, feedId, unreadOnly, limit, offset) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var p = [limit, offset];
@@ -17,7 +17,7 @@ function getArticles(res, feedId, read, limit, offset) {
         q += ' and a.feed_id = $3';
         p.push(feedId);
     }
-    if (!read) {
+    if (unreadOnly) {
         q += " and read = false";
     }
     q += " order by article_date desc";
@@ -44,7 +44,8 @@ var findByFeed = function (req, res) {
     } else {
         var limit = parseInt(req.query.limit) || 100;
         var offset = parseInt(req.query.offset) || 0;
-        getArticles(res, feedId, req.query.read, limit, offset);
+        var unreadOnly = "true" == req.query.unreadOnly;
+        getArticles(res, feedId, unreadOnly, limit, offset);
     }
 };
 
@@ -52,8 +53,9 @@ var findArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var limit = parseInt(req.query.limit) || 100;
     var offset = parseInt(req.query.offset) || 0;
+    var unreadOnly = "true" == req.query.unreadOnly;
 
-    getArticles(res, null, req.query.read, limit, offset);
+    getArticles(res, null, unreadOnly, limit, offset);
 };
 
 
