@@ -11,15 +11,15 @@ angular.module('izmet')
         });
 
         $scope.$on('updateUnread', function(evt, feedId, arg) {
-            var feed = _.find($scope.feeds, function(elt) { return elt.id == feedId; });
-            if (feed) {
+            var matching = _.filter($scope.feeds, function(elt) { return feedId === null || elt.id == feedId; });
+            _.each(matching, function(feed) {
                 if (arg.delta) {
                     feed.nb_unread += arg.delta;
                 } else {
                     feed.nb_unread = arg.value;
                 }
-                $scope.$emit('updateTotalUnread');
-            }
+            });
+            $scope.$emit('updateTotalUnread');
         });
 
 

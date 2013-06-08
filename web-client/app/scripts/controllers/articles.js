@@ -101,7 +101,14 @@ angular.module('izmet')
 
         $scope.markAllAsRead = function(){
             if (currentFeedId === 'all') {
-                // TODO
+                $http.put('/article', { all: true })
+                    .success(function(result){
+                        _.each($scope.articles, function(elt){
+                            elt.read = true;
+                        });
+                        $rootScope.$broadcast('updateUnread', null, { value: 0 });
+
+                    });
             } else if (currentFeedId != null) {
                 $http.put('/feed/' + currentFeedId + '/mark')
                     .success(function(result){
