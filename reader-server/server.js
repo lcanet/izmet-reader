@@ -15,10 +15,7 @@ var app = express();
 
 console.log("Starting in mode " + app.get('env'));
 
-// specific to dev
-if ('development' == app.get('env')) {
-    app.use(express.errorHandler());
-}
+app.use(express.errorHandler());
 
 // all environments
 app.use(express.logger('dev'));

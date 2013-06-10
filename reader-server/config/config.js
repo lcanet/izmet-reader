@@ -3,9 +3,9 @@ var configDev = require('./config.dev.js'),
 
 console.log("Environment: " + process.env.NODE_ENV);
 
-if (process.env.NODE_ENV == 'production') {
-    module.exports = configProd;
-} else {
+if (process.env.NODE_ENV == 'development') {
     module.exports = configDev;
+} else {
+    module.exports = configProd;
 }
 
