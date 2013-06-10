@@ -137,5 +137,31 @@ angular.module('izmet')
             getPage();
         };
 
+        // nav clavier
+        $scope.$on('navigateNextArticle', function(){
+            if ($scope.currentArticle != null && $scope.articles != null){
+                var idx = $scope.articles.indexOf($scope.currentArticle);
+                if (idx != -1) {
+                    if (idx < ($scope.articles.length - 1)) {
+                        $scope.selectArticle($scope.articles[idx+1]);
+                    } else {
+                        $scope.selectArticle($scope.currentArticle);
+                    }
+                }
+            }
+        });
+        $scope.$on('navigatePrevArticle', function(){
+            if ($scope.currentArticle != null && $scope.articles != null){
+                var idx = $scope.articles.indexOf($scope.currentArticle);
+                if (idx != -1) {
+                    if (idx > 0) {
+                        $scope.selectArticle($scope.articles[idx-1]);
+                    } else {
+                        $scope.selectArticle($scope.currentArticle);
+                    }
+                }
+            }
+        });
+
 
     });
