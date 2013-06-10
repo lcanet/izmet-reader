@@ -3,7 +3,7 @@
 /* global alert */
 
 angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress'])
-    .config(function ($routeProvider, $httpProvider) {
+    .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         $routeProvider.when('/:feedId', {
             templateUrl: 'views/articles.html',
             controller: 'ArticlesCtrl'
@@ -14,7 +14,7 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
             $('#ajax-loader').show();
             return d;
         });
-        $httpProvider.responseInterceptors.push(function($q){
+        $httpProvider.responseInterceptors.push(['$q', function($q){
             return function(promise){
                 return promise.then(function(res){
                     $('#ajax-loader').hide();
@@ -29,6 +29,6 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
                     return $q.reject(res);
                 });
             };
-        });
+        }]);
 
-    });
+    }]);

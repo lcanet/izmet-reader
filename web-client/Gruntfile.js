@@ -206,8 +206,8 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     '<%= yeoman.dist %>/styles/main.css': [
-                        '.tmp/styles/{,*/}*.css',
-                        '<%= yeoman.app %>/styles/{,*/}*.css'
+                        '.tmp/styles/{,*/}*.css'
+                        //'<%= yeoman.app %>/styles/{,*/}*.css'
                     ]
                 }
             }
@@ -313,7 +313,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'clean:dist',
         'jshint',
-        'test',
+        //'test',
         'coffee',
         'compass:dist',
         'useminPrepare',

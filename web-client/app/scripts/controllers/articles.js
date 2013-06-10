@@ -1,4 +1,5 @@
 'use strict';
+/* global _ */
 
 angular.module('izmet')
     .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope) {
@@ -106,16 +107,16 @@ angular.module('izmet')
         $scope.markAllAsRead = function(){
             if (currentFeedId === 'all') {
                 $http.put('/article', { all: true })
-                    .success(function(result){
+                    .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.read = true;
                         });
                         $rootScope.$broadcast('updateUnread', null, { value: 0 });
 
                     });
-            } else if (currentFeedId != null) {
+            } else if (currentFeedId !== null) {
                 $http.put('/feed/' + currentFeedId + '/mark')
-                    .success(function(result){
+                    .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.read = true;
                         });
@@ -139,7 +140,7 @@ angular.module('izmet')
 
         // nav clavier
         $scope.$on('navigateNextArticle', function(){
-            if ($scope.currentArticle != null && $scope.articles != null){
+            if ($scope.currentArticle !== null && $scope.articles !== null){
                 var idx = $scope.articles.indexOf($scope.currentArticle);
                 if (idx != -1) {
                     if (idx < ($scope.articles.length - 1)) {
@@ -151,7 +152,7 @@ angular.module('izmet')
             }
         });
         $scope.$on('navigatePrevArticle', function(){
-            if ($scope.currentArticle != null && $scope.articles != null){
+            if ($scope.currentArticle !== null && $scope.articles !== null){
                 var idx = $scope.articles.indexOf($scope.currentArticle);
                 if (idx != -1) {
                     if (idx > 0) {
