@@ -76,8 +76,12 @@ var addArticle = function (req, res) {
         queryExists = "select count(1) as nb from article where feed_id = $1 and article_id = $2";
         queryParams = [feedId, article.article_id];
     } else {
-        queryExists = "select count(1) as nb from article where feed_id = $1 and article_date = $2 and title = $3";
-        queryParams = [feedId, new Date(article.article_date), article.title];
+        queryExists = "select count(1) as nb from article where feed_id = $1 and article_date = $2";
+        queryParams = [feedId, new Date(article.article_date)];
+        if (article.title != null) {
+            queryExists += " and title = $3";
+            queryParams.push(article.title);
+        }
     }
 
     db.execSql(queryExists, queryParams)
