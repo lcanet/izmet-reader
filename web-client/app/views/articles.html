@@ -28,7 +28,7 @@
                     {{article.feed.name}}
                 </div>
                 <div class="span6">
-                    {{article.title}}
+                    {{article.title | titleFilter}}
                 </div>
                 <div class="span2">
                     {{article | ago:'article_date' }}

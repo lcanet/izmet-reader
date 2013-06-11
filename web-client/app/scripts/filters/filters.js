@@ -31,6 +31,16 @@ angular.module('izmet')
             return text.replace(new RegExp('href="http', 'g'), 'target="_blank" href="http');
         };
     })
+    .filter('titleFilter', function () {
+        'use strict';
+        return function (title) {
+            if (title === null || title === '') {
+                return 'Untitled article';
+            } else {
+                return title;
+            }
+        };
+    })
     .filter('iconLink', function () {
         'use strict';
         return function (arg) {
