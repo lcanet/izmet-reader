@@ -25,10 +25,10 @@ angular.module('izmet')
     .filter('fixLinks', function () {
         'use strict';
         return function (text) {
-            if (text === null){
-                return null;
+            if (text){
+                return text.replace(new RegExp('href="http', 'g'), 'target="_blank" href="http');
             }
-            return text.replace(new RegExp('href="http', 'g'), 'target="_blank" href="http');
+            return text;
         };
     })
     .filter('titleFilter', function () {
