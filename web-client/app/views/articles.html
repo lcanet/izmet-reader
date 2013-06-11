@@ -1,6 +1,6 @@
 <div class="articles-view">
 
-    <div class="feed-toolbar"  ng-show="selectedFeed != null">
+    <div class="feed-toolbar"  ng-show="currentFeedId != null">
         <a class="btn btn-small" href="" ng-click="markAllAsRead()">Mark all as read</a>
         <a class="btn btn-small" href="" ng-click="toggleUnread(true)" ng-show="unreadOnly == false">
             Show only unread
@@ -10,8 +10,13 @@
         </a>
     </div>
 
-    <header ng-show="selectedFeed != null">
-        {{selectedFeed.name}}
+    <header ng-show="currentFeedId != null">
+        <span ng-show="selectedFeed != null">
+            {{selectedFeed.name}}
+        </span>
+        <span ng-hide="selectedFeed != null">
+            All articles
+        </span>
     </header>
 
     <div class="no-articles" ng-show="articles.length == 0">

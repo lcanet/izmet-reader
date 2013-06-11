@@ -9,11 +9,11 @@ angular.module('izmet')
         var lastOffset ;
         var endOfFeed;      // marker of end of feed
 
-        // mode
-        var currentFeedId;
-
         // don't do another request when scrolling events fire in reaction of page change
         var requestInflight = false;
+
+        // mode
+        $scope.currentFeedId = null;
 
         // fetch only unread articles
         $scope.unreadOnly = true;
@@ -31,19 +31,18 @@ angular.module('izmet')
             };
 
             var unreadOnly = $scope.unreadOnly;
-            if (currentFeedId === 'all') {
+            if ($scope.currentFeedId === 'all') {
                 $http.get('/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}})
                     .success(resultHandler);
                 requestInflight = true;
-            } else if (currentFeedId !== null) {
-                $http.get('/feed/' + currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
+            } else if ($scope.currentFeedId !== null) {
+                $http.get('/feed/' + $scope.currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
                     .success(resultHandler);
                 requestInflight = true;
             }
         }
 
         // initialisation
-        currentFeedId = null;
 
         if ($routeParams.feedId) {
 
@@ -54,10 +53,10 @@ angular.module('izmet')
             lastOffset = 0;
             endOfFeed = false;
 
-            currentFeedId = $routeParams.feedId;
+            $scope.currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
-            if (currentFeedId !== null) {
-                $http.get('/feed/' + currentFeedId).success(function(result){
+            if ($scope.currentFeedId !== null) {
+                $http.get('/feed/' + $scope.currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
                 });
             }
@@ -105,7 +104,7 @@ angular.module('izmet')
         };
 
         $scope.markAllAsRead = function(){
-            if (currentFeedId === 'all') {
+            if ($scope.currentFeedId === 'all') {
                 $http.put('/article', { all: true })
                     .success(function(){
                         _.each($scope.articles, function(elt){
@@ -114,13 +113,13 @@ angular.module('izmet')
                         $rootScope.$broadcast('updateUnread', null, { value: 0 });
 
                     });
-            } else if (currentFeedId !== null) {
-                $http.put('/feed/' + currentFeedId + '/mark')
+            } else if ($scope.currentFeedId !== null) {
+                $http.put('/feed/' + $scope.currentFeedId + '/mark')
                     .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.read = true;
                         });
-                        $rootScope.$broadcast('updateUnread', currentFeedId, { value: 0 });
+                        $rootScope.$broadcast('updateUnread', $scope.currentFeedId, { value: 0 });
 
                     });
             }
