@@ -1,10 +1,12 @@
 <ul ng-controller="FeedsCtrl" class="feed-list">
+    <li class="feed-group-sep"></li>
     <li class="all-feeds" >
        <a href="#/all" title="all articles" ng-class="getClassForAllArticles()">
           All articles
            <span ng-show="totalUnread > 0">({{totalUnread}})</span>
        </a>
     </li>
+    <li class="feed-group-sep"></li>
     <li ng-repeat="feed in feeds">
         <a href="#/{{feed.id}}" title="{{feed.description}}" ng-click="selectFeed(feed)"
                 ng-class="getClassForFeed(feed)">

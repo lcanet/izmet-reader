@@ -1,5 +1,8 @@
 @import "compass_twitter_bootstrap";
 
+.cb {
+  clear:both;
+}
 
 .article .unread {
   font-weight: bold;
@@ -8,9 +11,10 @@
   background-color: #f0f0f0;
 }
 
-.article .header {
-  cursor: 'hand';
+.article .article-header {
+  cursor: hand;
 }
+
 .article {
   border-bottom: 1px solid #ddd;
 }
@@ -37,4 +41,25 @@
 }
 #detail-box {
   display: none;
+}
+
+.feed-group-sep {
+  border-bottom: 1px solid #c0c0c0;
+  margin-bottom: 5px;
+  height: 8px
+}
+
+.articles-view header {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin: 5px 0;
+  border-top: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  color: #454747;
+}
+
+.articles-view .feed-toolbar {
+  margin-top: 10px;
 }

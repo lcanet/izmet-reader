@@ -1,5 +1,6 @@
 <div class="articles-view">
-    <div class="btn-group" ng-show="selectedFeed != null">
+
+    <div class="feed-toolbar"  ng-show="selectedFeed != null">
         <a class="btn btn-small" href="" ng-click="markAllAsRead()">Mark all as read</a>
         <a class="btn btn-small" href="" ng-click="toggleUnread(true)" ng-show="unreadOnly == false">
             Show only unread
@@ -10,7 +11,7 @@
     </div>
 
     <header ng-show="selectedFeed != null">
-        selected feed: {{selectedFeed.name}}
+        {{selectedFeed.name}}
     </header>
 
     <div class="no-articles" ng-show="articles.length == 0">
@@ -22,12 +23,12 @@
          infinite-scroll-immediate-check="false"
          infinite-scroll="getNextPage()">
         <div ng-repeat="article in articles" class="article" autoscroll="article.id">
-            <div class="header row" ng-class="getClassForArticleHeader(article)"
+            <div class="article-header row-fluid" ng-class="getClassForArticleHeader(article)"
                  ng-click="selectArticle(article)">
-                <div class="span3">
+                <div class="span2">
                     {{article.feed.name}}
                 </div>
-                <div class="span6">
+                <div class="span8">
                     {{article.title | titleFilter}}
                 </div>
                 <div class="span2">
@@ -36,7 +37,7 @@
             </div>
             <detailbox detailbox-show="currentArticle == article"
                        detailbox-content="detail-box"
-                        class="content row">
+                        class="content">
             </detailbox>
 
         </div>
