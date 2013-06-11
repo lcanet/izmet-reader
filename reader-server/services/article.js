@@ -9,7 +9,7 @@ function getArticles(res, feedId, unreadOnly, limit, offset) {
     var p = [limit, offset];
 
     var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,' +
-        'f.id as feedid, f.name,f.description,f.url,f.type ' +
+        'f.id as feedid, f.name,f.description,f.type ' +
         'FROM article a ' +
         'INNER JOIN feed f on f.id = a.feed_id ' +
         'where 1=1 ';
@@ -25,7 +25,7 @@ function getArticles(res, feedId, unreadOnly, limit, offset) {
     db.execSql(q, p).then(function (result) {
         und.each(result.rows, function (elt) {
             // replace "feed" object
-            utils.objectify(elt, "feed", "name", "description", "url", "type", "feedid");
+            utils.objectify(elt, "feed", "name", "description", "type", "feedid");
             // some manual changes
             elt.feed.id = elt.feed.feedid;
             delete elt.feed.feedid;
