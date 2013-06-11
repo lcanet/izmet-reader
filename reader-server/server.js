@@ -23,6 +23,9 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(middleware.cacheHandler());
 app.use("/web-client", express.static(__dirname + '/web-client'));
+app.use('/', function(req, res){
+    res.redirect('/web-client/index.html');
+});
 
 // cors
 app.options("*", middleware.allowCrossDomain);
