@@ -23,9 +23,6 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(middleware.cacheHandler());
 app.use("/web-client", express.static(__dirname + '/web-client'));
-app.use('/', function(req, res){
-    res.redirect('/web-client/index.html');
-});
 
 // cors
 app.options("*", middleware.allowCrossDomain);
@@ -50,6 +47,11 @@ app.post('/feed/poll_all', services.poller.forcePollAll);
 app.get('/article', services.article.findArticles);
 app.put('/article', services.article.markArticles);
 app.put('/article/:articleId', services.article.markArticle);
+
+// redirect root at end
+app.use('/', function(req, res){
+    res.redirect('/web-client/index.html');
+});
 
 app.listen(config.serverPort);
 console.log("Server launched on port " + config.serverPort);
