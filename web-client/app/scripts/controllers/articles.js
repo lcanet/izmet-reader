@@ -50,7 +50,7 @@ angular.module('izmet')
             // reset articles
             $scope.articles = null;
             $scope.currentArticle = null;
-            pageSize = 100;
+            pageSize = 50;
             lastOffset = 0;
             endOfFeed = false;
 
@@ -132,7 +132,7 @@ angular.module('izmet')
             // reset
             $scope.articles = null;
             $scope.currentArticle = null;
-            pageSize = 100;
+            pageSize = 50;
             lastOffset = 0;
             endOfFeed = false;
             getPage();
