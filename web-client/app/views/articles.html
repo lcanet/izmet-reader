@@ -48,7 +48,7 @@
                 {{currentArticle.article_date | date:'medium' }}
             </span>
 
-            <span ng-bind-html="currentArticle.content"></span>
+            <span ng-bind-html="currentArticle.content | fixLinks"></span>
         </div>
     </div>
 </div>

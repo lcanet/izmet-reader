@@ -22,6 +22,15 @@ angular.module('izmet')
             return arg.__cache_ago;
         };
     })
+    .filter('fixLinks', function () {
+        'use strict';
+        return function (text) {
+            if (text === null){
+                return null;
+            }
+            return text.replace(new RegExp('href="http', 'g'), 'target="_blank" href="http');
+        };
+    })
     .filter('iconLink', function () {
         'use strict';
         return function (arg) {
