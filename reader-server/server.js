@@ -13,12 +13,12 @@ var express = require('express')
 
 var app = express();
 
-console.log("Starting in mode " + app.get('env'));
+console.log("Starting in mode " + config.mode);
 
 app.use(express.errorHandler());
 
 // all environments
-app.use(express.logger('dev'));
+app.use(express.logger(config.isDev ? 'dev' : 'default'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(middleware.cacheHandler());

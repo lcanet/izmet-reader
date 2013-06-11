@@ -5,5 +5,9 @@ module.exports = {
     apiLocalUrl: 'http://localhost:8080',
     pgUrl: 'postgres://reader:reader42@localhost/reader',
 
-    maxFeedsPerPoll: 10
+    maxFeedsPerPoll: 10,
+
+    mode: 'production',
+    isDev: false
+
 };
