@@ -18,13 +18,14 @@ var findById = function (req, res) {
 
     db.getConnection(function (client) {
         client.query(
-            'SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread FROM feed where id = $1',
+            'SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is not null as imagePresent, icon is not null as iconPresent FROM feed where id = $1',
             [id],
             function (err, result) {
                 if (!result.rows || result.rows.length == 0) {
                     res.send({code: 404, description: 'Not found'}, 404);
                 } else {
-                    res.send(JSON.stringify(result.rows[0]));
+                    processFeedLinks(result.rows);
+                    res.send(result.rows[0]);
                 }
             });
     });
@@ -102,32 +103,35 @@ var getDefaultIcon = function (req, res) {
     });
 };
 
+function processFeedLinks(rows) {
+    und.each(rows, function(f){
+        var links = [];
+        if (f.imagepresent) {
+            links.push({type: 'image', href:'/feed/' + f.id + '/image'});
+        }
+        if (f.iconpresent) {
+            links.push({type: 'icon', href:'/feed/' + f.id + '/icon'});
+        } else {
+            if (f.type == 'rss') {
+                links.push({type: 'icon', href:'/feed/default-icons/rss'});
+            } else if (f.type == 'twitter') {
+                links.push({type: 'icon', href:'/feed/default-icons/twitter'});
+            }
+        }
+
+        delete f.imagepresent;
+        delete f.iconpresent;
+        f.links = links;
+    });
+
+}
 
 var findAll = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     db.getConnection(function (client) {
         client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is not null as imagePresent, icon is not null as iconPresent ' +
             'FROM feed order by id', function (err, result) {
-            und.each(result.rows, function(f){
-                var links = [];
-                if (f.imagepresent) {
-                    links.push({type: 'image', href:'/feed/' + f.id + '/image'});
-                }
-                if (f.iconpresent) {
-                    links.push({type: 'icon', href:'/feed/' + f.id + '/icon'});
-                } else {
-                    if (f.type == 'rss') {
-                        links.push({type: 'icon', href:'/feed/default-icons/rss'});
-                    } else if (f.type == 'twitter') {
-                        links.push({type: 'icon', href:'/feed/default-icons/twitter'});
-                    }
-                }
-
-                delete f.imagepresent;
-                delete f.iconpresent;
-                f.links = links;
-            });
-
+            processFeedLinks(result.rows);
             res.send(result.rows);
         });
     });
