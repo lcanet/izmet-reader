@@ -41,6 +41,30 @@ angular.module('izmet')
             }
         };
     })
+    .filter('ellipsis', function () {
+        'use strict';
+        return function (text, length) {
+            if (text === null) {
+                return null;
+            }
+            if (text.length <= length) {
+                return text;
+            }
+            return text.substring(0, length) + '...';
+        };
+    })
+    .filter('feedUrl', function () {
+        'use strict';
+        return function (feed) {
+            if (feed=== null) {
+                return null;
+            }
+            if (feed.type === 'twitter') {
+                return 'http://twitter.com/' + feed.url;
+            }
+            return feed.url;
+        };
+    })
     .filter('iconLink', function () {
         'use strict';
         return function (arg) {
@@ -48,6 +72,20 @@ angular.module('izmet')
                 for (var i = 0; i < arg.links.length ; i++) {
                     var l = arg.links[i];
                     if (l.type === 'icon') {
+                        return l.href;
+                    }
+                }
+            }
+            return null;
+        };
+    })
+    .filter('imageLink', function () {
+        'use strict';
+        return function (arg) {
+            if (arg && arg.links) {
+                for (var i = 0; i < arg.links.length ; i++) {
+                    var l = arg.links[i];
+                    if (l.type === 'image') {
                         return l.href;
                     }
                 }

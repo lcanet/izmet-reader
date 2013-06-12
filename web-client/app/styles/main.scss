@@ -26,18 +26,17 @@ $sepGrisClair: #c0c0c0;
 .feed-search-form {
   margin-left: 5px;
 }
-.feed-list {
-  ul {
-    list-style-type: none;
-    margin-left: 5px;
-    margin-top: 0;
-    margin-right: 0;
-    margin-bottom: 0;
-  }
+.icon {
+  height: 16px;
+}
 
-  .icon {
-    height: 16px;
-  }
+.feed-list {
+  list-style-type: none;
+  margin-left: 5px;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+
   .unread {
     font-weight: bold;
   }
@@ -45,11 +44,12 @@ $sepGrisClair: #c0c0c0;
 
 .app-title {
   padding-left: 25px;
+  h1 {
+    font-weight: bold;
+    font-size: 1.5em;
+  }
 }
-.app-title h1 {
-  font-weight: bold;
-  font-size: 1.5em;
-}
+
 #ajax-loader {
   display: none;
   position: fixed;
@@ -69,14 +69,26 @@ $sepGrisClair: #c0c0c0;
 .articles-view {
 
   header {
-    font-weight: bold;
-    font-size: 1.2em;
     margin: 5px 0;
     border-top: 1px solid $sepGrisClair;
     border-bottom: 1px solid $sepGrisClair;
     padding-bottom: 5px;
     padding-top: 5px;
     color: #454747;
+    .feed-title {
+      display: inline;
+      font-size: 1.2em;
+      font-weight: bold
+    }
+    .description {
+      font-weight: normal;
+      font-size: 0.9em
+    }
+  }
+
+  .popover {
+    font-size: 1em;
+    font-weight: normal;
   }
 
   .feed-toolbar {

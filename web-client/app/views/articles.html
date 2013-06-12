@@ -1,4 +1,23 @@
 <div class="articles-view">
+    <script type="text/ng-template" id="feedDetail.html">
+        <div style="font-size: 1em; font-weight: normal">
+        <h4>
+            <a target="_blank" href="{{selectedFeed | feedUrl}}">
+                {{selectedFeed.name}}
+            </a>
+        </h4>
+        <img ng-src="{{ selectedFeed | imageLink }}" height="16" />
+        <p>
+            {{selectedFeed.description}}
+        </p>
+        <p>
+            Type: <em>{{selectedFeed.type}}</em>  <img ng-src="{{ selectedFeed | iconLink }}" height="16" class="icon"/>
+
+            <br/>
+            Last poll: <em>{{selectedFeed.last_poll | date:'medium' }} </em> (frequency: <em>{{selectedFeed.poll_frequency}}</em> minutes)
+        </p>
+        </div>
+    </script>
 
     <div class="feed-toolbar"  ng-show="currentFeedId != null">
         <a class="btn btn-small" href="" ng-click="markAllAsRead()">Mark all as read</a>
@@ -12,7 +31,18 @@
 
     <header ng-show="currentFeedId != null">
         <span ng-show="selectedFeed != null">
-            {{selectedFeed.name}}
+            <span class="feed-title">
+               {{selectedFeed.name}}
+            </span>
+            &nbsp; - &nbsp;
+            <span class="description">
+                <a title="Informations"
+                   data-placement="bottom"
+                   bs-popover="'feedDetail.html'">
+                    {{selectedFeed.description | ellipsis:80}}
+                    <i class="icon icon-h-sign"></i>
+                </a>
+            </span>
         </span>
         <span ng-hide="selectedFeed != null">
             All articles
@@ -21,7 +51,6 @@
 
     <div class="no-articles" ng-show="articles.length == 0">
         No articles found
-
     </div>
 
     <div class="articles-list" infinite-scroll-distance="3"

@@ -2,7 +2,7 @@
 /* global $ */
 /* global alert */
 
-angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress'])
+angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress', '$strap'])
     .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         $routeProvider.when('/:feedId', {
             templateUrl: 'views/articles.html',
