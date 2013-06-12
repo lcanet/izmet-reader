@@ -23,7 +23,18 @@ $sepGrisClair: #c0c0c0;
   }
 }
 
+.feed-search-form {
+  margin-left: 5px;
+}
 .feed-list {
+  ul {
+    list-style-type: none;
+    margin-left: 5px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
   .icon {
     height: 16px;
   }
