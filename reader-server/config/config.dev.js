@@ -8,5 +8,10 @@ module.exports = {
     maxFeedsPerPoll: 10,
 
     mode: 'development',
-    isDev: true
+    isDev: true,
+
+    twitter: {
+        key: '',
+        secret: ''
+    }
 };
