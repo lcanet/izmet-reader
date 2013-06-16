@@ -55,11 +55,16 @@ angular.module('izmet')
 
             $scope.currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
-            if ($scope.currentFeedId !== null) {
+            if ($scope.currentFeedId !== null && $scope.currentFeedId !== 'all') {
                 $http.get('/feed/' + $scope.currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
+                    $rootScope.$broadcast('feedSelected', result);
                 });
+            } else {
+                $rootScope.$broadcast('feedSelected', null);
             }
+
+            // fetch the first page
             getPage();
         }
 

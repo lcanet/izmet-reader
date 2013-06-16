@@ -30,8 +30,19 @@ angular.module('izmet')
                 }, 0);
         });
 
+        var currentlySelectedFeed = null;
+        $scope.$on('feedSelected', function($evt, x){
+            currentlySelectedFeed = x;
+        });
+
         $scope.getClassForFeed = function (feed) {
-            return feed.nb_unread > 0 ? 'unread' : '';
+            return feed.nb_unread > 0 ? 'unread' :'';
+        };
+        $scope.getRowClassForFeed = function(feed){
+            if (currentlySelectedFeed != null && currentlySelectedFeed.id === feed.id){
+                return 'current';
+            }
+            return '';
         };
         $scope.getClassForAllArticles = function () {
             return $scope.totalUnread > 0 ? 'unread' : '';
