@@ -64,6 +64,7 @@
                 </div>
                 <div class="span8">
                     {{article.title | titleFilter}}
+                    <span class="star" ng-class="isArticledStarred(article)" ng-click="toggleStar(article)"></span>
                 </div>
                 <div class="span2">
                     {{article | ago:'article_date' }}
@@ -77,7 +78,10 @@
         </div>
 
         <div id="detail-box">
-            <h3><a target="_blank" href="{{currentArticle.url}}">{{currentArticle.title}}</a></h3>
+            <h3>
+                <a target="_blank" href="{{currentArticle.url}}">{{currentArticle.title}}</a>
+                <span class="star-big" ng-class="isArticledStarred(currentArticle)" ng-click="toggleStar(currentArticle)"></span>
+            </h3>
             <span>
                 {{currentArticle.article_date | date:'medium' }}
             </span>

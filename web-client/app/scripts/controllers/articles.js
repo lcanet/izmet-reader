@@ -163,5 +163,17 @@ angular.module('izmet')
             }
         });
 
+        /* ********************** gestion stars ************ */
+        $scope.isArticledStarred = function(a){
+            return a !== null && a.starred ? 'starred':'';
+        };
+        $scope.toggleStar = function(a){
+            a.starred = !a.starred;
+            $http.put('/article/' + a.id, { starred: a.starred });
+
+        };
+
+
+
 
     });

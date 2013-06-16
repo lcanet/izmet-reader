@@ -21,7 +21,8 @@ CREATE TABLE article
   title character varying(256),
   content text,
   url character varying(1024),
-  read boolean DEFAULT false,
+  read boolean NOT NULL DEFAULT false,
+  starred boolean NOT NULL DEFAULT false,
   CONSTRAINT pk_article PRIMARY KEY (id )
 )
 WITH (

@@ -15,6 +15,35 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="stylesheet" href="styles/main.css">
+    <style type="text/css">
+        .star-big {
+            background: url('images/star-off-big.png');
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+
+        }
+        .star-big:hover {
+            background: url('images/star-on-big.png')
+        }
+        .star-big.starred {
+            background: url('images/star-on-big.png')
+        }
+        .star {
+            background: url('images/star-off.png');
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+
+        }
+        .star:hover {
+            background: url('images/star-on.png')
+        }
+        .star.starred {
+            background: url('images/star-on.png')
+        }
+
+    </style>
 </head>
 <body ng-app="izmet" ng-controller="GlobalCtrl" ui-keydown="{74:'keyNavNext($event)', 75:'keyNavPrev($event)'}">
 <!--[if lt IE 7]>
