@@ -8,7 +8,7 @@ function getArticles(res, feedId, unreadOnly, limit, offset) {
 
     var p = [limit, offset];
 
-    var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,' +
+    var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,a.starred,' +
         'f.id as feedid, f.name,f.description,f.type ' +
         'FROM article a ' +
         'INNER JOIN feed f on f.id = a.feed_id ' +
@@ -162,14 +162,32 @@ var markArticle = function (req, res) {
         return;
     }
     var state = req.body;
-    updateArticles([
-        {
-            id:articleId,
-            read:state.read
+
+    var sql = 'update article set ';
+    var sqlParams = [];
+    var sqlFragments = [];
+    if (state.hasOwnProperty('read')) {
+        sqlParams.push(state.read);
+        sqlFragments.push('read = $' + (sqlParams.length));
+    }
+    if (state.hasOwnProperty('starred')){
+        sqlParams.push(state.starred);
+        sqlFragments.push('starred = $' + (sqlParams.length));
+    }
+
+    sqlParams.push(articleId);
+    sql = 'update article set ' + sqlFragments.join(',') + ' where id = $' + (sqlParams.length);
+
+    db.execSql(sql, sqlParams)
+        .then(
+        function(r){
+            res.send({code: 200, description: 'ok'}, 200);
+        },
+        function(err){
+            console.error('cannot update article', err);
+            res.send({code: 500, description: 'cannot update'}, 500);
         }
-    ]).then(function () {
-            res.send("");
-        });
+    );
 };
 
 
@@ -187,11 +205,6 @@ var markArticles = function (req, res) {
                 res.send({code: 500, description: "Cannot update articles"}, 500);
 
             });
-
-    } else {
-        updateArticles(cmd).then(function (result) {
-            res.send("");
-        });
     }
 
 };
