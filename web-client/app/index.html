@@ -47,6 +47,8 @@
         </div>
     </div>
 
+    <ng-include src="'views/feed-add.html'"/>
+
 <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
 
 <!-- build:js scripts/libs.js -->
@@ -60,6 +62,7 @@
 <script src="components/angular-ui-utils/modules/keypress/keypress.js"></script>
 <script src="components/bootstrap/js/bootstrap-tooltip.js"></script>
 <script src="components/bootstrap/js/bootstrap-popover.js"></script>
+<script src="components/bootstrap/js/bootstrap-modal.js"></script>
 <script src="components/angular-strap/dist/angular-strap.js"></script>
 <!-- endbuild -->
 
@@ -67,10 +70,12 @@
 <script src="scripts/app.js"></script>
 <script src="scripts/controllers/global.js"></script>
 <script src="scripts/controllers/feeds.js"></script>
+<script src="scripts/controllers/feedadd.js"></script>
 <script src="scripts/controllers/articles.js"></script>
 <script src="scripts/filters/filters.js"></script>
 <script src="scripts/directives/detailbox.js"></script>
 <script src="scripts/directives/autoscroll.js"></script>
+<script src="scripts/directives/modal.js"></script>
 <!-- endbuild -->
 
 </body>

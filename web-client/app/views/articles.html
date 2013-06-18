@@ -27,6 +27,9 @@
         <a class="btn btn-small" href="" ng-click="toggleUnread(false)" ng-show="unreadOnly == true">
             Show all
         </a>
+        <a class="btn btn-small btn-danger" href="" ng-click="deleteFeed()" ng-show="selectedFeed != null">
+            Delete feed
+        </a>
     </div>
 
     <header ng-show="currentFeedId != null">

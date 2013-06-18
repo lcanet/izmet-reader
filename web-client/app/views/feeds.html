@@ -1,7 +1,9 @@
+<div ng-controller="FeedsCtrl">
 <form class="form-search feed-search-form">
     <input type="text" ng-model="filterText" class="search-query" placeholder="filter"/>
+    <a href="" ng-click="showAddFeed()">+ add</a>
 </form>
-<ul ng-controller="FeedsCtrl" class="feed-list">
+<ul class="feed-list">
     <li class="feed-group-sep"></li>
     <li class="all-feeds" >
        <a href="#/all" title="all articles" ng-class="getClassForAllArticles()">
@@ -21,3 +23,4 @@
 
 
 </ul>
+</div>

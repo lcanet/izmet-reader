@@ -2,7 +2,8 @@
 /* global _ */
 
 angular.module('izmet')
-    .controller('FeedsCtrl', function ($scope, $http, $rootScope) {
+    .controller('FeedsCtrl', function ($scope, $http, $rootScope, $location) {
+        $scope.filterText = '';
         $scope.totalUnread = 0;
 
         $http.get('/feed').success(function(result){
@@ -39,7 +40,7 @@ angular.module('izmet')
             return feed.nb_unread > 0 ? 'unread' :'';
         };
         $scope.getRowClassForFeed = function(feed){
-            if (currentlySelectedFeed != null && currentlySelectedFeed.id === feed.id){
+            if (currentlySelectedFeed !== null && currentlySelectedFeed.id === feed.id){
                 return 'current';
             }
             return '';
@@ -47,4 +48,20 @@ angular.module('izmet')
         $scope.getClassForAllArticles = function () {
             return $scope.totalUnread > 0 ? 'unread' : '';
         };
+
+        $scope.showAddFeed = function(){
+            $rootScope.$broadcast('showAddFeedPopup');
+        };
+
+        $scope.$on('feedAdded', function($evt, feed){
+            $scope.feeds.push(feed);
+            $location.path('/' + feed.id);
+        });
+        $scope.$on('feedDeleted', function($evt, feed){
+            var elt = _.find($scope.feeds, function(e){return e.id === feed.id; });
+            if (elt){
+                var idx = $scope.feeds.indexOf(elt);
+                $scope.feeds.splice(idx, 1);
+            }
+        });
     });

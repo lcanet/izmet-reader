@@ -1,8 +1,9 @@
 'use strict';
 /* global _ */
+/* global confirm */
 
 angular.module('izmet')
-    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope) {
+    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location) {
 
         // pagination parameters
         var pageSize ;
@@ -168,9 +169,20 @@ angular.module('izmet')
             }
         });
 
+        $scope.deleteFeed = function() {
+            if (confirm('Do you want to delete feed ?')) {
+                $http.delete('/feed/' + $scope.selectedFeed.id)
+                    .success(function(){
+                        $rootScope.$broadcast('feedDeleted', $scope.selectedFeed);
+                        $location.path('/');
+                    });
+            }
+        };
+
+
         /* ********************** gestion stars ************ */
         $scope.isArticledStarred = function(a){
-            return a !== null && a.starred ? 'starred':'';
+            return a && a.starred ? 'starred':'';
         };
         $scope.toggleStar = function(a){
             a.starred = !a.starred;

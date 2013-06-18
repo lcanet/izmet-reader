@@ -1,0 +1,37 @@
+<div class="modal hide fade" id="popup-feed-add" ng-controller="FeedAddCtrl" iz-modal="showPopup">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="showPopup = false" aria-hidden="true">&times;</button>
+        <h3>Add feed</h3>
+    </div>
+    <div class="modal-body">
+        <form name="addForm" class="form form-horizontal form-condensed">
+            <div class="control-group">
+                <label class="control-label" for="url">URL / Screen name</label>
+                <div class="controls">
+                    <input id="url" type="text" ng-model="url" class="input-large" required/>
+                </div>
+            </div>
+            <div class="control-group choix-type">
+                <div class="controls">
+                    <input type="radio" ng-model="type" value="rss" id="typeRss"/>
+                    <label for="typeRss">
+                        <img src="images/rss.png" alt="rss"/>
+                        RSS
+                    </label>
+                    <input type="radio" ng-model="type" value="twitter" id="typeTwitter"/>
+                    <label for="typeTwitter">
+                        <img src="images/twitter.png" alt="twitter"/>
+                        Twitter
+                    </label>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <a href="" class="btn" ng-click="showPopup = false">Close</a>
+        <a href="" class="btn btn-primary" ng-click="save()">Save</a>
+
+    </div>
+
+</div>

@@ -44,7 +44,7 @@ angular.module('izmet')
     .filter('ellipsis', function () {
         'use strict';
         return function (text, length) {
-            if (text === null) {
+            if (!text) {
                 return null;
             }
             if (text.length <= length) {
