@@ -8,13 +8,7 @@ var db = require('../db/db.js'),
     poller = require('../poller/poller.js');
 
 
-var findById = function (req, res) {
-    res.header("Content-Type", "application/json; charset=utf-8");
-    if (!req.params.id) {
-        res.send({code: 400, description: 'Invalid parameter id'}, 400);
-        return;
-    }
-    var id = parseInt(req.params.id);
+function getFeed(id, res) {
 
     db.getConnection(function (client) {
         client.query(
@@ -29,6 +23,16 @@ var findById = function (req, res) {
                 }
             });
     });
+}
+
+var findById = function (req, res) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+    if (!req.params.id) {
+        res.send({code: 400, description: 'Invalid parameter id'}, 400);
+        return;
+    }
+    var id = parseInt(req.params.id);
+    getFeed(id, res);
 };
 
 var getImage = function (req, res) {
@@ -189,33 +193,31 @@ var addFeed = function (req, res) {
             })
             .on('end', function (err) {
                 if (feedOk) {
-                    db.getConnection(function (client) {
-                        client.query("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
-                            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency],
-                            function (err, result) {
-                                if (err) {
-                                    res.send({code:500, description:'Error adding feed'}, 500);
-                                    return;
-                                }
-                                feed.id = result.rows[0].id;
+                    db.execSql("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
+                            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency])
+                        .then(function(result){
+                            feed.id = result.rows[0].id;
 
-                                // add feed image
-                                if (feedImageUrl != null) {
-                                    console.log("Downloading image for feed " + feed.name + " on " + feedImageUrl);
-                                    addImageForFeed(feed, feedImageUrl);
-                                }
+                            // add feed image
+                            if (feedImageUrl != null) {
+                                console.log("Downloading image for feed " + feed.name + " on " + feedImageUrl);
+                                addImageForFeed(feed, feedImageUrl);
+                            }
 
-                                // also add favicon if there is any
-                                addIconForFeed(feed);
+                            // also add favicon if there is any
+                            addIconForFeed(feed);
 
-                                // initial poll
-                                poller.pollFeed(feed, function () {
-                                    res.send(feed);
-                                });
-
+                            // initial poll
+                            poller.pollFeed(feed, function () {
+                                res.location('/feed/' + feed.id);
+                                res.send(201, { id : feed.id });
                             });
-                    });
-                }
+
+                        },
+                        function(err){
+                            res.send({code:500, description:'Error adding feed'}, 500);
+                        });
+                    }
             });
     } else if (feed.type == 'twitter') {
         if (!feed.name) {
@@ -227,7 +229,8 @@ var addFeed = function (req, res) {
         pr.then(function(result){
                 feed.id = result.rows[0].id;
                 poller.pollFeed(feed, function () {
-                    res.send(feed);
+                    res.location('/feed/' + feed.id);
+                    res.send(201, { id : feed.id });
                 });
             },
             function(error){
@@ -253,18 +256,16 @@ function addIconForFeed(feed) {
     request({url:url.format(opts), encoding:null}, function (err, response, body) {
         if (!err && response.statusCode == 200 && isImage(response)) {
             console.log("Updating image for feed " + feed.name);
-            db.getConnection(function (client) {
-                client.query("update feed set icon = $2 where id = $1",
-                    [feed.id, body.toString('base64')],
-                    function (err, result) {
-                        if (err) {
-                            console.log("Cannot update feed icon", err);
-                        }
-                    });
-            });
+            db.execSql("update feed set icon = $2 where id = $1",
+                    [feed.id, body.toString('base64')])
+                .then(function(success){
+                },
+                function(err){
+                    console.log("Cannot update feed icon", err);
+
+                });
         }
     });
-
 }
 
 function addImageForFeed(feed, imageurl) {
@@ -273,18 +274,15 @@ function addImageForFeed(feed, imageurl) {
     request({url:imageurl, encoding:null}, function (err, response, body) {
         if (!err && response.statusCode == 200 && isImage(response)) {
             console.log("Updating image for feed " + feed.name);
-            db.getConnection(function (client) {
-                client.query("update feed set image = $2 where id = $1",
-                    [feed.id, body.toString('base64')],
-                    function (err, result) {
-                        if (err) {
-                            console.log("Cannot update feed image", err);
-                        }
-                    });
-            });
-        } else {
-            console.log("Error while downloading feed image ", err);
-        }
+            db.execSql("update feed set image = $2 where id = $1",
+                    [feed.id, body.toString('base64')])
+                .then(function(success){
+                }, function(err){
+                    console.log("Cannot update feed image", err);
+                });
+            } else {
+                console.log("Error while downloading feed image ", err);
+            }
     });
 }
 
