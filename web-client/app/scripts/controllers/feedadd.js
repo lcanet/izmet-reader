@@ -9,12 +9,16 @@ angular.module('izmet')
         $scope.save = function(){
             if ($scope.addForm.$valid) {
                 $http.post('/feed', {type: $scope.type, url: $scope.url, poll_frequency: 120})
-                    .success(function(data){
+                    .success(function(data, status, headers){
                         $scope.showPopup = false;
                         // clean
                         $scope.url = '';
 
-                        $rootScope.$broadcast('feedAdded', data);
+                        // go get feed
+                        $http.get(headers('location')).success(function(feed) {
+                            $rootScope.$broadcast('feedAdded', feed);
+                        });
+
                     });
             }
 
