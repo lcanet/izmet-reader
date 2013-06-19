@@ -168,6 +168,11 @@ angular.module('izmet')
                 }
             }
         });
+        $scope.$on('openArticleLink', function(){
+            if ($scope.currentArticle && $scope.currentArticle.url) {
+                window.open($scope.currentArticle.url, '_blank');
+            }
+        });
 
         $scope.deleteFeed = function() {
             if (confirm('Do you want to delete feed ?')) {

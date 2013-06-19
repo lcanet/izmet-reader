@@ -13,5 +13,8 @@ angular.module('izmet')
             $event.preventDefault();
             $rootScope.$broadcast('navigatePrevArticle');
         };
-
+        $scope.openArticle = function($event) {
+            $event.preventDefault();
+            $rootScope.$broadcast('openArticleLink');
+        }
     });
