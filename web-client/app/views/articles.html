@@ -71,6 +71,13 @@
                 </div>
                 <div class="span2">
                     {{article | ago:'article_date' }}
+                    <span class="pull-right">
+                        <a href="" ng-click="scrollToTop($event)">
+                            <i class="icon icon-chevron-up"></i>
+                        </a>
+                        &nbsp;&nbsp;
+
+                    </span>
                 </div>
             </div>
             <detailbox detailbox-show="currentArticle == article"

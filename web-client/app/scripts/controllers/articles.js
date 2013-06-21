@@ -184,6 +184,12 @@ angular.module('izmet')
             }
         };
 
+        $scope.scrollToTop = function($event) {
+            $event.stopPropagation();
+            $scope.currentArticle = null;
+            window.scrollTo(0);
+
+        };
 
         /* ********************** gestion stars ************ */
         $scope.isArticledStarred = function(a){
