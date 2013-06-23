@@ -1,9 +1,8 @@
 'use strict';
 /* global _ */
-/* global confirm */
 
 angular.module('izmet')
-    .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope, $location) {
+    .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope) {
         $http.get('/favorites')
             .success(function(result){
                 // prepare array of group of 2

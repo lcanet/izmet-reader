@@ -16,5 +16,5 @@ angular.module('izmet')
         $scope.openArticle = function($event) {
             $event.preventDefault();
             $rootScope.$broadcast('openArticleLink');
-        }
+        };
     });
