@@ -5,6 +5,7 @@ var db = require('../db/db.js'),
     fs = require('fs'),
     url = require('url'),
     und = require('underscore'),
+    utils = require('../utils/utils.js'),
     poller = require('../poller/poller.js');
 
 
@@ -337,6 +338,70 @@ var markAllAsRead = function (req, res) {
         });
 };
 
+function getFavoritesFetchArticles(res, feeds) {
+    // process feed links (href)
+    processFeedLinks(feeds);
+
+    var inError = false;
+
+    var resultingFeeds = [];
+
+    // fetch articles
+    utils.processQueue(feeds, function(feed, next){
+        if (inError ){
+            next();
+            return;
+        }
+        db.sql('select id,fetch_date,article_date, title,content,url,read,starred ' +
+            'from article '+
+            'where feed_id = $1 and read = false ' +
+            'order by article_date desc limit 3',
+            [feed.id],
+            function(err, result) {
+                if (err) {
+                    console.log('Error getting articles for feed ' + feed.id, err);
+                    inError = true;
+                } else {
+                    feed.articles = result.rows;
+                    resultingFeeds.push(feed);
+                }
+                next();
+            }
+        )
+
+    }, function(){
+        // finally send feeds with articles
+        res.send(resultingFeeds);
+    });
+
+
+
+}
+
+var getFavorites = function(req, res){
+    // fetch 6 best feed by star-rating
+
+    res.header("Content-Type", "application/json; charset=utf-8");
+    db.execSql('select id,type,name,url,description,nb_unread, icon is not null as iconPresent, ' +
+        '(select count(1) from article where feed_id = feed.id and starred = true) as nbStarred ' +
+        'from feed ' +
+        'where nb_unread > 0 '+
+        'order by nbStarred desc, nb_unread desc limit 8', [])
+        .then(
+            function(resultFeeds) {
+                var content = resultFeeds.rows;
+                getFavoritesFetchArticles(res, content);
+            },
+            function(err){
+                console.log('Cannot get sql results', err);
+                res.send(500, {code: 500, description: 'database error'});
+            }
+        );
+
+};
+
+
+
 
 exports.getImage = getImage;
 exports.getIcon = getIcon;
@@ -347,3 +412,4 @@ exports.addFeed = addFeed;
 exports.deleteFeed = deleteFeed;
 exports.getDefaultIcon = getDefaultIcon;
 exports.markAllAsRead = markAllAsRead;
+exports.getFavorites = getFavorites;

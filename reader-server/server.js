@@ -44,6 +44,8 @@ app.get('/feed/default-icons/:type', services.feed.getDefaultIcon);
 
 app.post('/feed/poll_all', services.poller.forcePollAll);
 
+app.get('/favorites', services.feed.getFavorites);
+
 app.get('/article', services.article.findArticles);
 app.put('/article', services.article.markArticles);
 app.put('/article/:articleId', services.article.markArticle);
