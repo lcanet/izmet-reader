@@ -42,8 +42,10 @@ BEGIN
 	IF TG_OP = 'UPDATE' AND OLD.read <> NEW.read AND NEW.read = true THEN
 		UPDATE feed SET nb_unread = nb_unread - 1 WHERE id = new.feed_id;
 	END IF;
-	IF TG_OP = 'DELETE' AND old.read = false THEN
-		UPDATE feed SET nb_unread = nb_unread - 1 WHERE id = new.feed_id;
+	IF TG_OP = 'DELETE' THEN
+		IF old.read = false THEN
+			UPDATE feed SET nb_unread = nb_unread - 1 WHERE id = new.feed_id;
+		END IF;
 	END IF;
 		
 	RETURN NEW;
@@ -65,6 +67,10 @@ CREATE TRIGGER trigger_delete_article_unread
   BEFORE DELETE ON article
   FOR EACH ROW
   EXECUTE PROCEDURE update_article_unread();
+
+create index idx_article_feed_id on article (feed_id);
+create index idx_article_feed_id_starred on article (feed_id, starred);
+
 
 
     
