@@ -4,6 +4,14 @@
 
 angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress', '$strap'])
     .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+        $routeProvider.when('/', {
+            templateUrl: 'views/home.html',
+            controller: 'HomeCtrl'
+        });
+        $routeProvider.when('/:feedId/:articleId', {
+            templateUrl: 'views/articles.html',
+            controller: 'ArticlesCtrl'
+        });
         $routeProvider.when('/:feedId', {
             templateUrl: 'views/articles.html',
             controller: 'ArticlesCtrl'

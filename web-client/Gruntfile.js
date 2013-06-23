@@ -82,6 +82,13 @@ module.exports = function (grunt) {
                     changeOrigin: false
                 },
                 {
+                    context: '/favorites',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
+                },
+                {
                     context: '/article',
                     host: 'localhost',
                     port: 8080,

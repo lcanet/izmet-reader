@@ -1,0 +1,25 @@
+<div class="home">
+    <h1>Welcome to IZMET feed reader</h1>
+
+    <div class="row" ng-repeat="r in favorites">
+        <div class="span6" ng-repeat="feed in r">
+            <h3>
+                <a href="#/{{feed.id}}/">{{feed.name}}</a> ({{feed.nb_unread}})
+            </h3>
+            <ul>
+                <li ng-repeat="a in feed.articles">
+                    <a href="#/{{feed.id}}/{{a.id}}">{{a.title}}</a>
+                    <p>
+                        {{a.content | ellipsis:100}}
+
+                    </p>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+
+</div>

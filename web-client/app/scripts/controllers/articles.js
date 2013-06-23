@@ -19,6 +19,8 @@ angular.module('izmet')
         // fetch only unread articles
         $scope.unreadOnly = true;
 
+        var articleIdToSelect = null;
+
         function getPage() {
             var resultHandler= function(result) {
                 if (result.length < pageSize) {
@@ -29,6 +31,20 @@ angular.module('izmet')
                 }
                 $scope.articles = $scope.articles.concat( result);
                 requestInflight = false;
+
+                if (articleIdToSelect){
+                    // try to find article
+                    var articleToSelect = _.find($scope.articles, function(a){
+                        return ('' + a.id) == $routeParams.articleId;
+                    });
+                    if (articleToSelect) {
+                        $scope.selectArticle(articleToSelect);
+                    }
+
+                    // it's ok, do not test it next time
+                    articleIdToSelect = null;
+
+                }
             };
 
             var unreadOnly = $scope.unreadOnly;
@@ -64,6 +80,8 @@ angular.module('izmet')
             } else {
                 $rootScope.$broadcast('feedSelected', null);
             }
+
+            articleIdToSelect = $routeParams.articleId;
 
             // fetch the first page
             getPage();

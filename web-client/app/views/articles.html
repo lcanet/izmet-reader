@@ -60,18 +60,18 @@
          infinite-scroll-immediate-check="false"
          infinite-scroll="getNextPage()">
         <div ng-repeat="article in articles" class="article" autoscroll="article.id">
-            <div class="article-header row-fluid" ng-class="getClassForArticleHeader(article)"
-                 ng-click="selectArticle(article)">
-                <div class="span2">
+            <div class="article-header row-fluid" ng-class="getClassForArticleHeader(article)">
+                <div class="span2" ng-click="selectArticle(article)">
                     {{article.feed.name}}
                 </div>
-                <div class="span8">
+                <div class="span8" ng-click="selectArticle(article)">
                     {{article.title | titleFilter}}
                     <span class="star" ng-class="isArticledStarred(article)" ng-click="toggleStar(article)"></span>
                 </div>
                 <div class="span2">
                     {{article | ago:'article_date' }}
                     <span class="pull-right">
+                        <a href="#/"><i class="icon icon-home"></i> </a>
                         <a href="" ng-click="scrollToTop($event)">
                             <i class="icon icon-chevron-up"></i>
                         </a>
