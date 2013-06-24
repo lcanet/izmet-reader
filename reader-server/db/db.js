@@ -1,48 +1,11 @@
-var pg = require('pg'),
-    promise = require("promises-a"),
-    config = require('../config/config.js'),
+var config = require('../config/config.js'),
     Sequelize = require('sequelize-postgres').sequelize,
     postgres = require('sequelize-postgres').postgres
     ;
 
-/**
- * Get a connection from the pool . callback(client) will be called only if a connection suceeded
- * @param callback
- */
-var getConnection = function(callback) {
-    pg.connect(config.pgUrl, function(err, client, done) {
-        try {
-            if (err) {
-                console.log("Error getting connection from pool", err);
-                return;
-            }
-            callback(client);
-        } finally {
-            done();
-        }
-    });
-};
-
-var execSql = function(query, params) {
-    var def = promise();
-    // console.log("[SQL] '" + query + "' with params", params);
-    getConnection(function(client){
-        client.query(query, params, function(err,res){
-            if (err) {
-                console.log("SQL Error", err);
-                def.reject(err);
-            } else {
-                def.fulfill(res);
-            }
-        });
-    });
-    return def.promise;
-};
-
-
-var sql = new Sequelize(config.database, config.dbUser, config.dbPass, {
-    host: config.dbHost,
-    port: config.dbPort,
+var sql = new Sequelize(config.db.database, config.db.user, config.db.pass, {
+    host: config.db.host,
+    port: config.db.port,
     dialect: 'postgres',
     omitNull: true
 });
@@ -127,8 +90,6 @@ var model = {
     Article: Article
 };
 
-exports.getConnection = getConnection;
-exports.execSql = execSql;
 exports.sql = sql;
 exports.model = model;
 

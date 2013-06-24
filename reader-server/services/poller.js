@@ -3,6 +3,15 @@ var db = require('../db/db.js'),
     poller = require('../poller/poller.js'),
     promise = require("promises-a");
 
+function getErrorHandler(res){
+    return function(err){
+        console.log('DB Error', err);
+        if (res) {
+            res.send(500, {code: 500, description: 'Database error'});
+        }
+    }
+}
+
 
 var forcePollAll = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
@@ -17,18 +26,18 @@ var forcePoll = function (req, res) {
         return;
     }
     var id = parseInt(req.params.id);
-    db.execSql("select * from feed where id = $1", [id])
-        .then(function (result) {
-            if (result.rows == null || result.rows.length === 0) {
-                res.send({code: 404, description: 'not found'}, 404);
-            } else {
-                poller.pollFeed(result.rows[0], function () {
+    db.model.Feed.find(id)
+        .success(function(feed){
+            if (feed) {
+                poller.pollFeed(feed, function () {
                     res.send({"code":200, description:"OK"});
                 });
+
+            } else {
+                res.send({code: 404, description: 'not found'}, 404);
             }
-        }, function (err) {
-            res.send({"code":500, "description":'feed cannot be updated'}, 500);
-        });
+        })
+        .error(getErrorHandler(res));
 };
 
 

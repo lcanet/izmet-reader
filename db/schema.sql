@@ -30,14 +30,15 @@ WITH (
 );
 
 CREATE LANGUAGE PLPGSQL;
-DROP FUNCTION update_article_unread();
-CREATE FUNCTION update_article_unread() RETURNS TRIGGER AS $eof$
+
+CREATE OR REPLACE FUNCTION update_article_unread() RETURNS TRIGGER AS $eof$
 BEGIN
-	IF TG_OP = 'INSERT' AND NEW.read = false THEN
-		UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
+	IF TG_OP = 'INSERT' THEN
+		IF NEW.read = false THEN
+			UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
+		END IF;
 		RETURN NEW;
 	END IF;
-	IF TG_OP = 'UPDATE' THEN
 	IF TG_OP = 'UPDATE' THEN
 		IF OLD.read <> NEW.read AND NEW.read = false THEN
 			UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
