@@ -352,22 +352,21 @@ function getFavoritesFetchArticles(res, feeds) {
             next();
             return;
         }
-        db.sql('select id,fetch_date,article_date, title,content,url,read,starred ' +
+        db.execSql('select id,fetch_date,article_date, title,content,url,read,starred ' +
             'from article '+
             'where feed_id = $1 and read = false ' +
             'order by article_date desc limit 3',
-            [feed.id],
-            function(err, result) {
-                if (err) {
-                    console.log('Error getting articles for feed ' + feed.id, err);
-                    inError = true;
-                } else {
-                    feed.articles = result.rows;
-                    resultingFeeds.push(feed);
-                }
+            [feed.id])
+            .then(function(result) {
+                feed.articles = result.rows;
+                resultingFeeds.push(feed);
+                next();
+            }, function(err){
+                console.log('Error getting articles for feed ' + feed.id, err);
+                inError = true;
                 next();
             }
-        )
+            );
 
     }, function(){
         // finally send feeds with articles

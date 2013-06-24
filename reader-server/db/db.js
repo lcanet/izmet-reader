@@ -19,12 +19,6 @@ var getConnection = function(callback) {
         }
     });
 };
-var sql = function(query, params, callback){
-    getConnection(function(client){
-        client.query(query, params, callback);
-    });
-};
-
 
 var execSql = function(query, params) {
     var def = promise();
@@ -44,6 +38,5 @@ var execSql = function(query, params) {
 
 exports.getConnection = getConnection;
 exports.execSql = execSql;
-exports.sql = sql;
 
 
