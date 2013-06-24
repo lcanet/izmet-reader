@@ -6,7 +6,9 @@ CREATE TABLE feed
    url character varying(1024), 
    description text, 
    poll_frequency integer NOT NULL DEFAULT 60, 
-   last_poll timestamp without time zone, 
+   last_poll timestamp without time zone,
+	image_id integer,
+	icon_id integer,
    CONSTRAINT pk_feed PRIMARY KEY (id)
 ) 
 WITH (
@@ -28,6 +30,16 @@ CREATE TABLE article
 WITH (
   OIDS=FALSE
 );
+
+CREATE TABLE image
+(
+   id serial, 
+   content_type character varying(255), 
+   data text, 
+   creation_date timestamp without time zone, 
+   CONSTRAINT pk_image PRIMARY KEY (id)
+) ;
+
 
 CREATE LANGUAGE PLPGSQL;
 
