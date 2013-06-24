@@ -6,24 +6,40 @@ var db = require('../db/db.js'),
     url = require('url'),
     und = require('underscore'),
     utils = require('../utils/utils.js'),
+    Sequelize = require('sequelize'),
     poller = require('../poller/poller.js');
 
 
-function getFeed(id, res) {
+function getErrorHandler(res){
+    return function(err){
+        console.log('DB Error', err);
+        if (res) {
+            res.send(500, {code: 500, description: 'Database error'});
+        }
+    }
+}
 
-    db.getConnection(function (client) {
-        client.query(
-            'SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is not null as imagePresent, icon is not null as iconPresent FROM feed where id = $1',
-            [id],
-            function (err, result) {
-                if (!result.rows || result.rows.length == 0) {
-                    res.send({code: 404, description: 'Not found'}, 404);
-                } else {
-                    processFeedLinks(result.rows);
-                    res.send(result.rows[0]);
-                }
-            });
-    });
+/**
+ * Process a feed before returning
+ */
+function processFeed(feed) {
+    return feed.output();
+}
+
+function processFeeds(feeds) {
+    return und.map(feeds, processFeed);
+}
+
+function getFeed(id, res) {
+    db.model.Feed.find(id)
+        .success(function(feed){
+            if (feed == null){
+                res.send({code: 404, description: 'Not found'}, 404);
+            } else {
+                res.send(processFeed(feed));
+            }
+        })
+        .error(getErrorHandler(res));
 }
 
 var findById = function (req, res) {
@@ -36,110 +52,14 @@ var findById = function (req, res) {
     getFeed(id, res);
 };
 
-var getImage = function (req, res) {
-    if (!req.params.id) {
-        res.send({code: 400, description: 'Invalid parameter id'}, 400);
-        return;
-    }
-    var id = parseInt(req.params.id);
-    db.getConnection(function (client) {
-        client.query('select image from feed where id = $1', [id],
-            function (err, result) {
-                if (err) {
-                    console.log("Cannot get image", err);
-                    res.header("Content-Type", "application/json; charset=utf-8");
-                    res.send({code:500, description:'Cannot get image'});
-                } else if (result.rows == null || result.rows.length == 0 || result.rows[0].image == null) {
-                    res.header("Content-Type", "application/json; charset=utf-8");
-                    res.send({code: 404, description: 'Not found'}, 404);
-                } else {
-                    var image = new Buffer(result.rows[0].image, 'base64');
-                    res.setHeader('Cache-Control', 'public,max-age=864000');
-                    res.setHeader("Content-Type", "image/jpeg");
-                    res.send(image);
-                }
-            });
-    });
-};
-
-
-
-var getIcon = function (req, res) {
-    if (!req.params.id) {
-        res.send({code: 400, description: 'Invalid parameter id'}, 400);
-        return;
-    }
-    var id = parseInt(req.params.id);
-    db.getConnection(function (client) {
-        client.query('select icon from feed where id = $1', [id],
-            function (err, result) {
-                if (err) {
-                    console.log("Cannot get icon", err);
-                    res.header("Content-Type", "application/json; charset=utf-8");
-                    res.send({code:500, description:'Cannot get icon'}, 500);
-                } else if (result.rows == null ||result.rows.length == 0 || result.rows[0].icon == null) {
-                    res.header("Content-Type", "application/json; charset=utf-8");
-                    res.send({code:404, description:'Cannot get icon'}, 404);
-                } else {
-                    var image = new Buffer(result.rows[0].icon, 'base64');
-                    res.setHeader("Content-Type", "image/jpeg");
-                    res.setHeader('Cache-Control', 'public,max-age=864000');
-                    res.send(image);
-                }
-            });
-    });
-};
-
-
-
-var getDefaultIcon = function (req, res) {
-    var type = req.params.type;
-
-    // send default icon
-    fs.readFile('resources/' + type + '.png', function (err, data) {
-        if (err) {
-            res.header("Content-Type", "application/json; charset=utf-8");
-            res.send({code:404, description:'Cannot get icon'}, 404);
-        } else {
-            res.setHeader("Content-Type", "image/png");
-            res.setHeader('Cache-Control', 'public,max-age=864000');
-            res.send(data);
-        }
-    });
-};
-
-function processFeedLinks(rows) {
-    und.each(rows, function(f){
-        var links = [];
-        if (f.imagepresent) {
-            links.push({type: 'image', href:'/feed/' + f.id + '/image'});
-        }
-        if (f.iconpresent) {
-            links.push({type: 'icon', href:'/feed/' + f.id + '/icon'});
-        } else {
-            if (f.type == 'rss') {
-                links.push({type: 'icon', href:'/feed/default-icons/rss'});
-            } else if (f.type == 'twitter') {
-                links.push({type: 'icon', href:'/feed/default-icons/twitter'});
-            }
-        }
-
-        delete f.imagepresent;
-        delete f.iconpresent;
-        f.links = links;
-    });
-
-}
 
 var findAll = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
-    db.getConnection(function (client) {
-        client.query('SELECT id,type,name,url,description,poll_frequency,last_poll,nb_unread,image is not null as imagePresent, icon is not null as iconPresent ' +
-            'FROM feed order by id', function (err, result) {
-            processFeedLinks(result.rows);
-            res.send(result.rows);
-        });
-    });
+    db.model.Feed.findAll()
+        .success(function(feeds){
+            res.send(processFeeds(feeds));
+        })
+        .error(getErrorHandler(res));
 };
 
 var updateFeed = function (req, res) {
@@ -151,102 +71,112 @@ var updateFeed = function (req, res) {
     var id = parseInt(req.params.id);
     var feedData = req.body;
 
-    db.execSql("update feed set last_poll = $1 where id = $2", [ new Date(feedData.last_poll), id])
-        .then(function (result) {
-            if (result.rowCount != 1) {
+    db.model.Feed.find(id)
+        .success(function(feed){
+            if (feed == null) {
                 res.send({code: 404, description: 'Not found'}, 404);
             } else {
-                res.send({code:200, description:'Feed updated'}, 200);
+                feed.updateAttributes(feedData, ['last_poll'])
+                    .success(function(){
+                        // ok ..
+                        res.send({code:200, description:'Feed updated'}, 200);
+                    })
+                    .error(getErrorHandler(res));
             }
-        }, function (err) {
-            res.send({"code":500, "description":'feed cannot be updated'}, 500);
-        });
+        })
+        .error(getErrorHandler(res));
 };
 
 
 var addFeed = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
-    var feed = req.body;
+    var feedData = req.body;
 
-    // get feed data
-    var feedOk = true;
-    var feedImageUrl = null;
-
-    if (feed.type == 'rss') {
-        request(feed.url)
-            .pipe(new FeedParser({feedurl:feed.url}))
-            .on('error', function (err) {
-                console.log("Error getting feed " + feed.url, err);
-                feedOk = false;
-                res.send({code:500, description:'Error getting feed'}, 500);
-            })
-            .on('meta', function (meta) {
-                if (meta.image && meta.image.url) {
-                    feedImageUrl = meta.image.url;
-                }
-                // use provided feed description
-                if (!feed.name && meta.title) {
-                    feed.name = meta.title;
-                }
-                if (!feed.description && meta.description) {
-                    feed.description = meta.description;
-                }
-            })
-            .on('end', function (err) {
-                if (feedOk) {
-                    db.execSql("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
-                            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency])
-                        .then(function(result){
-                            feed.id = result.rows[0].id;
-
-                            // add feed image
-                            if (feedImageUrl != null) {
-                                console.log("Downloading image for feed " + feed.name + " on " + feedImageUrl);
-                                addImageForFeed(feed, feedImageUrl);
-                            }
-
-                            // also add favicon if there is any
-                            addIconForFeed(feed);
-
-                            // initial poll
-                            poller.pollFeed(feed, function () {
-                                res.location('/feed/' + feed.id);
-                                res.send(201, { id : feed.id });
-                            });
-
-                        },
-                        function(err){
-                            res.send({code:500, description:'Error adding feed'}, 500);
-                        });
-                    }
-            });
-    } else if (feed.type == 'twitter') {
-        if (!feed.name) {
-            feed.name = feed.url;
-        }
-        feed.description = 'Twitter of ' + feed.name;
-        var pr = db.execSql("insert into feed (type, name, url, description, poll_frequency) values ($1, $2, $3, $4, $5) RETURNING id",
-            [feed.type, feed.name, feed.url, feed.description, feed.poll_frequency]);
-        pr.then(function(result){
-                feed.id = result.rows[0].id;
-                poller.pollFeed(feed, function () {
-                    res.location('/feed/' + feed.id);
-                    res.send(201, { id : feed.id });
-                });
-            },
-            function(error){
-                console.log("Cannot insert feed", error);
-                res.send({code:500, description:'Error adding feed'}, 500);
-            });
-
+    if (feedData.type == 'rss') {
+        addFeedRss(feedData, res);
+    } else if (feedData.type == 'twitter') {
+        addFeedTwitter(feedData, res);
     } else {
         res.send({code:402, description:'Unknown feed type'}, 402);
     }
 };
 
+function addFeedRss(feedData, res) {
+    // get feed data
+    var feedOk = true;
+    var feedImageUrl = null;
+
+    request(feedData.url)
+        .pipe(new FeedParser({feedurl:feedData.url}))
+        .on('error', function (err) {
+            console.log("Error getting feed " + feedData.url, err);
+            feedOk = false;
+            res.send({code:500, description:'Error getting feed'}, 500);
+        })
+        .on('meta', function (meta) {
+            if (meta.image && meta.image.url) {
+                feedImageUrl = meta.image.url;
+            }
+            // use provided feed description
+            if (!feedData.name && meta.title) {
+                feedData.name = meta.title;
+            }
+            if (!feedData.description && meta.description) {
+                feedData.description = meta.description;
+            }
+        })
+        .on('end', function (err) {
+            if (feedOk) {
+                addFeedRssSave(feedData, feedImageUrl, res);
+            } else {
+                res.send(500, {description: 'Bad feed', code: 500});
+            }
+        });
+}
+
+function addFeedRssSave(feedData, feedImageUrl, res) {
+    db.model.Feed.create(feedData)
+        .success(function(feed){
+            // add feed image
+            if (feedImageUrl != null) {
+                console.log("Downloading image for feed " + feed.name + " on " + feedImageUrl);
+                addImageForFeed(feed, feedImageUrl);
+            }
+
+            // also add favicon if there is any
+            addIconForFeed(feed);
+
+            // initial poll
+            poller.pollFeed(feed, function () {
+                res.location('/feed/' + feed.id);
+                res.send(201, { id : feed.id });
+            });
+
+        })
+        .error(getErrorHandler(res));
+
+}
+
+function addFeedTwitter(feedData, res) {
+    if (!feedData.name) {
+        feedData.name = feedData.url;
+    }
+    feedData.description = 'Twitter of ' + feedData.name;
+    db.model.Feed.create(feedData)
+        .success(function(feed){
+            poller.pollFeed(feed, function () {
+                res.location('/feed/' + feed.id);
+                res.send(201, { id : feed.id });
+            });
+        })
+        .error(getErrorHandler(res));
+}
+
 function isImage(response) {
     var content = response.headers['content-type'];
-    return content && content.toLowerCase().indexOf('image/') == 0;
+    return content &&(
+        content.toLowerCase().indexOf('image/') == 0 ||
+        content.toLowerCase().indexOf('text/plain') == 0);
 }
 
 function addIconForFeed(feed) {
@@ -256,15 +186,18 @@ function addIconForFeed(feed) {
 
     request({url:url.format(opts), encoding:null}, function (err, response, body) {
         if (!err && response.statusCode == 200 && isImage(response)) {
-            console.log("Updating image for feed " + feed.name);
-            db.execSql("update feed set icon = $2 where id = $1",
-                    [feed.id, body.toString('base64')])
-                .then(function(success){
-                },
-                function(err){
-                    console.log("Cannot update feed icon", err);
-
-                });
+            var image = db.model.Image.build({
+                content_type: response.headers['content-type'],
+                data: body.toString('base64'),
+                creation_date: new Date()
+            });
+            image.save()
+                .success(function(image){
+                    // only save id
+                    feed.icon_id = image.id;
+                    feed.save(['icon_id']);
+                })
+                .error(getErrorHandler());
         }
     });
 }
@@ -274,16 +207,19 @@ function addImageForFeed(feed, imageurl) {
     // poll rest pi
     request({url:imageurl, encoding:null}, function (err, response, body) {
         if (!err && response.statusCode == 200 && isImage(response)) {
-            console.log("Updating image for feed " + feed.name);
-            db.execSql("update feed set image = $2 where id = $1",
-                    [feed.id, body.toString('base64')])
-                .then(function(success){
-                }, function(err){
-                    console.log("Cannot update feed image", err);
-                });
-            } else {
-                console.log("Error while downloading feed image ", err);
-            }
+            var image = db.model.Image.build({
+                content_type: response.headers['content-type'],
+                data: body.toString('base64'),
+                creation_date: new Date()
+            });
+            image.save()
+                .success(function(image){
+                    // only save id
+                    feed.image_id = image.id;
+                    feed.save(['image_id']);
+                })
+                .error(getErrorHandler());
+        }
     });
 }
 
@@ -295,27 +231,25 @@ var deleteFeed = function (req, res) {
         return;
     }
     var id = parseInt(req.params.id);
-    db.getConnection(function (client) {
-        client.query("delete from article where feed_id = $1", [id],
-            function (err) {
-                if (err) {
-                    console.log("Cannot delete articles", err);
-                    res.send({code:500, description:"Cannot delete articles"});
-                } else {
-                    db.getConnection(function (client) {
-                        client.query("delete from feed where id = $1", [id],
-                            function (err) {
-                                if (err) {
-                                    console.log("Cannot delete feed", err);
-                                    res.send({code:500, description:"Cannot delete feed"});
-                                } else {
-                                    res.send("");
-                                }
-                            });
-                    });
-                }
-            });
-    });
+
+
+    db.model.Feed.find(id)
+        .success(function(feed){
+            if (feed){
+                // delete articles
+                var chainer = new Sequelize.Utils.QueryChainer();
+                chainer.add(db.model.Article.destroy({feed_id: id}));
+                chainer.add(feed.destroy());
+                chainer.runSerially({ skipOnError: true })
+                    .success(function(){
+                        res.send({code: 200, description: 'Feed deleted'});
+                    })
+                    .error(getErrorHandler(res));
+            } else{
+                res.send(404, {code: 404, description: 'Cannot delete non-existant feed'});
+            }
+        })
+        .error(getErrorHandler(res));
 };
 
 
@@ -327,53 +261,34 @@ var markAllAsRead = function (req, res) {
         return;
     }
     var id = parseInt(req.params.id);
-    var feedData = req.body;
-
-    db.execSql("update article set read = true where feed_id = $1", [id])
-        .then(function (result) {
+    db.model.Article.update({read: true}, {feed_id: id})
+        .success(function(){
             res.send({code:200, description:'Articles read'}, 200);
-        }, function (err) {
-            console.log("Cannot update articles", err);
-            res.send({"code":500, "description":'Server error cannot be updated'}, 500);
-        });
+        })
+        .error(getErrorHandler(res));
 };
 
-function getFavoritesFetchArticles(res, feeds) {
-    // process feed links (href)
-    processFeedLinks(feeds);
-
+function getFavoritesFetchArticles(feeds, res) {
     var inError = false;
-
     var resultingFeeds = [];
 
     // fetch articles
-    utils.processQueue(feeds, function(feed, next){
-        if (inError ){
-            next();
-            return;
-        }
-        db.execSql('select id,fetch_date,article_date, title,content,url,read,starred ' +
-            'from article '+
-            'where feed_id = $1 and read = false ' +
-            'order by article_date desc limit 3',
-            [feed.id])
-            .then(function(result) {
-                feed.articles = result.rows;
-                resultingFeeds.push(feed);
-                next();
-            }, function(err){
-                console.log('Error getting articles for feed ' + feed.id, err);
-                inError = true;
-                next();
+    var chainer = new Sequelize.Utils.QueryChainer();
+    for (var i = 0; i < feeds.length; i++){
+        chainer.add(db.model.Article.findAll({
+            where: {feed_id: feeds[i].id},
+            order: 'article_date desc',
+            limit: 3
+        }));
+    }
+    chainer.runSerially({ skipOnError: true })
+        .success(function(results){
+            for (var i = 0; i < results.length; i++){
+                feeds[i].articles = results[i];
             }
-            );
-
-    }, function(){
-        // finally send feeds with articles
-        res.send(resultingFeeds);
-    });
-
-
+            res.send(feeds);
+        })
+        .error(getErrorHandler(res));
 
 }
 
@@ -381,34 +296,72 @@ var getFavorites = function(req, res){
     // fetch 6 best feed by star-rating
 
     res.header("Content-Type", "application/json; charset=utf-8");
-    db.execSql('select id,type,name,url,description,nb_unread, icon is not null as iconPresent, ' +
-        '(select count(1) from article where feed_id = feed.id and starred = true) as nbStarred ' +
-        'from feed ' +
-        'where nb_unread > 0 '+
-        'order by nbStarred desc, nb_unread desc limit 8', [])
-        .then(
-            function(resultFeeds) {
-                var content = resultFeeds.rows;
-                getFavoritesFetchArticles(res, content);
-            },
-            function(err){
-                console.log('Cannot get sql results', err);
-                res.send(500, {code: 500, description: 'database error'});
-            }
-        );
 
+    var chainer = new Sequelize.Utils.QueryChainer();
+    chainer.add(db.sql.query('select feed_id, sum(case when starred then 1 else 0 end) as nb from article group by feed_id order by 2 desc limit 8'));
+    chainer.add(db.model.Feed.findAll());
+    chainer.runSerially({ skipOnError: true })
+        .success(function(results){
+            var counts = results[0];
+            // build a table indexed by id
+            var feedsTable = und.groupBy(results[1], function(feed){return feed.id; });
+
+            // get best feeds
+            var feeds = [];
+            for (var i = 0; i < counts.length && feeds.length < 8; i++) {
+                var feed = feedsTable[counts[i].feed_id];
+                if (feed){
+                    feeds.push(processFeed(feed[0]));
+                }
+            }
+
+            getFavoritesFetchArticles(feeds, res);
+        })
+        .error(getErrorHandler(res));
 };
 
 
+function getSubResource(req, res, type){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    if (!req.params.id) {
+        res.send({code: 400, description: 'Invalid parameter id'}, 400);
+        return;
+    }
+    var id = parseInt(req.params.id);
+    db.model.Feed.find(id)
+        .success(function(feed){
+            if (feed){
+                var subResourceId = feed[type];
+                if (subResourceId){
+                    res.redirect('/image/' + subResourceId);
+                } else {
+                    res.send(404, {code: 404, description: 'Sub resource not found'});
+                }
+            } else {
+                res.send(404, {code: 404, description: 'Feed not found'});
+            }
+        })
+        .error(getErrorHandler(res));
+
+    getFeed(id, res);
+
+}
+
+var getImage = function(req, res){
+    getSubResource(req, res, "image_id");
+};
+
+var getIcon = function(req, res){
+    getSubResource(req, res, "icon_id");
+};
 
 
-exports.getImage = getImage;
-exports.getIcon = getIcon;
 exports.findById = findById;
 exports.findAll = findAll;
 exports.updateFeed = updateFeed;
 exports.addFeed = addFeed;
 exports.deleteFeed = deleteFeed;
-exports.getDefaultIcon = getDefaultIcon;
 exports.markAllAsRead = markAllAsRead;
 exports.getFavorites = getFavorites;
+exports.getImage = getImage;
+exports.getIcon = getIcon;

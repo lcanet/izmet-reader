@@ -6,6 +6,8 @@ module.exports = {
     pgUrl: 'postgres://reader:reader42@localhost/reader',
 
     maxFeedsPerPoll: 10,
+    pollerEnabled: true,
+
 
     mode: 'production',
     isDev: false,

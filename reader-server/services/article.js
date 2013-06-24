@@ -3,36 +3,41 @@ var db = require('../db/db.js'),
     und = require('underscore'),
     promise = require("promises-a");
 
+
+function getErrorHandler(res){
+    return function(err){
+        console.log('DB Error', err);
+        if (res) {
+            res.send(500, {code: 500, description: 'Database error'});
+        }
+    }
+}
+
 function getArticles(res, feedId, unreadOnly, limit, offset) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    var p = [limit, offset];
-
-    var q = 'SELECT a.id,a.fetch_date,a.article_date,a.title,a.content,a.url,a.read,a.starred,' +
-        'f.id as feedid, f.name,f.description,f.type ' +
-        'FROM article a ' +
-        'INNER JOIN feed f on f.id = a.feed_id ' +
-        'where 1=1 ';
-    if (feedId != null) {
-        q += ' and a.feed_id = $3';
-        p.push(feedId);
+    var args = {
+        where: { },
+        include: [ db.model.Feed ],
+        offset: offset,
+        limit: limit,
+        order: 'article_date desc'
+    };
+    if (feedId != null){
+        args.where.feed_id = feedId;
     }
-    if (unreadOnly) {
-        q += " and read = false";
+    if (unreadOnly){
+        args.where.read = false;
     }
-    q += " order by article_date desc";
-    q += " limit $1 offset $2";
-    db.execSql(q, p).then(function (result) {
-        und.each(result.rows, function (elt) {
-            // replace "feed" object
-            utils.objectify(elt, "feed", "name", "description", "type", "feedid");
-            // some manual changes
-            elt.feed.id = elt.feed.feedid;
-            delete elt.feed.feedid;
-        });
-        res.send(JSON.stringify(result.rows));
-    });
+    if (und.isEmpty(args.where)) {
+        delete args.where;
+    }
 
+    db.model.Article.findAll(args)
+        .success(function (articles) {
+            res.send(articles);
+        })
+        .error(getErrorHandler(res));
 }
 
 var findByFeed = function (req, res) {
@@ -70,89 +75,28 @@ var addArticle = function (req, res) {
     var article = req.body;
 
     // first check if article exists
-    var queryExists;
-    var queryParams;
+    var q;
     if (article.article_id) {
-        queryExists = "select count(1) as nb from article where feed_id = $1 and article_id = $2";
-        queryParams = [feedId, article.article_id];
+        q = db.model.Article.find({where: {feed_id: feedId, article_id: article.article_id }});
     } else {
-        queryExists = "select count(1) as nb from article where feed_id = $1 and article_date = $2";
-        queryParams = [feedId, new Date(article.article_date)];
-        if (article.title != null) {
-            queryExists += " and title = $3";
-            queryParams.push(article.title);
-        }
+        q = db.model.Article.find({where: {feed_id: feedId, article_date: article.article_date}});
     }
 
-    db.execSql(queryExists, queryParams)
-        .then(function (result) {
-            var nb = result.rows[0].nb;
-
-            if (nb == 0) {
-                // add article
-                return db.execSql("insert into article (feed_id, fetch_date, article_date, title, content, url, article_id, read)" +
-                    "values ($1, $2, $3, $4, $5, $6, $7, $8)",
-                    [feedId,
-                        new Date(article.fetch_date),
-                        new Date(article.article_date),
-                        article.title,
-                        article.content,
-                        article.url,
-                        article.article_id,
-                        false]);
-            } else {
-                res.send({"code":304, "description":'article already exists'}, 304);
-                throw 0;
-            }
-        })
-        .then(function (result) {
-            if (result != 0) {
-                res.send({"code":201, "description":'article created'}, 201);
-            }
-        });
-};
-
-function buildQueryPlaceholder(nb) {
-    var s = "(";
-    for (var i = 0; i < nb; i++) {
-        if (i != 0) {
-            s += ", ";
-        }
-        s += ("$" + (i + 1));
-    }
-    s += ")";
-    return s;
-}
-
-function updateArticles(articlesState) {
-    var idsRead = [];
-    var idsUnread = [];
-    for (var i = 0; i < articlesState.length; i++) {
-        if (articlesState[i].read) {
-            idsRead.push(articlesState[i].id);
+    q.success(function(found){
+        if (found) {
+            res.send({"code":304, "description":'article already exists'}, 304);
         } else {
-            idsUnread.push(articlesState[i].id);
+            article.feed_id = feedId;
+            db.model.Article.create(article)
+                .success(function(art){
+                    res.send({"code":201, "description":'article created'}, 201);
+                })
+                .error(getErrorHandler(res));
         }
-    }
 
-    var def = promise();
-    var p = def.promise;
-    if (idsRead.length > 0) {
-        p = p.then(function () {
-            return db.execSql("update article set read = true where id in " + buildQueryPlaceholder(idsRead.length),
-                idsRead);
-        });
-    }
-    if (idsUnread.length > 0) {
-        p = p.then(function () {
-            return db.execSql("update article set read = false where id in " + buildQueryPlaceholder(idsUnread.length),
-                idsUnread);
-        });
-    }
-    def.fulfill("0");
-    return p;
-}
+    }).error(getErrorHandler(res));
 
+};
 
 var markArticle = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
@@ -162,32 +106,11 @@ var markArticle = function (req, res) {
         return;
     }
     var state = req.body;
-
-    var sql = 'update article set ';
-    var sqlParams = [];
-    var sqlFragments = [];
-    if (state.hasOwnProperty('read')) {
-        sqlParams.push(state.read);
-        sqlFragments.push('read = $' + (sqlParams.length));
-    }
-    if (state.hasOwnProperty('starred')){
-        sqlParams.push(state.starred);
-        sqlFragments.push('starred = $' + (sqlParams.length));
-    }
-
-    sqlParams.push(articleId);
-    sql = 'update article set ' + sqlFragments.join(',') + ' where id = $' + (sqlParams.length);
-
-    db.execSql(sql, sqlParams)
-        .then(
-        function(r){
+    db.model.Article.update(state, {id: articleId})
+        .success(function(){
             res.send({code: 200, description: 'ok'}, 200);
-        },
-        function(err){
-            console.error('cannot update article', err);
-            res.send({code: 500, description: 'cannot update'}, 500);
-        }
-    );
+        })
+        .error(getErrorHandler(res));
 };
 
 
@@ -195,18 +118,14 @@ var markArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var cmd = req.body;
     if (cmd && cmd.all){
-        db.execSql("update article set read=true", [])
-            .then(function(result){
+        db.model.Article.update({read: true}, {read: false})
+            .success(function(){
                 res.send({code: 200, description: "Articles updated"});
-
-            },
-            function(error){
-                console.log("Cannot update articles")
-                res.send({code: 500, description: "Cannot update articles"}, 500);
-
-            });
+            })
+            .error(getErrorHandler(res));
+    } else {
+        res.send('?');
     }
-
 };
 
 

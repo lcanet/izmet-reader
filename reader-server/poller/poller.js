@@ -50,7 +50,7 @@ function shouldPollFeed(feed) {
 
 function markFeedUpdated(feed){
     var feedData = {
-        last_poll: new Date().getTime()
+        last_poll: new Date()
     };
 
     var opts = url.parse(config.apiLocalUrl + '/feed/' + feed.id);
@@ -76,6 +76,9 @@ function markFeedUpdated(feed){
 
 }
 function doPoll(limit) {
+    if (!config.pollerEnabled) {
+        return;
+    }
 
     // poll rest pi
     http.get(config.apiLocalUrl + '/feed',

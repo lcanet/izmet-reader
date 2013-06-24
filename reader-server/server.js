@@ -35,13 +35,11 @@ app.get('/feed/:id', services.feed.findById);
 app.put('/feed/:id', services.feed.updateFeed);
 app.put('/feed/:id/mark', services.feed.markAllAsRead);
 app.delete('/feed/:id', services.feed.deleteFeed);
-app.get('/feed/:id/image', services.feed.getImage);
-app.get('/feed/:id/icon', services.feed.getIcon);
 app.post('/feed/:id/poll', services.poller.forcePoll);
 app.get('/feed/:id/article', services.article.findByFeed);
 app.post('/feed/:id/article', services.article.addArticle);
-app.get('/feed/default-icons/:type', services.feed.getDefaultIcon);
-
+app.get('/feed/:id/image', services.feed.getImage);
+app.get('/feed/:id/icon', services.feed.getIcon);
 app.post('/feed/poll_all', services.poller.forcePollAll);
 
 app.get('/favorites', services.feed.getFavorites);
@@ -49,6 +47,10 @@ app.get('/favorites', services.feed.getFavorites);
 app.get('/article', services.article.findArticles);
 app.put('/article', services.article.markArticles);
 app.put('/article/:articleId', services.article.markArticle);
+
+
+app.get('/image/default-icons/:type', services.image.getDefaultIcon);
+app.get('/image/:imageId', services.image.findById);
 
 // redirect root at end
 app.use('/', function(req, res){
