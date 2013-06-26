@@ -49,7 +49,7 @@ module.exports = function (grunt) {
             options: {
                 port: 9000,
                 // Change this to '0.0.0.0' to access the server from outside.
-                hostname: 'localhost'
+                hostname: '0.0.0.0'
             },
             livereload: {
                 options: {
@@ -94,6 +94,13 @@ module.exports = function (grunt) {
                     port: 8080,
                     https: false,
                     changeOrigin: false
+                },
+                {
+                    context: '/resource',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
                 }
             ]
         },
@@ -119,7 +126,8 @@ module.exports = function (grunt) {
         },
         jshint: {
             options: {
-                jshintrc: '.jshintrc'
+                jshintrc: '.jshintrc',
+                ignores: ['app/scripts/lib/*.js']
             },
             all: [
                 'Gruntfile.js',
@@ -185,14 +193,14 @@ module.exports = function (grunt) {
             }
         },
         useminPrepare: {
-            html: '<%= yeoman.app %>/index.html',
+            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/m.html'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
         },
         usemin: {
             html: ['<%= yeoman.dist %>/{,*/}*.html'],
-            css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
+            css: ['<%= yeoman.dist %>/styles/main.css', '<%= yeoman.dist %>/styles/mobile.css'],
             options: {
                 dirs: ['<%= yeoman.dist %>']
             }
@@ -213,7 +221,11 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     '<%= yeoman.dist %>/styles/main.css': [
-                        '.tmp/styles/{,*/}*.css'
+                        '.tmp/styles/main.css'
+                        //'<%= yeoman.app %>/styles/{,*/}*.css'
+                    ],
+                    '<%= yeoman.dist %>/styles/mobile.css': [
+                        '.tmp/styles/mobile.css'
                         //'<%= yeoman.app %>/styles/{,*/}*.css'
                     ]
                 }
