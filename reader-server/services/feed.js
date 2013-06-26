@@ -340,7 +340,7 @@ function getSubResource(req, res, type){
             if (feed){
                 var subResourceId = feed[type];
                 if (subResourceId){
-                    res.redirect('/image/' + subResourceId);
+                    res.redirect('/resource/' + subResourceId);
                 } else {
                     res.send(404, {code: 404, description: 'Sub resource not found'});
                 }

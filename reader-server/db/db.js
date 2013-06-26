@@ -30,15 +30,15 @@ var Feed = sql.define('feed', {
         getLinks: function() {
             var links = [];
             if (this.image_id){
-                links.push({type: 'image', href:'/image/' + this.image_id});
+                links.push({type: 'image', href:'/resource/' + this.image_id});
             }
             if (this.icon_id) {
-                links.push({type: 'icon', href:'/image/' + this.icon_id });
+                links.push({type: 'icon', href:'/resource/' + this.icon_id });
             } else {
                 if (this.type == 'rss') {
-                    links.push({type: 'icon', href:'/image/default-icons/rss'});
+                    links.push({type: 'icon', href:'/resource/default-icons/rss'});
                 } else if (this.type == 'twitter') {
-                    links.push({type: 'icon', href:'/image/default-icons/twitter'});
+                    links.push({type: 'icon', href:'/resource/default-icons/twitter'});
                 }
             }
             return links;

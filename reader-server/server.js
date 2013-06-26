@@ -49,8 +49,8 @@ app.put('/article', services.article.markArticles);
 app.put('/article/:articleId', services.article.markArticle);
 
 
-app.get('/image/default-icons/:type', services.image.getDefaultIcon);
-app.get('/image/:imageId', services.image.findById);
+app.get('/resource/default-icons/:type', services.image.getDefaultIcon);
+app.get('/resource/:imageId', services.image.findById);
 
 // redirect root at end
 app.use('/', function(req, res){
