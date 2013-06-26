@@ -1,0 +1,24 @@
+<div class="feed-view" ng-swipe-left="$emit('navigateNextArticle')" ng-swipe-right="$emit('navigatePrevArticle')">
+
+    <div ng-show="requestInflight" class="loading-banner">
+        Loading articles ...
+    </div>
+    <div class="no-articles" ng-show="articles.length == 0 && !requestInflight">
+        No articles found
+    </div>
+
+    <div class="article" ng-show="currentArticle != null">
+        <h4>
+            {{ currentArticle.title }}
+        </h4>
+        <p class="feed-title">
+            from {{ currentArticle.feed.name }} -
+            {{currentArticle | ago:'article_date' }}
+        </p>
+        <p>
+            <span ng-bind-html="currentArticle.content | fixLinks"></span>
+        </p>
+    </div>
+
+
+</div>

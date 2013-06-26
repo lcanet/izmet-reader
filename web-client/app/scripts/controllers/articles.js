@@ -3,7 +3,7 @@
 /* global confirm */
 
 angular.module('izmet')
-    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location) {
+    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location, izmetParameters) {
 
         // pagination parameters
         var pageSize ;
@@ -11,7 +11,7 @@ angular.module('izmet')
         var endOfFeed;      // marker of end of feed
 
         // don't do another request when scrolling events fire in reaction of page change
-        var requestInflight = false;
+        $scope.requestInflight = false;
 
         // mode
         $scope.currentFeedId = null;
@@ -30,8 +30,9 @@ angular.module('izmet')
                     $scope.articles = [];
                 }
                 $scope.articles = $scope.articles.concat( result);
-                requestInflight = false;
+                $scope.requestInflight = false;
 
+                // article to select (with url parameter)
                 if (articleIdToSelect){
                     // try to find article
                     var articleToSelect = _.find($scope.articles, function(a){
@@ -45,17 +46,23 @@ angular.module('izmet')
                     articleIdToSelect = null;
 
                 }
+                // article to select in mobile
+                if (izmetParameters.mobile &&
+                    $scope.currentArticle == null &&
+                    $scope.articles.length > 0) {
+                    $scope.selectArticle($scope.articles[0]);
+                }
             };
 
             var unreadOnly = $scope.unreadOnly;
             if ($scope.currentFeedId === 'all') {
                 $http.get('/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}})
                     .success(resultHandler);
-                requestInflight = true;
+                $scope.requestInflight = true;
             } else if ($scope.currentFeedId !== null) {
                 $http.get('/feed/' + $scope.currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
                     .success(resultHandler);
-                requestInflight = true;
+                $scope.requestInflight = true;
             }
         }
 
@@ -88,7 +95,7 @@ angular.module('izmet')
         }
 
         $scope.getNextPage = function () {
-            if (!endOfFeed && !requestInflight) {
+            if (!endOfFeed && !$scope.requestInflight) {
                 lastOffset += pageSize;
                 getPage();
             }
@@ -108,8 +115,10 @@ angular.module('izmet')
 
         $scope.selectArticle = function(article) {
             if ($scope.currentArticle === article ){
-                // unselect article
-                $scope.currentArticle = null;
+                // unselect article (not on mobile)
+                if (!izmetParameters.mobile) {
+                    $scope.currentArticle = null;
+                }
             } else {
                 $scope.currentArticle = article;
                 if (article && !article.read) {
@@ -171,6 +180,11 @@ angular.module('izmet')
                     } else {
                         $scope.selectArticle($scope.currentArticle);
                     }
+
+                    // anticipate next page of scroll (when less than 5 articles are still to display)
+                    if (idx > ($scope.articles.length - 5)) {
+                        $scope.getNextPage();
+                    }
                 }
             }
         });
@@ -219,6 +233,12 @@ angular.module('izmet')
 
         };
 
+        $scope.onSwipeRight = function(){
+            alert('SwipeRight');
+        };
+        $scope.onSwipeLeft = function(){
+            alert('SwipeLeft');
+        };
 
 
 

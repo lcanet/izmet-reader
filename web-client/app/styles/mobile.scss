@@ -1,0 +1,46 @@
+@import "compass_twitter_bootstrap";
+
+.cb {
+  clear: both;
+}
+
+$sepGrisFonce: #ddd;
+$sepGrisClair: #c0c0c0;
+$rougeFonce: #970009;
+$grisFonce: #454747;
+
+.main {
+  .feed-list {
+    margin: 0 0 10px 10px;
+    li {
+      list-style-type: none;
+    }
+    .sep {
+      border-bottom: 1px solid $sepGrisClair;
+      margin-bottom: 5px;
+      height: 8px
+    }
+
+    .unread {
+      font-weight: bold;
+    }
+
+  }
+}
+
+.feed-view {
+
+  margin-left: 2px;
+  margin-right: 2px;
+  .article {
+    h4 {
+      font-size: 1.4em;
+    }
+    .feed-title {
+      font-weight: bold;
+      color: $grisFonce;
+      padding-bottom: 5px;
+      border-bottom: 1px solid $sepGrisClair;
+    }
+  }
+}
