@@ -20,7 +20,7 @@ DECLARE
 	r record;
 	insertid integer;
 BEGIN
-	delete from image;cre
+	delete from image;
 	update feed set image_id = null, icon_id = null;
 
 	FOR r in SELECT id,image from feed where image is not null
