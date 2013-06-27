@@ -28,8 +28,8 @@ function pollFeedRSS(feed, callback) {
 
 function transformArticleData(article){
     var articleData = {
-        article_date: article.date != null ? article.date.getTime() : new Date().getTime(),
-        fetch_date: new Date().getTime(),
+        article_date: article.date != null ? article.date : new Date(),
+        fetch_date: new Date(),
         content: article.description,
         url: article.link,
         title: article.title,

@@ -305,7 +305,7 @@ var getFavorites = function(req, res){
         'sum(case when starred then 1 else 0 end) as nb ' +
         'from article ' +
         'group by feed_id ' +
-        'order by 2 desc limit 8'));
+        'order by 2 desc'));
     chainer.add(db.model.Feed.findAll());
     chainer.runSerially({ skipOnError: true })
         .success(function(results){
@@ -316,9 +316,9 @@ var getFavorites = function(req, res){
             // get best feeds
             var feeds = [];
             for (var i = 0; i < counts.length && feeds.length < 8; i++) {
-                var feed = feedsTable[counts[i].feed_id];
+                var feed = feedsTable[counts[i].feed_id][0];
                 if (feed && feed.nb_unread > 0){
-                    feeds.push(processFeed(feed[0]));
+                    feeds.push(processFeed(feed));
                 }
             }
 
