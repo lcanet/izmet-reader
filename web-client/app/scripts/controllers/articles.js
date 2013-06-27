@@ -48,7 +48,7 @@ angular.module('izmet')
                 }
                 // article to select in mobile
                 if (izmetParameters.mobile &&
-                    $scope.currentArticle == null &&
+                    $scope.currentArticle === null &&
                     $scope.articles.length > 0) {
                     $scope.selectArticle($scope.articles[0]);
                 }
@@ -232,14 +232,5 @@ angular.module('izmet')
             $http.put('/article/' + a.id, { starred: a.starred });
 
         };
-
-        $scope.onSwipeRight = function(){
-            alert('SwipeRight');
-        };
-        $scope.onSwipeLeft = function(){
-            alert('SwipeLeft');
-        };
-
-
 
     });

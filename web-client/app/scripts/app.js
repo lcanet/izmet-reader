@@ -2,7 +2,7 @@
 /* global $ */
 /* global alert */
 
-angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress', '$strap'])
+angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress', '$strap', 'izmetConfig'])
     .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         $routeProvider.when('/', {
             templateUrl: 'views/home.html',

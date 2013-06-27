@@ -5,6 +5,8 @@
  * Time: 20:06
  * To change this template use File | Settings | File Templates.
  */
+'use strict';
+
 function IzmetParametersProvider() {
 
     this.defaults = {
@@ -14,6 +16,6 @@ function IzmetParametersProvider() {
     this.$get = function(){
         var obj = angular.copy(this.defaults, {});
         return obj;
-    }
+    };
 }
 angular.module('izmetConfig', []).provider('izmetParameters',IzmetParametersProvider);
