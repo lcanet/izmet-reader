@@ -4,17 +4,27 @@ angular.module('izmet')
     .controller('GlobalCtrl', function ($scope, $rootScope) {
 
         // nav clavier
+        function isKeyboardFocusAllowed($event) {
+            return $event.target == null ||
+                $event.target.nodeName.toUpperCase() !== 'INPUT';
+        }
 
         $scope.keyNavNext = function($event) {
-            $event.preventDefault();
-            $rootScope.$broadcast('navigateNextArticle');
+            if (isKeyboardFocusAllowed($event)){
+                $event.preventDefault();
+                $rootScope.$broadcast('navigateNextArticle');
+            }
         };
         $scope.keyNavPrev = function($event) {
-            $event.preventDefault();
-            $rootScope.$broadcast('navigatePrevArticle');
+            if (isKeyboardFocusAllowed($event)){
+                $event.preventDefault();
+                $rootScope.$broadcast('navigatePrevArticle');
+            }
         };
         $scope.openArticle = function($event) {
-            $event.preventDefault();
-            $rootScope.$broadcast('openArticleLink');
+            if (isKeyboardFocusAllowed($event)){
+                $event.preventDefault();
+                $rootScope.$broadcast('openArticleLink');
+            }
         };
     });
