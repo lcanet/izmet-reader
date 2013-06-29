@@ -25,7 +25,12 @@ app.use(middleware.cacheHandler());
 app.use("/web-client", express.static(__dirname + '/web-client'));
 
 // cors
-app.options("*", middleware.allowCrossDomain);
+app.use(middleware.allowCrossDomain);
+app.options("*",
+    function(res,res){
+        res.header('Access-Control-Max-Age', '86400');
+        res.send('');
+    });
 
 // swagger services
 

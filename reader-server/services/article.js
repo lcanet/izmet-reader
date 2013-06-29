@@ -13,7 +13,7 @@ function getErrorHandler(res){
     }
 }
 
-function getArticles(res, feedId, unreadOnly, limit, offset) {
+function getArticles(res, feedId, unreadOnly, starred, limit, offset) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var args = {
@@ -28,6 +28,9 @@ function getArticles(res, feedId, unreadOnly, limit, offset) {
     }
     if (unreadOnly){
         args.where.read = false;
+    }
+    if (starred) {
+        args.where.starred = true;
     }
     if (und.isEmpty(args.where)) {
         delete args.where;
@@ -50,7 +53,9 @@ var findByFeed = function (req, res) {
         var limit = parseInt(req.query.limit) || 100;
         var offset = parseInt(req.query.offset) || 0;
         var unreadOnly = "true" == req.query.unreadOnly;
-        getArticles(res, feedId, unreadOnly, limit, offset);
+        var starredOnly = "true" == req.query.starred;
+
+        getArticles(res, feedId, unreadOnly, starredOnly, limit, offset);
     }
 };
 
@@ -59,8 +64,9 @@ var findArticles = function (req, res) {
     var limit = parseInt(req.query.limit) || 100;
     var offset = parseInt(req.query.offset) || 0;
     var unreadOnly = "true" == req.query.unreadOnly;
+    var starredOnly = "true" == req.query.starred;
 
-    getArticles(res, null, unreadOnly, limit, offset);
+    getArticles(res, null, unreadOnly, starredOnly, limit, offset);
 };
 
 
