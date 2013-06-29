@@ -113,8 +113,8 @@ function processTweets(feed, tweets, callback) {
 function processTweet(feed, tweet, endCallback) {
     // push the article
     var articleData = {
-        article_date: new Date(tweet.created_at).getTime(),
-        fetch_date: new Date().getTime(),
+        article_date: new Date(tweet.created_at),
+        fetch_date: new Date(),
         content: tweet.text,
         url: 'http://twitter.com/' + feed.url,
         title: tweet.text,

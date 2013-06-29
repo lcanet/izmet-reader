@@ -27,7 +27,12 @@ function processFeed(feed) {
 }
 
 function processFeeds(feeds) {
-    return und.map(feeds, processFeed);
+    var res = und.map(feeds, processFeed);
+    // sort case insensitively
+    res.sort(function(a,b){
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    });
+    return res;
 }
 
 function getFeed(id, res) {

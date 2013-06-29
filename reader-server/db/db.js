@@ -7,7 +7,8 @@ var sql = new Sequelize(config.db.database, config.db.user, config.db.pass, {
     host: config.db.host,
     port: config.db.port,
     dialect: 'postgres',
-    omitNull: true
+    omitNull: true,
+    logging: false
 });
 
 
