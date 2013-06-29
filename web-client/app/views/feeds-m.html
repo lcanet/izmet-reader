@@ -1,16 +1,15 @@
 <div class="main">
-    <h1>Izmet</h1>
-
     <ul class="feed-list">
         <li>
             <a href="#/all" ng-class="getClassForAllArticles()">
+                <i class="icon icon-home"></i>
                 All articles
                 <span ng-show="totalUnread > 0">({{ totalUnread }})</span>
             </a>
         </li>
-        <li class="sep"></li>
         <li ng-repeat="f in feeds">
             <a href="#/{{ f.id }}" ng-class="getClassForFeed(f)">
+                <img ng-src="{{ f | iconLink }}" height="16" class="icon"/>
                 {{ f.name }}
                 <span ng-show="f.nb_unread > 0">({{ f.nb_unread }})</span>
             </a>

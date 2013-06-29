@@ -2,13 +2,16 @@
 /* global _ */
 
 angular.module('izmet')
-    .controller('FeedsCtrl', function ($scope, $http, $rootScope, $location) {
+    .controller('FeedsCtrl', function ($scope, $http, $rootScope, $location, feedService, izmetParameters) {
         $scope.filterText = '';
         $scope.totalUnread = 0;
 
-        $http.get('/feed').success(function(result){
+        $http.get(izmetParameters.backendUrl + 'feed').success(function(result){
             $scope.feeds = result;
             $rootScope.$broadcast('updateTotalUnread');
+
+            // send to feedservice
+            feedService.feeds = result;
         });
 
         $scope.$on('updateUnread', function(evt, feedId, arg) {
@@ -54,7 +57,7 @@ angular.module('izmet')
         };
 
         $scope.$on('feedAdded', function($evt, feed){
-            $scope.feeds.push(feed);
+            $scope.feeds.push(feed);        // we should sort too
             $location.path('/' + feed.id);
         });
         $scope.$on('feedDeleted', function($evt, feed){

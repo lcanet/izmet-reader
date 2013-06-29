@@ -3,7 +3,7 @@
 /* global confirm */
 
 angular.module('izmet')
-    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location, izmetParameters) {
+    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location, izmetParameters, feedService) {
 
         // pagination parameters
         var pageSize ;
@@ -56,11 +56,11 @@ angular.module('izmet')
 
             var unreadOnly = $scope.unreadOnly;
             if ($scope.currentFeedId === 'all') {
-                $http.get('/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}})
+                $http.get(izmetParameters.backendUrl + 'article', {params: {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}})
                     .success(resultHandler);
                 $scope.requestInflight = true;
             } else if ($scope.currentFeedId !== null) {
-                $http.get('/feed/' + $scope.currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
+                $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
                     .success(resultHandler);
                 $scope.requestInflight = true;
             }
@@ -79,9 +79,14 @@ angular.module('izmet')
 
             $scope.currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
+            $scope.nextUnreadFeed = null;
+
             if ($scope.currentFeedId !== null && $scope.currentFeedId !== 'all') {
-                $http.get('/feed/' + $scope.currentFeedId).success(function(result){
+                $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
+                    // get the next unread feed
+                    $scope.nextUnreadFeed = feedService.getNextUnread(result);
+
                     $rootScope.$broadcast('feedSelected', result);
                 });
             } else {
@@ -124,7 +129,7 @@ angular.module('izmet')
                 if (article && !article.read) {
                     article.read = true;
                     // update status on server
-                    $http.put('/article/' + article.id, { read: true })
+                    $http.put(izmetParameters.backendUrl + 'article/' + article.id, { read: true })
                         .success(function(){
                             $rootScope.$broadcast('updateUnread', article.feed.id, { delta: -1 });
                         });
@@ -138,7 +143,7 @@ angular.module('izmet')
 
         $scope.markAllAsRead = function(){
             if ($scope.currentFeedId === 'all') {
-                $http.put('/article', { all: true })
+                $http.put(izmetParameters.backendUrl + 'article', { all: true })
                     .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.read = true;
@@ -147,7 +152,7 @@ angular.module('izmet')
 
                     });
             } else if ($scope.currentFeedId !== null) {
-                $http.put('/feed/' + $scope.currentFeedId + '/mark')
+                $http.put(izmetParameters.backendUrl +  'feed/' + $scope.currentFeedId + '/mark')
                     .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.read = true;
@@ -208,7 +213,7 @@ angular.module('izmet')
 
         $scope.deleteFeed = function() {
             if (confirm('Do you want to delete feed ?')) {
-                $http.delete('/feed/' + $scope.selectedFeed.id)
+                $http.delete(izmetParameters.backendUrl + 'feed/' + $scope.selectedFeed.id)
                     .success(function(){
                         $rootScope.$broadcast('feedDeleted', $scope.selectedFeed);
                         $location.path('/');
@@ -229,7 +234,7 @@ angular.module('izmet')
         };
         $scope.toggleStar = function(a){
             a.starred = !a.starred;
-            $http.put('/article/' + a.id, { starred: a.starred });
+            $http.put(izmetParameters.backendUrl + 'article/' + a.id, { starred: a.starred });
 
         };
 

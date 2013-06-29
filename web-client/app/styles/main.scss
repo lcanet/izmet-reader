@@ -28,9 +28,6 @@ $grisFonce: #454747;
 .feed-search-form {
   margin-left: 5px;
 }
-.icon {
-  height: 16px;
-}
 
 .feed-list {
   list-style-type: none;
@@ -39,6 +36,9 @@ $grisFonce: #454747;
   margin-right: 0;
   margin-bottom: 0;
 
+  .icon {
+    height: 16px;
+  }
   .unread {
     font-weight: bold;
   }

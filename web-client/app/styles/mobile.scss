@@ -44,3 +44,61 @@ $grisFonce: #454747;
     }
   }
 }
+
+.feed-list {
+  li {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #c0c0c0;
+    font-size: 1.2em;
+  }
+  .icon {
+    height: 16px;
+  }
+
+}
+
+.star-big {
+  background: url('../images/star-off-big.png');
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+
+}
+
+.star-big:hover {
+  background: url('../images/star-on-big.png')
+}
+
+.star-big.starred {
+  background: url('../images/star-on-big.png')
+}
+
+.star {
+  background: url('../images/star-off.png');
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+
+}
+
+.star:hover {
+  background: url('../images/star-on.png')
+}
+
+.star.starred {
+  background: url('../images/star-on.png')
+}
+
+.banner {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.no-articles {
+  @extend .banner;
+}
+.loading-banner {
+  @extend .banner;
+}

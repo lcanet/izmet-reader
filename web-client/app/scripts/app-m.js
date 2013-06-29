@@ -40,5 +40,12 @@ angular.module('izmet', ['ngMobile', 'ngResource', 'ngSanitize', 'izmetConfig'])
 
         // pre-configure app
         izmetParametersProvider.defaults.mobile = true;
-
-    }]);
+    }])
+    .run(['$location', 'izmetParameters', function($location, izmetParameters){
+        // for the phonegap version
+        var protocol = $location.protocol();
+        if (protocol === 'file') {
+            izmetParameters.backendUrl = 'http://reader.tekila.org/';
+        }
+    }])
+;

@@ -10,16 +10,10 @@
                 <li ng-repeat="a in feed.articles">
                     <a href="#/{{feed.id}}/{{a.id}}">{{a.title}}</a>
                     <p>
-                        {{a.content | ellipsis:100}}
-
+                        <span ng-bind="a.content | ellipsis:100"></span>
                     </p>
                 </li>
-
             </ul>
-
         </div>
-
     </div>
-
-
 </div>

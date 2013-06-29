@@ -10,7 +10,8 @@
 function IzmetParametersProvider() {
 
     this.defaults = {
-
+        mobile: false,
+        backendUrl: '/'
     };
 
     this.$get = function(){

@@ -15,6 +15,9 @@ angular.module('izmet')
     .filter('ago', function () {
         'use strict';
         return function (arg, prop) {
+            if (arg === null) {
+                return null;
+            }
             // lazy evaluation
             if (!arg.__cache_ago) {
                 arg.__cache_ago = agoCalc(arg[prop]);

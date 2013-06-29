@@ -5,7 +5,7 @@ angular.module('izmet')
 
         // nav clavier
         function isKeyboardFocusAllowed($event) {
-            return $event.target == null ||
+            return !$event.target ||
                 $event.target.nodeName.toUpperCase() !== 'INPUT';
         }
 

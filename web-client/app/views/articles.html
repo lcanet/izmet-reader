@@ -43,6 +43,11 @@
             <i class="icon icon-home"></i>
             Home
         </a>
+        <a class="btn btn-small btn-info" href="#/{{ nextUnreadFeed.id }}" ng-show="nextUnreadFeed != null">
+            <i class="icon icon-fast-forward"></i>
+            Next : {{ nextUnreadFeed.name | ellipsis:40 }}
+
+        </a>
 
     </div>
 

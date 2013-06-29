@@ -4,7 +4,7 @@
         Loading articles ...
     </div>
     <div class="no-articles" ng-show="articles.length == 0 && !requestInflight">
-        No articles found
+        No articles found ...
     </div>
 
     <div class="article" ng-show="currentArticle != null">
@@ -19,6 +19,30 @@
             <span ng-bind-html="currentArticle.content | fixLinks"></span>
         </p>
     </div>
+
+    <div class="navbar navbar-fixed-bottom">
+        <div class="navbar-inner">
+            <ul class="nav">
+                <li class="divider-vertical">
+                    <a href="#/">
+                        <i class="icon icon-home"></i>
+                    </a>
+                </li>
+                <li class="divider-vertical">
+                    <a href="">
+                        <span ng-show="currentArticle != null"
+                                class="star"
+                                ng-class="isArticledStarred(currentArticle)"
+                                ng-click="toggleStar(currentArticle)"></span>
+                    </a>
+
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+
 
 
 </div>
