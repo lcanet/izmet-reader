@@ -27,4 +27,10 @@ angular.module('izmet')
                 $rootScope.$broadcast('openArticleLink');
             }
         };
+        $scope.starArticle = function($event) {
+            if (isKeyboardFocusAllowed($event)){
+                $event.preventDefault();
+                $rootScope.$broadcast('starCurrentArticle');
+            }
+        };
     });

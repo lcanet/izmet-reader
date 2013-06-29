@@ -55,13 +55,19 @@ angular.module('izmet')
             };
 
             var unreadOnly = $scope.unreadOnly;
+            var p;
             if ($scope.currentFeedId === 'all') {
-                $http.get(izmetParameters.backendUrl + 'article', {params: {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}})
-                    .success(resultHandler);
-                $scope.requestInflight = true;
+                p = $http.get(izmetParameters.backendUrl + 'article', {params:
+                    {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}});
+            } else if ($scope.currentFeedId === 'starred') {
+                p = $http.get(izmetParameters.backendUrl + 'article', {params:
+                    {limit: pageSize, offset:lastOffset, unreadOnly: false, starred: true}});
             } else if ($scope.currentFeedId !== null) {
-                $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params: {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}})
-                    .success(resultHandler);
+                p = $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params:
+                    {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}});
+            }
+            if (p) {
+                p.success(resultHandler);
                 $scope.requestInflight = true;
             }
         }
@@ -81,7 +87,9 @@ angular.module('izmet')
             $scope.selectedFeed = null;
             $scope.nextUnreadFeed = null;
 
-            if ($scope.currentFeedId !== null && $scope.currentFeedId !== 'all') {
+            if ($scope.currentFeedId !== null &&
+                    $scope.currentFeedId !== 'all' &&
+                    $scope.currentFeedId != 'starred') {
                 $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
                     // get the next unread feed
@@ -142,7 +150,7 @@ angular.module('izmet')
         };
 
         $scope.markAllAsRead = function(){
-            if ($scope.currentFeedId === 'all') {
+            if ($scope.currentFeedId === 'all' || $scope.currentFeedId === 'starred') {
                 $http.put(izmetParameters.backendUrl + 'article', { all: true })
                     .success(function(){
                         _.each($scope.articles, function(elt){
@@ -208,6 +216,11 @@ angular.module('izmet')
         $scope.$on('openArticleLink', function(){
             if ($scope.currentArticle && $scope.currentArticle.url) {
                 window.open($scope.currentArticle.url, '_blank');
+            }
+        });
+        $scope.$on('starCurrentArticle', function(){
+            if ($scope.currentArticle) {
+                $scope.toggleStar($scope.currentArticle);
             }
         });
 

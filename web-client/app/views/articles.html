@@ -20,15 +20,15 @@
     </script>
 
     <div class="feed-toolbar"  ng-show="currentFeedId != null">
-        <a class="btn btn-small" href="" ng-click="markAllAsRead()">
+        <a class="btn btn-small" href="" ng-click="markAllAsRead()" ng-show="currentFeedId != 'starred'">
             <i class="icon icon-resize-horizontal"></i>
             Mark all as read
         </a>
-        <a class="btn btn-small" href="" ng-click="toggleUnread(true)" ng-show="unreadOnly == false">
+        <a class="btn btn-small" href="" ng-click="toggleUnread(true)" ng-show="unreadOnly == false && currentFeedId != 'starred'">
             <i class="icon icon-filter"></i>
             Show only unread
         </a>
-        <a class="btn btn-small" href="" ng-click="toggleUnread(false)" ng-show="unreadOnly == true">
+        <a class="btn btn-small" href="" ng-click="toggleUnread(false)" ng-show="unreadOnly == true && currentFeedId != 'starred'">
             <i class="icon icon-ok"></i>
             Show all
         </a>
@@ -37,13 +37,16 @@
             Delete feed
         </a>
 
-        |
+        <span class="sep" ng-show="currentFeedId != 'starred'">
+        &nbsp; | &nbsp;
+
+        </span>
 
         <a class="btn btn-small" href="#/">
             <i class="icon icon-home"></i>
             Home
         </a>
-        <a class="btn btn-small btn-info" href="#/{{ nextUnreadFeed.id }}" ng-show="nextUnreadFeed != null">
+        <a class="btn btn-small btn-primary" href="#/{{ nextUnreadFeed.id }}" ng-show="nextUnreadFeed != null">
             <i class="icon icon-fast-forward"></i>
             Next : {{ nextUnreadFeed.name | ellipsis:40 }}
 
@@ -66,8 +69,11 @@
                 </a>
             </span>
         </span>
-        <span ng-hide="selectedFeed != null">
+        <span ng-show="currentFeedId == 'all'" class="feed-title">
             All articles
+        </span>
+        <span ng-show="currentFeedId == 'starred'" class="feed-title">
+            Starred articles
         </span>
     </header>
 
