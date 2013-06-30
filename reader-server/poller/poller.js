@@ -50,7 +50,7 @@ function shouldPollFeed(feed) {
 
 function markFeedUpdated(feed){
     var feedData = {
-        last_poll: new Date()
+        last_poll: moment().format()
     };
 
     var opts = url.parse(config.apiLocalUrl + '/feed/' + feed.id);
