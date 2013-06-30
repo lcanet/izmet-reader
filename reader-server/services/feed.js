@@ -321,9 +321,13 @@ var getFavorites = function(req, res){
             // get best feeds
             var feeds = [];
             for (var i = 0; i < counts.length && feeds.length < 8; i++) {
-                var feed = feedsTable[counts[i].feed_id][0];
-                if (feed && feed.nb_unread > 0){
-                    feeds.push(processFeed(feed));
+                var feedId = counts[i].feed_id;
+                var feedsOfThisId = feedsTable[feedId];
+                if (feedsOfThisId && feedsOfThisId.length > 0) {
+                    var feed = feedsOfThisId[0];
+                    if (feed && feed.nb_unread > 0){
+                        feeds.push(processFeed(feed));
+                    }
                 }
             }
 
