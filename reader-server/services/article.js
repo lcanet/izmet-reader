@@ -84,8 +84,10 @@ var addArticle = function (req, res) {
     var q;
     if (article.article_id) {
         q = db.model.Article.find({where: {feed_id: feedId, article_id: article.article_id }});
-    } else {
+    } else if (article.article_date) {
         q = db.model.Article.find({where: {feed_id: feedId, article_date: article.article_date}});
+    } else {
+        q = db.model.Article.find({where: {feed_id: feedId, title: article.title}});
     }
 
     q.success(function(found){
