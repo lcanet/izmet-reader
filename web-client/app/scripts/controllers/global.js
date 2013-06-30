@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('izmet')
-    .controller('GlobalCtrl', function ($scope, $rootScope) {
+    .controller('GlobalCtrl', function ($scope, $rootScope, $location) {
 
         // nav clavier
         function isKeyboardFocusAllowed($event) {
@@ -33,4 +33,10 @@ angular.module('izmet')
                 $rootScope.$broadcast('starCurrentArticle');
             }
         };
+        $scope.keyGoHome = function($event) {
+            if (isKeyboardFocusAllowed($event)) {
+                $event.preventDefault();
+                $location.path('/');
+            }
+        }
     });
