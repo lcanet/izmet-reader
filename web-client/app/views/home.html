@@ -4,6 +4,7 @@
     <div class="row" ng-repeat="r in favorites">
         <div class="span6" ng-repeat="feed in r">
             <h3>
+                <img ng-src="{{ feed | iconLink }}" class="icon"/>
                 <a href="#/{{feed.id}}/">{{feed.name}}</a> ({{feed.nb_unread}})
             </h3>
             <ul>

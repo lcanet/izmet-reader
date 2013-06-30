@@ -36,6 +36,10 @@ $grisFonce: #454747;
   margin-right: 0;
   margin-bottom: 0;
 
+  .main-item {
+    font-size: 1.2em;
+    margin: 5px 0;
+  }
   .icon {
     height: 16px;
   }
@@ -156,6 +160,9 @@ $grisFonce: #454747;
   li a {
     color: $grisFonce;
     font-weight: bold;
+  }
+  .icon {
+    height: 20px;
   }
 }
 
