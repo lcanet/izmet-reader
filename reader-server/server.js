@@ -42,7 +42,7 @@ app.put('/feed/:id/mark', services.feed.markAllAsRead);
 app.delete('/feed/:id', services.feed.deleteFeed);
 app.post('/feed/:id/poll', services.poller.forcePoll);
 app.get('/feed/:id/article', services.article.findByFeed);
-app.post('/feed/:id/article', services.article.addArticle);
+app.post('/feed/:id/article', services.article.addArticles);
 app.get('/feed/:id/image', services.feed.getImage);
 app.get('/feed/:id/icon', services.feed.getIcon);
 app.post('/feed/poll_all', services.poller.forcePollAll);

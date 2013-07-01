@@ -97,29 +97,26 @@ function pollFeedTwitter(feed, callback) {
 }
 
 function processTweets(feed, tweets, callback) {
-    var proceedNext = function() {
-        if (tweets.length > 0) {
-            processTweet(feed, tweets.shift(), proceedNext);
-        } else {
-            console.log("Finished processing tweet source " + feed.name);
-            callback();
-        }
-    };
-    proceedNext();
-}
+    if (tweets.length == 0) {
+        callback();
+        return;
+    }
 
-
-
-function processTweet(feed, tweet, endCallback) {
-    // push the article
-    var articleData = {
-        article_date: new Date(tweet.created_at),
-        fetch_date: moment().format(),
-        content: tweet.text,
-        url: 'http://twitter.com/' + feed.url,
-        title: tweet.text,
-        article_id: tweet.id_str
-    };
+    // build article data
+    var articles = [];
+    for (var i = 0; i < tweets.length; i++) {
+        var tweet = tweets[i];
+        // push the article
+        var articleData = {
+            article_date: new Date(tweet.created_at),
+            fetch_date: moment().format(),
+            content: tweet.text,
+            url: 'http://twitter.com/' + feed.url,
+            title: tweet.text,
+            article_id: tweet.id_str
+        };
+        articles.push(articleData);
+    }
 
     // create http request for posting article
     // backend will check if article doesn't already exists
@@ -133,7 +130,7 @@ function processTweet(feed, tweet, endCallback) {
         // not
         if (res.statusCode != 201 && res.statusCode != 304) {
             console.log("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
-            endCallback();
+            callback();
             return;
         }
         var chunks = [];
@@ -142,13 +139,13 @@ function processTweet(feed, tweet, endCallback) {
         });
         res.on("end", function(){
             // fin ...
-            if (endCallback){
-                endCallback();
+            if (callback){
+                callback();
             }
         });
     });
 
-    req.write(JSON.stringify(articleData));
+    req.write(JSON.stringify(articles));
     req.write("\n");
     req.end();
 }

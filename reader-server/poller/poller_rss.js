@@ -40,12 +40,11 @@ function transformArticleData(article){
 }
 
 function processArticles(feed, articles, callback) {
-    utils.processQueue(articles, function(article, done){
-        pushFeedArticle(feed, article, done);
-    }, callback);
-}
+    if (articles.length == 0) {
+        callback();
+        return;
+    }
 
-function pushFeedArticle(feed, articleData, callback) {
     // push the article
     // create http request for posting article
     // backend will check if article doesn't already exists
@@ -71,7 +70,7 @@ function pushFeedArticle(feed, articleData, callback) {
         });
     });
 
-    req.write(JSON.stringify(articleData));
+    req.write(JSON.stringify(articles));
     req.write("\n");
     req.end();
 }

@@ -9,7 +9,7 @@ var sql = new Sequelize(config.db.database, config.db.user, config.db.pass, {
     dialect: 'postgres',
     pool: { maxConnections: 20, maxIdleTime: 120},
     omitNull: true,
-    logging: false
+    logging: config.isDev ? console.log : false
 });
 
 

@@ -1,6 +1,7 @@
 var db = require('../db/db.js'),
     utils = require('../utils/utils.js'),
     und = require('underscore'),
+    Sequelize = require('sequelize'),
     promise = require("promises-a");
 
 
@@ -69,7 +70,7 @@ var findArticles = function (req, res) {
     getArticles(res, null, unreadOnly, starredOnly, limit, offset);
 };
 
-
+/*
 var addArticle = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var feedId = req.params.id;
@@ -106,6 +107,66 @@ var addArticle = function (req, res) {
 
 };
 
+*/
+
+var addArticles = function (req, res) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var feedId = req.params.id;
+    if (!feedId) {
+        res.send({code: 400, description: 'Invalid parameter id'}, 400);
+        return;
+    }
+
+    var articles = req.body;
+    if (!und.isArray(articles)) {
+        articles = [articles];
+    }
+
+    var chainer = new Sequelize.Utils.QueryChainer();
+    for (var i = 0; i < articles.length; i++) {
+        var article = articles[i];
+        var q;
+        if (article.article_id) {
+            q = db.model.Article.find({where: {feed_id: feedId, article_id: article.article_id }});
+        } else if (article.article_date) {
+            q = db.model.Article.find({where: {feed_id: feedId, article_date: article.article_date}});
+        } else {
+            q = db.model.Article.find({where: {feed_id: feedId, title: article.title}});
+        }
+        chainer.add(q);
+    }
+
+    chainer.runSerially()
+        .success(function(result){
+            var chainer = new Sequelize.Utils.QueryChainer();
+            var nbArticlesToAdd = 0;
+            for (var i = 0; i < articles.length; i++) {
+                var article = articles[i];
+                var existing = result[i] != null;
+                if (!existing) {
+                    nbArticlesToAdd++;
+                    article.feed_id = feedId;
+                    chainer.add(db.model.Article.create(article));
+                }
+            }
+
+            if (nbArticlesToAdd > 0) {
+                chainer.runSerially()
+                    .success(function(createdArticles){
+                        res.send(201, createdArticles);
+                    })
+                    .error(getErrorHandler(res));
+
+            } else {
+                res.send(304, {code: 304, description: 'No Articles to add'});
+            }
+        })
+        .error(getErrorHandler(res));
+
+};
+
+
+
 var markArticle = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var articleId = req.params.articleId;
@@ -138,7 +199,7 @@ var markArticles = function (req, res) {
 
 
 exports.findByFeed = findByFeed;
-exports.addArticle = addArticle;
+exports.addArticles = addArticles;
 exports.markArticle = markArticle;
 exports.markArticles = markArticles;
 exports.findArticles = findArticles;
