@@ -6,11 +6,13 @@ var cronJob = require('cron').CronJob,
     rss = require('./poller_rss.js'),
     und = require('underscore'),
     utils = require('../utils/utils.js'),
-    twitter = require('./poller_twitter.js');
+    twitter = require('./poller_twitter.js'),
+    dilbert = require('./poller_dilbert.js');
 
 var pollers = {
     'rss': rss.poll,
-    'twitter': twitter.poll
+    'twitter': twitter.poll,
+    'dilbert': dilbert.poll
 };
 
 function processFeeds(feeds, limit) {
