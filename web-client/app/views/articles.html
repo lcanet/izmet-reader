@@ -117,11 +117,11 @@
                 <a target="_blank" href="{{currentArticle.url}}">{{currentArticle.title}}</a>
                 <span class="star-big" ng-class="isArticledStarred(currentArticle)" ng-click="toggleStar(currentArticle)"></span>
             </h3>
-            <span>
-                {{currentArticle.article_date | date:'medium' }}
-            </span>
+            <p>
+                {{currentArticle.article_date | date:'EEEE d MMM yyyy - H:mm:ss' }}
+            </p>
 
-            <span ng-bind-html="currentArticle.content | fixLinks"></span>
+            <p ng-bind-html="currentArticle.content | fixLinks"></p>
         </div>
     </div>
 </div>
