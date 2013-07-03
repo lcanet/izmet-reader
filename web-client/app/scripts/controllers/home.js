@@ -15,7 +15,7 @@ angular.module('izmet')
             });
 
         // to indicate that no feed is selected
-        $rootScope.$broadcast('feedSelected', null);
+        $rootScope.$broadcast('feedSelected', 'home');
 
 
 

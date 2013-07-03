@@ -5,20 +5,20 @@
 </form>
 <ul class="feed-list">
     <li class="feed-group-sep"></li>
-    <li class="main-item">
+    <li class="main-item" ng-class="getRowClassForFeed('home')">
         <a href="#/" >
             <i class="icon icon-home"></i>
             Home
         </a>
     </li>
-    <li class="all-feeds main-item" >
+    <li class="all-feeds main-item" ng-class="getRowClassForFeed('all')">
        <a href="#/all" title="all articles" ng-class="getClassForAllArticles()">
            <i class="icon icon-list"></i>
           All articles
            <span ng-show="totalUnseen > 0">({{totalUnseen}})</span>
        </a>
     </li>
-    <li class="all-feeds main-item" >
+    <li class="all-feeds main-item" ng-class="getRowClassForFeed('starred')">
         <a href="#/starred" title="All starred articles" >
             <i class="icon icon-star"></i>
             Starred articles

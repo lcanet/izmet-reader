@@ -34,17 +34,23 @@ angular.module('izmet')
                 }, 0);
         });
 
-        var currentlySelectedFeed = null;
+        var currentlySelectedFeedId = null;
         $scope.$on('feedSelected', function($evt, x){
-            currentlySelectedFeed = x;
+            currentlySelectedFeedId = x;
         });
 
         $scope.getClassForFeed = function (feed) {
             return feed.nb_unseen > 0 ? 'unread' :'';
         };
         $scope.getRowClassForFeed = function(feed){
-            if (currentlySelectedFeed !== null && currentlySelectedFeed.id === feed.id){
-                return 'current';
+            if (_.isString(feed)) {
+                if (currentlySelectedFeedId !== null && currentlySelectedFeedId === feed){
+                    return 'current';
+                }
+            } else {
+                if (currentlySelectedFeedId !== null && currentlySelectedFeedId === feed.id.toString()){
+                    return 'current';
+                }
             }
             return '';
         };

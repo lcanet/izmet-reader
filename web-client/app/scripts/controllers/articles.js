@@ -86,7 +86,9 @@ angular.module('izmet')
             $scope.currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
             $scope.nextUnseenFeed = null;
+            $rootScope.$broadcast('feedSelected', $scope.currentFeedId);
 
+            // fetch informations about current feed
             if ($scope.currentFeedId !== null &&
                     $scope.currentFeedId !== 'all' &&
                     $scope.currentFeedId != 'starred') {
@@ -95,10 +97,7 @@ angular.module('izmet')
                     // get the next unseen feed
                     $scope.nextUnseenFeed = feedService.getNextUnseen(result);
 
-                    $rootScope.$broadcast('feedSelected', result);
                 });
-            } else {
-                $rootScope.$broadcast('feedSelected', null);
             }
 
             articleIdToSelect = $routeParams.articleId;
