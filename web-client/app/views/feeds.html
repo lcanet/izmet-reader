@@ -15,7 +15,7 @@
        <a href="#/all" title="all articles" ng-class="getClassForAllArticles()">
            <i class="icon icon-list"></i>
           All articles
-           <span ng-show="totalUnread > 0">({{totalUnread}})</span>
+           <span ng-show="totalUnseen > 0">({{totalUnseen}})</span>
        </a>
     </li>
     <li class="all-feeds main-item" >
@@ -30,7 +30,7 @@
                 ng-class="getClassForFeed(feed)">
             <img ng-src="{{ feed | iconLink }}" height="16" class="icon"/>
             {{feed.name}}
-            <span ng-show="feed.nb_unread > 0">({{feed.nb_unread}})</span>
+            <span ng-show="feed.nb_unseen > 0">({{feed.nb_unseen}})</span>
         </a>
     </li>
 

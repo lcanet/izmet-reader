@@ -11,7 +11,7 @@ function FeedService() {
      * Get the next unread feed
      * @returns {*}
      */
-    this.getNextUnread = function(feed){
+    this.getNextUnseen = function(feed){
         if (!this.feeds){
             return null;
         }
@@ -23,7 +23,7 @@ function FeedService() {
                 found = true;
                 continue;
             }
-            if (curFeed.nb_unread > 0 && found){
+            if (curFeed.nb_unseen > 0 && found){
                 return curFeed;
             }
         }

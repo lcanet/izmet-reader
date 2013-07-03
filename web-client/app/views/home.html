@@ -5,7 +5,7 @@
         <div class="span6" ng-repeat="feed in r">
             <h3>
                 <img ng-src="{{ feed | iconLink }}" class="icon"/>
-                <a href="#/{{feed.id}}/">{{feed.name}}</a> ({{feed.nb_unread}})
+                <a href="#/{{feed.id}}/">{{feed.name}}</a> ({{feed.nb_unseen}})
             </h3>
             <ul>
                 <li ng-repeat="a in feed.articles">

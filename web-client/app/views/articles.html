@@ -20,15 +20,15 @@
     </script>
 
     <div class="feed-toolbar"  ng-show="currentFeedId != null">
-        <a class="btn btn-small" href="" ng-click="markAllAsRead()" ng-show="currentFeedId != 'starred'">
+        <a class="btn btn-small" href="" ng-click="markAllAsSeen()" ng-show="currentFeedId != 'starred'">
             <i class="icon icon-resize-horizontal"></i>
             Mark all as read
         </a>
-        <a class="btn btn-small" href="" ng-click="toggleUnread(true)" ng-show="unreadOnly == false && currentFeedId != 'starred'">
+        <a class="btn btn-small" href="" ng-click="toggleUnseen(true)" ng-show="unseenOnly == false && currentFeedId != 'starred'">
             <i class="icon icon-filter"></i>
             Show only unread
         </a>
-        <a class="btn btn-small" href="" ng-click="toggleUnread(false)" ng-show="unreadOnly == true && currentFeedId != 'starred'">
+        <a class="btn btn-small" href="" ng-click="toggleUnseen(false)" ng-show="unseenOnly == true && currentFeedId != 'starred'">
             <i class="icon icon-ok"></i>
             Show all
         </a>
@@ -46,9 +46,9 @@
             <i class="icon icon-home"></i>
             Home
         </a>
-        <a class="btn btn-small btn-primary" href="#/{{ nextUnreadFeed.id }}" ng-show="nextUnreadFeed != null">
+        <a class="btn btn-small btn-primary" href="#/{{ nextUnseenFeed.id }}" ng-show="nextUnseenFeed != null">
             <i class="icon icon-fast-forward"></i>
-            Next : {{ nextUnreadFeed.name | ellipsis:40 }}
+            Next : {{ nextUnseenFeed.name | ellipsis:40 }}
 
         </a>
 

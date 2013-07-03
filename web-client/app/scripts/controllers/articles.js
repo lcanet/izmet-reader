@@ -17,7 +17,7 @@ angular.module('izmet')
         $scope.currentFeedId = null;
 
         // fetch only unread articles
-        $scope.unreadOnly = true;
+        $scope.unseenOnly = true;
 
         var articleIdToSelect = null;
 
@@ -54,17 +54,17 @@ angular.module('izmet')
                 }
             };
 
-            var unreadOnly = $scope.unreadOnly;
+            var unseenOnly = $scope.unseenOnly;
             var p;
             if ($scope.currentFeedId === 'all') {
                 p = $http.get(izmetParameters.backendUrl + 'article', {params:
-                    {limit: pageSize, offset:lastOffset, unreadOnly: unreadOnly}});
+                    {limit: pageSize, offset:lastOffset, unseenOnly: unseenOnly}});
             } else if ($scope.currentFeedId === 'starred') {
                 p = $http.get(izmetParameters.backendUrl + 'article', {params:
-                    {limit: pageSize, offset:lastOffset, unreadOnly: false, starred: true}});
+                    {limit: pageSize, offset:lastOffset, unseenOnly: false, starred: true}});
             } else if ($scope.currentFeedId !== null) {
                 p = $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params:
-                    {limit: pageSize, offset:lastOffset, unreadOnly:unreadOnly}});
+                    {limit: pageSize, offset:lastOffset, unseenOnly:unseenOnly}});
             }
             if (p) {
                 p.success(resultHandler);
@@ -85,15 +85,15 @@ angular.module('izmet')
 
             $scope.currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
-            $scope.nextUnreadFeed = null;
+            $scope.nextUnseenFeed = null;
 
             if ($scope.currentFeedId !== null &&
                     $scope.currentFeedId !== 'all' &&
                     $scope.currentFeedId != 'starred') {
                 $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId).success(function(result){
                     $scope.selectedFeed = result;
-                    // get the next unread feed
-                    $scope.nextUnreadFeed = feedService.getNextUnread(result);
+                    // get the next unseen feed
+                    $scope.nextUnseenFeed = feedService.getNextUnseen(result);
 
                     $rootScope.$broadcast('feedSelected', result);
                 });
@@ -117,7 +117,7 @@ angular.module('izmet')
         // styles
 
         $scope.getClassForArticleHeader = function(article) {
-            if (!article.read) {
+            if (!article.seen) {
                 return 'unread';
             } else {
                 return 'read';
@@ -134,12 +134,12 @@ angular.module('izmet')
                 }
             } else {
                 $scope.currentArticle = article;
-                if (article && !article.read) {
-                    article.read = true;
+                if (article && !article.seen) {
+                    article.seen = true;
                     // update status on server
-                    $http.put(izmetParameters.backendUrl + 'article/' + article.id, { read: true })
+                    $http.put(izmetParameters.backendUrl + 'article/' + article.id, { seen: true, read:true })
                         .success(function(){
-                            $rootScope.$broadcast('updateUnread', article.feed.id, { delta: -1 });
+                            $rootScope.$broadcast('updateUnseen', article.feed.id, { delta: -1 });
                         });
                 }
                 // scroll to article
@@ -149,30 +149,30 @@ angular.module('izmet')
             }
         };
 
-        $scope.markAllAsRead = function(){
+        $scope.markAllAsSeen = function(){
             if ($scope.currentFeedId === 'all' || $scope.currentFeedId === 'starred') {
                 $http.put(izmetParameters.backendUrl + 'article', { all: true })
                     .success(function(){
                         _.each($scope.articles, function(elt){
-                            elt.read = true;
+                            elt.seen = true;
                         });
-                        $rootScope.$broadcast('updateUnread', null, { value: 0 });
+                        $rootScope.$broadcast('updateUnseen', null, { value: 0 });
 
                     });
             } else if ($scope.currentFeedId !== null) {
-                $http.put(izmetParameters.backendUrl +  'feed/' + $scope.currentFeedId + '/mark')
+                $http.put(izmetParameters.backendUrl +  'feed/' + $scope.currentFeedId + '/article')
                     .success(function(){
                         _.each($scope.articles, function(elt){
-                            elt.read = true;
+                            elt.seen = true;
                         });
-                        $rootScope.$broadcast('updateUnread', $scope.currentFeedId, { value: 0 });
+                        $rootScope.$broadcast('updateUnseen', $scope.currentFeedId, { value: 0 });
 
                     });
             }
         };
 
-        $scope.toggleUnread = function(val) {
-            $scope.unreadOnly = val;
+        $scope.toggleUnseen = function(val) {
+            $scope.unseenOnly = val;
 
             // reset
             $scope.articles = null;

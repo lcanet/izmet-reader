@@ -4,33 +4,33 @@
 angular.module('izmet')
     .controller('FeedsCtrl', function ($scope, $http, $rootScope, $location, feedService, izmetParameters) {
         $scope.filterText = '';
-        $scope.totalUnread = 0;
+        $scope.totalUnseen = 0;
 
         $http.get(izmetParameters.backendUrl + 'feed').success(function(result){
             $scope.feeds = result;
-            $rootScope.$broadcast('updateTotalUnread');
+            $rootScope.$broadcast('updateTotalUnseen');
 
             // send to feedservice
             feedService.feeds = result;
         });
 
-        $scope.$on('updateUnread', function(evt, feedId, arg) {
+        $scope.$on('updateUnseen', function(evt, feedId, arg) {
             var matching = _.filter($scope.feeds, function(elt) { return feedId === null || elt.id == feedId; });
             _.each(matching, function(feed) {
                 if (arg.delta) {
-                    feed.nb_unread += arg.delta;
+                    feed.nb_unseen += arg.delta;
                 } else {
-                    feed.nb_unread = arg.value;
+                    feed.nb_unseen = arg.value;
                 }
             });
-            $scope.$emit('updateTotalUnread');
+            $scope.$emit('updateTotalUnseen');
         });
 
 
-        $scope.$on('updateTotalUnread', function(){
-            $scope.totalUnread = _.reduce($scope.feeds,
+        $scope.$on('updateTotalUnseen', function(){
+            $scope.totalUnseen = _.reduce($scope.feeds,
                 function(sum, feed) {
-                    return sum + feed.nb_unread;
+                    return sum + feed.nb_unseen;
                 }, 0);
         });
 
@@ -40,7 +40,7 @@ angular.module('izmet')
         });
 
         $scope.getClassForFeed = function (feed) {
-            return feed.nb_unread > 0 ? 'unread' :'';
+            return feed.nb_unseen > 0 ? 'unread' :'';
         };
         $scope.getRowClassForFeed = function(feed){
             if (currentlySelectedFeed !== null && currentlySelectedFeed.id === feed.id){
@@ -49,7 +49,7 @@ angular.module('izmet')
             return '';
         };
         $scope.getClassForAllArticles = function () {
-            return $scope.totalUnread > 0 ? 'unread' : '';
+            return $scope.totalUnseen > 0 ? 'unseen' : '';
         };
 
         $scope.showAddFeed = function(){

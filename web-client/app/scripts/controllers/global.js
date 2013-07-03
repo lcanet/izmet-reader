@@ -38,5 +38,5 @@ angular.module('izmet')
                 $event.preventDefault();
                 $location.path('/');
             }
-        }
+        };
     });
