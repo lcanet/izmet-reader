@@ -43,28 +43,38 @@ CREATE TABLE image
 
 CREATE LANGUAGE PLPGSQL;
 
+
 CREATE OR REPLACE FUNCTION update_article_unread() RETURNS TRIGGER AS $eof$
 BEGIN
 	IF TG_OP = 'INSERT' THEN
-		IF NEW.read = false THEN
-			UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
+		IF NEW.seen = false THEN
+			UPDATE feed SET nb_unseen = nb_unseen + 1 WHERE id = new.feed_id;
 		END IF;
 		RETURN NEW;
 	END IF;
 	IF TG_OP = 'UPDATE' THEN
 		IF OLD.read <> NEW.read AND NEW.read = false THEN
-			UPDATE feed SET nb_unread = nb_unread + 1 WHERE id = new.feed_id;
+			UPDATE feed SET nb_read = nb_read - 1 WHERE id = new.feed_id;
 		END IF;
 		IF OLD.read <> NEW.read AND NEW.read = true THEN
-			UPDATE feed SET nb_unread = nb_unread - 1 WHERE id = new.feed_id;
+			UPDATE feed SET nb_read = nb_read + 1 WHERE id = new.feed_id;
+		END IF;
+		IF OLD.seen <> NEW.seen AND NEW.seen = false THEN
+			UPDATE feed SET nb_unseen = nb_unseen + 1 WHERE id = new.feed_id;
+		END IF;
+		IF OLD.seen <> NEW.seen AND NEW.seen = true THEN
+			UPDATE feed SET nb_unseen = nb_unseen - 1 WHERE id = new.feed_id;
 		END IF;
 		RETURN NEW;
 	END IF;
 	IF TG_OP = 'DELETE' THEN
-		IF old.read = false THEN
-			UPDATE feed SET nb_unread = nb_unread - 1 WHERE id = old.feed_id;
+		IF old.read = true THEN
+			UPDATE feed SET nb_read = nb_read - 1 WHERE id = old.feed_id;
 		END IF;
 		return old;
+		IF old.seen = false THEN
+			UPDATE feed SET nb_unseen = nb_unseen - 1 WHERE id = old.feed_id;
+		END IF;
 	END IF;
 	RETURN NEW;
 		
