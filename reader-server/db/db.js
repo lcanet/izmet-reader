@@ -22,7 +22,8 @@ var Feed = sql.define('feed', {
     description: Sequelize.STRING,
     poll_frequency: Sequelize.INTEGER,
     last_poll: Sequelize.DATE,
-    nb_unread: Sequelize.INTEGER,
+    nb_read: Sequelize.INTEGER,
+    nb_unseen: Sequelize.INTEGER,
     image_id: Sequelize.INTEGER,
     icon_id: Sequelize.INTEGER
 }, {
@@ -75,6 +76,7 @@ var Article = sql.define('article', {
     content: Sequelize.STRING,
     url: Sequelize.STRING,
     read: Sequelize.BOOLEAN,
+    seen: Sequelize.BOOLEAN,
     starred: Sequelize.BOOLEAN,
     fetch_date: Sequelize.DATE,
     article_date: Sequelize.DATE,

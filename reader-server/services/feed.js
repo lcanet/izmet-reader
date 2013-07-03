@@ -259,14 +259,14 @@ var deleteFeed = function (req, res) {
 
 
 
-var markAllAsRead = function (req, res) {
+var markAllAsSeen = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     if (!req.params.id) {
         res.send({code: 400, description: 'Invalid parameter id'}, 400);
         return;
     }
     var id = parseInt(req.params.id);
-    db.model.Article.update({read: true}, {feed_id: id})
+    db.model.Article.update({seen: true}, {feed_id: id})
         .success(function(){
             res.send({code:200, description:'Articles read'}, 200);
         })
@@ -283,7 +283,7 @@ function getFavoritesFetchArticles(feeds, res) {
         chainer.add(db.model.Article.findAll({
             where: {
                 feed_id: feeds[i].id,
-                read: false
+                seen: false
             },
             order: 'article_date desc',
             limit: 3
@@ -300,6 +300,17 @@ function getFavoritesFetchArticles(feeds, res) {
 
 }
 
+function getPopularity(feedStruct) {
+    // avoid divide by zero
+    if (feedStruct.nbarticles == 0){
+        return 0;
+    }
+    var starRatio = feedStruct.nbstarred / feedStruct.nbarticles;
+    var readRatio = feedStruct.nbread / feedStruct.nbarticles;
+    var pop = (starRatio + readRatio) / 2;
+    return pop;
+}
+
 var getFavorites = function(req, res){
     // fetch 6 best feed by star-rating
 
@@ -307,7 +318,9 @@ var getFavorites = function(req, res){
 
     var chainer = new Sequelize.Utils.QueryChainer();
     chainer.add(db.sql.query('select feed_id, ' +
-        'sum(case when starred then 1 else 0 end) as nb ' +
+        'sum(case when starred then 1 else 0 end) as nbStarred, ' +
+        'sum(case when read then 1 else 0 end) as nbRead, ' +
+        'count(1) as nbArticles ' +
         'from article ' +
         'group by feed_id ' +
         'order by 2 desc'));
@@ -315,6 +328,10 @@ var getFavorites = function(req, res){
     chainer.runSerially({ skipOnError: true })
         .success(function(results){
             var counts = results[0];
+            // sort according to 'popularity', mix of star and read
+            counts = und.sortBy(counts, getPopularity);
+            counts.reverse();
+
             // build a table indexed by id
             var feedsTable = und.groupBy(results[1], function(feed){return feed.id; });
 
@@ -325,8 +342,11 @@ var getFavorites = function(req, res){
                 var feedsOfThisId = feedsTable[feedId];
                 if (feedsOfThisId && feedsOfThisId.length > 0) {
                     var feed = feedsOfThisId[0];
-                    if (feed && feed.nb_unread > 0){
-                        feeds.push(processFeed(feed));
+                    if (feed && feed.nb_unseen > 0){
+                        // also add popularity
+                        var feedDataPlain = processFeed(feed);
+                        feedDataPlain.popularity = getPopularity(counts[i]);
+                        feeds.push(feedDataPlain);
                     }
                 }
             }
@@ -377,7 +397,7 @@ exports.findAll = findAll;
 exports.updateFeed = updateFeed;
 exports.addFeed = addFeed;
 exports.deleteFeed = deleteFeed;
-exports.markAllAsRead = markAllAsRead;
+exports.markAllAsSeen = markAllAsSeen;
 exports.getFavorites = getFavorites;
 exports.getImage = getImage;
 exports.getIcon = getIcon;

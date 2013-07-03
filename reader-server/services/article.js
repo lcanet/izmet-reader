@@ -14,7 +14,7 @@ function getErrorHandler(res){
     }
 }
 
-function getArticles(res, feedId, unreadOnly, starred, limit, offset) {
+function getArticles(res, feedId, unseenOnly, starred, limit, offset) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var args = {
@@ -27,8 +27,8 @@ function getArticles(res, feedId, unreadOnly, starred, limit, offset) {
     if (feedId != null){
         args.where.feed_id = feedId;
     }
-    if (unreadOnly){
-        args.where.read = false;
+    if (unseenOnly){
+        args.where.seen = false;
     }
     if (starred) {
         args.where.starred = true;
@@ -53,10 +53,10 @@ var findByFeed = function (req, res) {
     } else {
         var limit = parseInt(req.query.limit) || 100;
         var offset = parseInt(req.query.offset) || 0;
-        var unreadOnly = "true" == req.query.unreadOnly;
+        var unseenOnly = "true" == req.query.unseenOnly;
         var starredOnly = "true" == req.query.starred;
 
-        getArticles(res, feedId, unreadOnly, starredOnly, limit, offset);
+        getArticles(res, feedId, unseenOnly, starredOnly, limit, offset);
     }
 };
 
@@ -64,50 +64,11 @@ var findArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var limit = parseInt(req.query.limit) || 100;
     var offset = parseInt(req.query.offset) || 0;
-    var unreadOnly = "true" == req.query.unreadOnly;
+    var unseenOnly = "true" == req.query.unseenOnly;
     var starredOnly = "true" == req.query.starred;
 
-    getArticles(res, null, unreadOnly, starredOnly, limit, offset);
+    getArticles(res, null, unseenOnly, starredOnly, limit, offset);
 };
-
-/*
-var addArticle = function (req, res) {
-    res.header("Content-Type", "application/json; charset=utf-8");
-    var feedId = req.params.id;
-    if (!feedId) {
-        res.send({code: 400, description: 'Invalid parameter id'}, 400);
-        return;
-    }
-
-    var article = req.body;
-
-    // first check if article exists
-    var q;
-    if (article.article_id) {
-        q = db.model.Article.find({where: {feed_id: feedId, article_id: article.article_id }});
-    } else if (article.article_date) {
-        q = db.model.Article.find({where: {feed_id: feedId, article_date: article.article_date}});
-    } else {
-        q = db.model.Article.find({where: {feed_id: feedId, title: article.title}});
-    }
-
-    q.success(function(found){
-        if (found) {
-            res.send({"code":304, "description":'article already exists'}, 304);
-        } else {
-            article.feed_id = feedId;
-            db.model.Article.create(article)
-                .success(function(art){
-                    res.send({"code":201, "description":'article created'}, 201);
-                })
-                .error(getErrorHandler(res));
-        }
-
-    }).error(getErrorHandler(res));
-
-};
-
-*/
 
 var addArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
@@ -187,7 +148,7 @@ var markArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var cmd = req.body;
     if (cmd && cmd.all){
-        db.model.Article.update({read: true}, {read: false})
+        db.model.Article.update({seen: true}, {seen: false})
             .success(function(){
                 res.send({code: 200, description: "Articles updated"});
             })
