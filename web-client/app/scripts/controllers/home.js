@@ -17,6 +17,9 @@ angular.module('izmet')
         // to indicate that no feed is selected
         $rootScope.$broadcast('feedSelected', 'home');
 
+        $scope.showAddFeed = function(){
+            $rootScope.$broadcast('showAddFeedPopup');
+        };
 
 
     });

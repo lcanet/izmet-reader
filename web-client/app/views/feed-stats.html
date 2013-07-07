@@ -1,0 +1,67 @@
+<div class="stats">
+    <h1>IZMET Feed stats</h1>
+    <form class="form-search">
+        <input class="search-query" ng-model="filterFeedStats" placeholder="Filter feed"/>
+
+    </form>
+
+    <table class="table table-condensed table-striped">
+        <thead>
+        <tr>
+            <th rowspan="2">Feed</th>
+            <th rowspan="2">Last poll/fetch</th>
+            <th rowspan="2">First poll</th>
+            <th colspan="6"># articles</th>
+        </tr>
+        <tr>
+            <th>Last day</th>
+            <th>Last week</th>
+            <th>Last month</th>
+            <th>Last quarter</th>
+            <th>Last year</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="r in stats | filter:filterFeedStats">
+            <td>
+                <a href="#/{{ r.feed.id }}" title="{{ r.feed.name }}">
+                    {{ r.feed.name | ellipsis:50 }}
+
+                </a>
+            </td>
+            <td>
+                {{ r.feed.last_poll | date:'dd/MM/yyyy H:mm' }}
+                <span class="small-text"> ({{ r.feed | ago:'last_poll' }}) </span>
+                <br/>
+                {{ r.last_fetch |date:'dd/MM/yyyy H:mm' }}
+                <span class="small-text"> ({{ r | ago:'last_fetch' }}) </span>
+            </td>
+            <td>
+                {{ r.first_fetch | date:'dd/MM/yyyy'}}
+            </td>
+            <td>
+                {{ r.articles_day }}
+            </td>
+            <td>
+                {{ r.articles_week }}
+            </td>
+            <td>
+                {{ r.articles_month }}
+            </td>
+            <td>
+                {{ r.articles_quarter }}
+            </td>
+            <td>
+                {{ r.articles_year }}
+            </td>
+            <td>
+                {{ r.nb_articles }}
+            </td>
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
