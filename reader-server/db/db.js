@@ -88,10 +88,30 @@ var Article = sql.define('article', {
 
 Article.belongsTo(Feed, { foreignKey: 'feed_id'});
 
+
+var FeedStat = sql.define('feed_stat', {
+    feed_id: { type: Sequelize.INTEGER, primaryKey: true },
+    articles_day: Sequelize.INTEGER,
+    articles_week: Sequelize.INTEGER,
+    articles_month: Sequelize.INTEGER,
+    articles_quarter: Sequelize.INTEGER,
+    articles_year: Sequelize.INTEGER,
+    nb_articles: Sequelize.INTEGER,
+    first_fetch: Sequelize.DATE,
+    last_fetch: Sequelize.DATE,
+    articles_stats: Sequelize.STRING
+}, {
+    timestamps: false,
+    freezeTableName: true
+});
+FeedStat.belongsTo(Feed, { foreignKey: 'feed_id'});
+
+
 var model = {
     Feed: Feed,
     Image: Image,
-    Article: Article
+    Article: Article,
+    FeedStat: FeedStat
 };
 
 exports.sql = sql;
