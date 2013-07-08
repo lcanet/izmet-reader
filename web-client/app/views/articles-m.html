@@ -9,7 +9,7 @@
 
     <div class="article" ng-show="currentArticle != null">
         <h4>
-            {{ currentArticle.title }}
+            <a target="_blank" href="{{currentArticle.url}}">{{currentArticle.title}}</a>
         </h4>
         <p class="feed-title">
             from {{ currentArticle.feed.name }} -
