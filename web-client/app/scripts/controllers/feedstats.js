@@ -1,4 +1,5 @@
 'use strict';
+/* global alert */
 
 angular.module('izmet')
     .controller('FeedStatsCtrl', function ($scope, $http, $rootScope, izmetParameters) {
@@ -16,6 +17,6 @@ angular.module('izmet')
                     refresh();
                     alert('Feed polled');
                 });
-        }
+        };
 
     });
