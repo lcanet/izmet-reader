@@ -2,8 +2,20 @@
 
 angular.module('izmet')
     .controller('FeedStatsCtrl', function ($scope, $http, $rootScope, izmetParameters) {
-        $http.get('/feed-stats').success(function(res){
-            $scope.stats = res;
-        });
+        function refresh(){
+            $http.get(izmetParameters.backendUrl + 'feed-stats').success(function(res){
+                $scope.stats = res;
+            });
+        }
+
+        refresh();
+
+        $scope.forcePoll = function(feed){
+            $http.post(izmetParameters.backendUrl + 'feed/' + feed.id + '/poll')
+                .success(function(){
+                    refresh();
+                    alert('Feed polled');
+                });
+        }
 
     });

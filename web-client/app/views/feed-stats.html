@@ -27,7 +27,11 @@
             <td>
                 <a href="#/{{ r.feed.id }}" title="{{ r.feed.name }}">
                     {{ r.feed.name | ellipsis:50 }}
-
+                </a>
+                <a href="" ng-click="forcePoll(r.feed)">
+                    (
+                    <i class="icon icon-refresh"></i>
+                    force poll)
                 </a>
             </td>
             <td>
