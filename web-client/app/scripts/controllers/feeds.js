@@ -55,7 +55,7 @@ angular.module('izmet')
             return '';
         };
         $scope.getClassForAllArticles = function () {
-            return $scope.totalUnseen > 0 ? 'unseen' : '';
+            return $scope.totalUnseen > 0 ? 'unread' : '';
         };
 
         $scope.showAddFeed = function(){
