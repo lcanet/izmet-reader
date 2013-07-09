@@ -73,6 +73,7 @@ function processArticles(feed, articles, callback) {
     req.write(JSON.stringify(articles));
     req.write("\n");
     req.end();
+    articles = null;
 }
 
 exports.poll = pollFeedRSS;
