@@ -40,7 +40,7 @@ function getStatsPage(resultsById, start){
         { property: 'articles_year', threshold: moment().subtract('year', 1) }
     ];
 
-    db.model.Article.findAll({where: '1=1', order: 'id', limit: 1000, offset: start, raw:true})
+    db.model.Article.findAll({where: '1=1', order: 'id', limit: 100, offset: start, raw:true})
         .success(function(res){
             console.log('Processing result for page ' + start);
             // process each article
@@ -50,7 +50,7 @@ function getStatsPage(resultsById, start){
 
             // go to next page
             if (res.length > 0){
-                getStatsPage(resultsById, start + 1000);
+                getStatsPage(resultsById, start + 100);
             } else{
                 saveResults(resultsById);
             }
@@ -95,17 +95,18 @@ function processArticle(standardThresholds, resultsById, article) {
 
     var ad = moment(article.article_date);
     var afd = moment(article.fetch_date);
+    if (ad != null && afd != null) {
+        // simple
+        feedStat.nb_articles++;
+        // first/last
+        feedStat.first_fetch = (feedStat.first_fetch == null || feedStat.first_fetch.isAfter(afd)) ? afd : feedStat.first_fetch;
+        feedStat.last_fetch = (feedStat.last_fetch == null || feedStat.last_fetch.isBefore(afd)) ? afd : feedStat.last_fetch;
 
-    // simple
-    feedStat.nb_articles++;
-    // first/last
-    feedStat.first_fetch = feedStat.first_fetch == null || feedStat.first_fetch.isAfter(afd) ? afd : feedStat.first_fetch;
-    feedStat.last_fetch = feedStat.last_fetch == null || feedStat.last_fetch.isBefore(afd) ? afd : feedStat.last_fetch;
-
-    // last_day/year/month etc
-    for (var i = 0; i < standardThresholds.length; i++) {
-        if (ad.isAfter(standardThresholds[i].threshold)){
-            feedStat[standardThresholds[i].property]++;
+        // last_day/year/month etc
+        for (var i = 0; i < standardThresholds.length; i++) {
+            if (ad.isAfter(standardThresholds[i].threshold)){
+                feedStat[standardThresholds[i].property]++;
+            }
         }
     }
 }

@@ -24,6 +24,7 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(middleware.cacheHandler());
 app.use("/web-client", express.static(__dirname + '/web-client'));
+app.use("/dumps", express.static(__dirname + '/dumps'));
 
 // cors
 app.use(middleware.allowCrossDomain);
@@ -59,6 +60,10 @@ app.get('/resource/default-icons/:type', services.image.getDefaultIcon);
 app.get('/resource/:imageId', services.image.findById);
 
 app.get('/feed-stats', services.feedStat.getStats);
+app.get('/refresh-feed-stats', function(res, res){
+    statsUpdater.updateStats();
+    res.send('Stats refreshed');
+});
 
 // redirect root at end
 app.use('/', function(req, res){
@@ -78,5 +83,3 @@ console.log("Poller launched");
 
 statsUpdater.startUpdater('development' == app.get('env'));
 console.log('Stats updater launched');
-
-
