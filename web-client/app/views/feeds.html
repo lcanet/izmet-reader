@@ -25,7 +25,7 @@
         </a>
     </li>
     <li class="feed-group-sep"></li>
-    <li ng-repeat="feed in feeds | filter:filterText" ng-class="getRowClassForFeed(feed)">
+    <li ng-repeat="feed in feedData.feeds | filter:filterText" ng-class="getRowClassForFeed(feed)">
         <a href="#/{{feed.id}}" title="{{feed.description}}" ng-click="selectFeed(feed)"
                 ng-class="getClassForFeed(feed)">
             <img ng-src="{{ feed | iconLink }}" height="16" class="icon"/>

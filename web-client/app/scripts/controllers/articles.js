@@ -227,7 +227,7 @@ angular.module('izmet')
             if (confirm('Do you want to delete feed ?')) {
                 $http.delete(izmetParameters.backendUrl + 'feed/' + $scope.selectedFeed.id)
                     .success(function(){
-                        $rootScope.$broadcast('feedDeleted', $scope.selectedFeed);
+                        feedService.deleteFeed($scope.selectedFeed);
                         $location.path('/');
                     });
             }

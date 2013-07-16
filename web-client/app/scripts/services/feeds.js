@@ -1,17 +1,44 @@
-/**
- * Created with JetBrains WebStorm.
- * User: lc
- * Date: 16/07/13
- * Time: 20:59
- * To change this template use File | Settings | File Templates.
- */
 'use strict';
+/* global _ */
 
-function FeedService($http) {
+function FeedService($http, izmetParameters, $rootScope, $location) {
 
     var feedService = {
-        feeds: []
+        feeds: [],
+        totalUnseen: 0
     };
+
+    /**
+     * Load feeds
+     */
+    feedService.loadFeeds = function() {
+
+        $http.get(izmetParameters.backendUrl + 'feed').success(function(result){
+            feedService.feeds = result;
+            $rootScope.$broadcast('updateTotalUnseen');
+        });
+
+    };
+
+    $rootScope.$on('updateUnseen', function(evt, feedId, arg) {
+        var matching = _.filter(feedService.feeds, function(elt) { return feedId === null || elt.id == feedId; });
+        _.each(matching, function(feed) {
+            if (arg.delta) {
+                feed.nb_unseen += arg.delta;
+            } else {
+                feed.nb_unseen = arg.value;
+            }
+        });
+        $rootScope.$emit('updateTotalUnseen');
+    });
+
+
+    $rootScope.$on('updateTotalUnseen', function(){
+        feedService.totalUnseen = _.reduce(feedService.feeds,
+            function(sum, feed) {
+                return sum + feed.nb_unseen;
+            }, 0);
+    });
 
 
     /**
@@ -35,11 +62,34 @@ function FeedService($http) {
             }
         }
         return null;
-
     };
 
-    return feedService;
+    /**
+     * Add a new feed and switch current view to it
+     * @param feed
+     */
+    feedService.addFeed = function(feed) {
+        feedService.feeds.push(feed);
+        $location.path('/' + feed.id);
+    };
 
+    /**
+     * Delete the given feed
+     * @param feed
+     */
+    feedService.deleteFeed = function(feed){
+        var elt = _.find(feedService.feeds, function(e){return e.id === feed.id; });
+        if (elt){
+            var idx = feedService.feeds.indexOf(elt);
+            feedService.feeds.splice(idx, 1);
+        }
+    };
+
+
+    // on startup load feeds
+    feedService.loadFeeds();
+
+    return feedService;
 }
 
 

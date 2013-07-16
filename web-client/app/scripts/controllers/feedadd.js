@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('izmet')
-    .controller('FeedAddCtrl', function ($scope, $http, $rootScope, izmetParameters) {
+    .controller('FeedAddCtrl', function ($scope, $http, $rootScope, izmetParameters, feedService) {
         $scope.showPopup = false;
 
         $scope.type = 'rss';
@@ -16,7 +16,7 @@ angular.module('izmet')
 
                         // go get feed
                         $http.get(headers('location')).success(function(feed) {
-                            $rootScope.$broadcast('feedAdded', feed);
+                            feedService.addFeed(feed);
                         });
 
                     });
