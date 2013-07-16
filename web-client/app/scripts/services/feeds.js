@@ -85,6 +85,18 @@ function FeedService($http, izmetParameters, $rootScope, $location) {
         }
     };
 
+    /**
+     * Get a feed by its id
+     * @param id
+     * @returns {Mixed}
+     */
+    feedService.getFeed = function(id) {
+        if (_.isString(id)) {
+            id = parseInt(id);
+        }
+        return _.find(feedService.feeds, function(e){return e.id === id; });
+    };
+
 
     // on startup load feeds
     feedService.loadFeeds();

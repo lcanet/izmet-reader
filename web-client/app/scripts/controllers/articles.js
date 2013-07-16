@@ -92,12 +92,9 @@ angular.module('izmet')
             if ($scope.currentFeedId !== null &&
                     $scope.currentFeedId !== 'all' &&
                     $scope.currentFeedId != 'starred') {
-                $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId).success(function(result){
-                    $scope.selectedFeed = result;
-                    // get the next unseen feed
-                    $scope.nextUnseenFeed = feedService.getNextUnseen(result);
-
-                });
+                $scope.selectedFeed = feedService.getFeed($scope.currentFeedId);
+                // get the next unseen feed
+                $scope.nextUnseenFeed = feedService.getNextUnseen($scope.selectedFeed);
             }
 
             articleIdToSelect = $routeParams.articleId;
