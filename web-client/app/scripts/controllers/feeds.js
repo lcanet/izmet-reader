@@ -4,7 +4,6 @@
 angular.module('izmet')
     .controller('FeedsCtrl', function ($scope, $http, $rootScope, $location, feedService) {
         $scope.filterText = '';
-        $scope.totalUnseen = 0;
 
         $scope.feedData = feedService;
 
@@ -29,7 +28,7 @@ angular.module('izmet')
             return '';
         };
         $scope.getClassForAllArticles = function () {
-            return $scope.totalUnseen > 0 ? 'unread' : '';
+            return $scope.feedData.totalUnseen > 0 ? 'unread' : '';
         };
 
         $scope.showAddFeed = function(){
