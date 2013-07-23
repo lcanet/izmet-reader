@@ -69,6 +69,10 @@ function processArticles(feed, articles, callback) {
             if (callback) callback();
         });
     });
+    req.on('error', function(e) {
+        console.log('Error while adding articles: ' +  + e.message);
+    });
+
 
     req.write(JSON.stringify(articles));
     req.write("\n");
