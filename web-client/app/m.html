@@ -54,7 +54,12 @@
     function startApp() {
         angular.bootstrap(document, ['izmet']);
     }
-    document.addEventListener("deviceready", startApp, false);
+
+    if (window.PhoneGap) {
+        document.addEventListener("deviceready", startApp, false);
+    } else {
+        startApp();
+    }
 
 </script>
 

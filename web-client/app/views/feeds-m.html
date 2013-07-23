@@ -4,7 +4,7 @@
             <a href="#/all" ng-class="getClassForAllArticles()">
                 <i class="icon icon-home"></i>
                 All articles
-                <span ng-show="totalUnseen > 0">({{ totalUnseen }})</span>
+                <span ng-show="feedData.totalUnseen > 0">({{ feedData.totalUnseen }})</span>
             </a>
         </li>
         <li ng-repeat="f in feedData.feeds">

@@ -15,7 +15,7 @@
        <a href="#/all" title="all articles" ng-class="getClassForAllArticles()">
            <i class="icon icon-list"></i>
           All articles
-           <span ng-show="totalUnseen > 0">({{totalUnseen}})</span>
+           <span ng-show="feedData.totalUnseen > 0">({{feedData.totalUnseen}})</span>
        </a>
     </li>
     <li class="all-feeds main-item" ng-class="getRowClassForFeed('starred')">
