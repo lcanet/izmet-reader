@@ -15,14 +15,30 @@ var pollers = {
     'dilbert': dilbert.poll
 };
 
+// set of currently polling feeds
+var currentlyPolling = {};
+
+function shuffle(o){ //v1.0
+    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+}
+
 function processFeeds(feeds, limit) {
 
+    feeds =shuffle(feeds);
     // filter feeds
     var feedsToProcess = und.filter(feeds, shouldPollFeed);
     if (limit > 0) {
         feedsToProcess = feedsToProcess.slice(0, Math.min(feedsToProcess.length, limit));
     }
     console.log("Processing " + feedsToProcess.length + "/" + feeds.length + " feeds");
+    console.log("Backlog of bad feeds is ", currentlyPolling);
+
+    // mark feeds
+    for (var i = 0; i < feedsToProcess.length; i++) {
+        currentlyPolling[feedsToProcess[i].id] = true;
+    }
+
 
     utils.processQueue(feedsToProcess, function(nextFeed, done){
         pollFeed(nextFeed, done);
@@ -46,11 +62,17 @@ function shouldPollFeed(feed) {
     if (feed.last_poll == null) {
         return true;
     }
+    // currently polling by another thread ?
+    if (currentlyPolling[feed.id]){
+        return false;
+    }
     var nextPoll = moment(feed.last_poll).add('minutes', feed.poll_frequency);
     return nextPoll.isBefore(moment());
 }
 
 function markFeedUpdated(feed){
+    delete currentlyPolling[feed.id];
+
     var feedData = {
         last_poll: moment().format()
     };
