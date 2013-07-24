@@ -12,6 +12,7 @@
         </p>
         <p>
             Type: <em>{{selectedFeed.type}}</em>  <img ng-src="{{ selectedFeed | iconLink }}" height="16" class="icon"/>
+            <a href="{{ selectedFeed.url }}" ng-show="selectedFeed.type == 'rss">RSS Link</a>
 
             <br/>
             Last poll: <em>{{selectedFeed.last_poll | date:'medium' }} </em> (frequency: <em>{{selectedFeed.poll_frequency}}</em> minutes)
