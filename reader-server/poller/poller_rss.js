@@ -35,6 +35,10 @@ function transformArticleData(article){
         title: article.title,
         article_id: null
     };
+    // specific
+    if (!articleData.article_date && article['a10:updated'] != null) {
+        articleData.article_date = article['a10:updated']['#'];
+    }
 
     return articleData;
 }
