@@ -15,4 +15,32 @@
             </a>
         </li>
     </ul>
+
+
+    <div class="navbar navbar-fixed-bottom" ng-controller="MobileOptionsCtrl">
+        <div class="navbar-inner">
+            <ul class="nav">
+                <li class="divider-vertical">
+                    <a href="" ng-click="launchSync()">
+                        <i class="icon icon-bullhorn"></i>
+                    </a>
+                </li>
+
+                <li class="divider-vertical" ng-style="getStyleForConnectivity()">
+                    <a href="">
+                        <i class="icon" ng-class="getIconClassForConnectivity()"></i>
+                    </a>
+                </li>
+                <li class="divider-vertical" >
+                    <a href="">
+                        {{ syncLabel }}
+                    </a>
+                </li>
+
+
+            </ul>
+        </div>
+
+    </div>
+
 </div>
