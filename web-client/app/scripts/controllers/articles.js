@@ -1,6 +1,7 @@
 'use strict';
 /* global _ */
 /* global confirm */
+/* global alert */
 
 angular.module('izmet')
     .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location, $q,
@@ -57,7 +58,7 @@ angular.module('izmet')
                 }
             };
             var faultHandler = function(){
-                alert("Cannot get articles");
+                alert('Cannot get articles');
             };
 
             var unseenOnly = $scope.unseenOnly;
@@ -66,17 +67,17 @@ angular.module('izmet')
             // load offline or not
             if (offlineService.hasOfflineSupport &&
                 !offlineService.hasNetwork() &&
-                offlineService.offlineData != null) {
+                offlineService.offlineData !== null) {
 
-                console.log("Loading offline");
+                console.log('Loading offline');
                 var defer = $q.defer();
                 var subList = offlineService.offlineData.articles;
 
                 // filter unseen
-                subList = _.filter(subList, function(a) { return !a.seen });
+                subList = _.filter(subList, function(a) { return !a.seen; });
 
                 if ($scope.currentFeedId !== 'all' && $scope.currentFeedId !== null) {
-                    var subList = _.filter(subList, function(a) { return a.feed.id == $scope.currentFeedId; });
+                    subList = _.filter(subList, function(a) { return a.feed.id == $scope.currentFeedId; });
                 }
 
                 subList = subList.slice(lastOffset, Math.min(lastOffset+pageSize, subList.length));

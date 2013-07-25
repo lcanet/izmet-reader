@@ -1,6 +1,5 @@
 'use strict';
-/* global _ */
-/* global confirm */
+/* global alert */
 
 angular.module('izmet')
     .controller('MobileOptionsCtrl', function ($scope, offlineService, $rootScope) {
@@ -23,21 +22,21 @@ angular.module('izmet')
         $rootScope.$on('offlineDataSyncProgress', function(ev, prog) {
             $scope.syncLabel = prog + ' ...';
         });
-        $rootScope.$on('offlineDataSyncEnd', function(ev, prog) {
+        $rootScope.$on('offlineDataSyncEnd', function() {
             $scope.syncLabel = null;
         });
 
         $scope.online = offlineService.hasNetwork();
-        $rootScope.$on('networkStateChange', function($ev, newState){
+        $rootScope.$on('networkStateChange', function(){
             $scope.online = offlineService.hasNetwork();
         });
 
         $scope.showLastUpdate = function(){
             if (offlineService.hasOfflineSupport) {
-                if (offlineService.offlineData == null) {
-                    alert("No offline data");
+                if (offlineService.offlineData === null) {
+                    alert('No offline data');
                 } else {
-                    alert("Last update : " + offlineService.offlineData.syncDate.toLocaleString());
+                    alert('Last update : ' + offlineService.offlineData.syncDate.toLocaleString());
                 }
             }
         };

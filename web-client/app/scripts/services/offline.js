@@ -1,5 +1,4 @@
 'use strict';
-/* global _ */
 
 function OfflineService() {
 

@@ -1,5 +1,6 @@
 'use strict';
 /* global _ */
+/* global alert */
 
 function FeedService($http, izmetParameters, $rootScope, $location, offlineService) {
 
@@ -19,10 +20,10 @@ function FeedService($http, izmetParameters, $rootScope, $location, offlineServi
 
         if (offlineService.hasOfflineSupport &&
             !offlineService.hasNetwork()) {
-            if (offlineService.offlineData != null) {
+            if (offlineService.offlineData !== null) {
                 resHandler(offlineService.offlineData.feeds);
             } else {
-                alert("No connectivity - cannot get data");
+                alert('No connectivity - cannot get data');
             }
 
         } else {
@@ -103,7 +104,7 @@ function FeedService($http, izmetParameters, $rootScope, $location, offlineServi
      */
     feedService.getFeed = function(id) {
         if (_.isString(id)) {
-            id = parseInt(id);
+            id = parseInt(id, 10);
         }
         return _.find(feedService.feeds, function(e){return e.id === id; });
     };

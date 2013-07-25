@@ -1,5 +1,5 @@
 'use strict';
-/* global _ */
+/* global alert */
 
 function OfflineMobileService($http, izmetParameters, $rootScope, $location, $log, $timeout, $q) {
 
@@ -20,12 +20,12 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
     service.start = function() {
         // check online/offline
         if (izmetParameters.mobile && navigator && navigator.network) {
-            console.log("Registering connectivity change event");
+            console.log('Registering connectivity change event');
 
             var checkConnectivityFunction = function(){
                 var newNetworkState = navigator.network.connection.type;
                 if (service.networkState === null || newNetworkState !== service.networkState) {
-                    $log.log("NEW NETWORK STATE IS " + newNetworkState);
+                    $log.log('NEW NETWORK STATE IS ' + newNetworkState);
                     service.networkState = newNetworkState;
 
                     $rootScope.$broadcast('networkStateChange', newNetworkState);
@@ -62,7 +62,7 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
 
     function checkLocalStorage() {
         try {
-            return 'localStorage' in window && window['localStorage'] !== null;
+            return 'localStorage' in window && window.localStorage !== null;
         } catch (e) {
             return false;
         }
@@ -70,7 +70,7 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
 
     service.loadLocalData = function(){
         if (!checkLocalStorage()) {
-            alert("No local storage");
+            alert('No local storage');
             return null;
         }
         var str = localStorage.getItem(LOCALSTORAGE_CACHE_KEY);
@@ -92,8 +92,8 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
 
     service.pushPendingActions = function() {
         var defer = $q.defer();
-        if (service.pendingActions != null && service.pendingActions.length > 0) {
-            console.log("About to push ", service.pendingActions);
+        if (service.pendingActions !== null && service.pendingActions.length > 0) {
+            console.log('About to push ', service.pendingActions);
 
             $http.put(izmetParameters.backendUrl + 'article',
                 service.pendingActions)
@@ -102,8 +102,8 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
                     defer.resolve();
                 })
                 .error(function(err){
-                    console.log("Error", err);
-                    alert("Cannot push actions");
+                    console.log('Error', err);
+                    alert('Cannot push actions');
                     defer.reject();
                 });
 
@@ -118,7 +118,7 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
         service.offlineData = {};
         service.offlineData.syncDate = new Date();
 
-        $rootScope.$broadcast("offlineDataSyncStart");
+        $rootScope.$broadcast('offlineDataSyncStart');
 
         // load feeds
         var currentArticlesIndex = 0;
@@ -139,12 +139,12 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
                     $http.get(izmetParameters.backendUrl + 'article',
                         {params: {limit: 100, offset:currentArticlesIndex, unseenOnly: true}})
                         .success(function(data){
-                            console.log("Fetched articles @ " + currentArticlesIndex);
+                            console.log('Fetched articles @ ' + currentArticlesIndex);
                             articles = articles.concat(data);
                             currentArticlesIndex += 100;
 
                             // publish progress
-                            $rootScope.$broadcast("offlineDataSyncProgress", articles.length);
+                            $rootScope.$broadcast('offlineDataSyncProgress', articles.length);
 
                             fetchArticles(data.length === 0);
                         });
@@ -163,11 +163,11 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
                 try {
                     localStorage.setItem(LOCALSTORAGE_CACHE_KEY, jsonData);
                 } catch (e){
-                    alert("Cannot save to local storage", e);
+                    alert('Cannot save to local storage', e);
                 }
             }
 
-            $rootScope.$broadcast("offlineDataSyncEnd", service.offlineData);
+            $rootScope.$broadcast('offlineDataSyncEnd', service.offlineData);
         });
     };
     return service;
