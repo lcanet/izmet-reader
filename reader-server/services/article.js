@@ -147,7 +147,22 @@ var markArticle = function (req, res) {
 var markArticles = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var cmd = req.body;
-    if (cmd && cmd.all){
+    if (und.isArray(cmd)){
+        // updates
+        var chainer = new Sequelize.Utils.QueryChainer();
+        for (var i = 0; i < cmd.length; i++) {
+            var updates = und.clone(cmd[i]);
+            delete updates.id;
+            chainer.add(db.model.Article.update(updates, {id: cmd[i].id }));
+
+        }
+        chainer.runSerially()
+            .success(function(result){
+                res.send({code: 200, description: "Articles updated"});
+            })
+            .error(getErrorHandler(res));
+
+    } else if (cmd && cmd.all){
         db.model.Article.update({seen: true}, {seen: false})
             .success(function(){
                 res.send({code: 200, description: "Articles updated"});
