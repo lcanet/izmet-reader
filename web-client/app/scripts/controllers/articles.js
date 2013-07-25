@@ -3,7 +3,8 @@
 /* global confirm */
 
 angular.module('izmet')
-    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location, izmetParameters, feedService) {
+    .controller('ArticlesCtrl', function ($http, $scope, $routeParams, $rootScope, $location, $q,
+                                          izmetParameters, feedService, offlineService) {
 
         // pagination parameters
         var pageSize ;
@@ -23,13 +24,15 @@ angular.module('izmet')
 
         function getPage() {
             var resultHandler= function(result) {
-                if (result.length < pageSize) {
+                var data = result.data;
+
+                if (data.length < pageSize) {
                     endOfFeed = true;
                 }
                 if (!$scope.articles) {
                     $scope.articles = [];
                 }
-                $scope.articles = $scope.articles.concat( result);
+                $scope.articles = $scope.articles.concat( data);
                 $scope.requestInflight = false;
 
                 // article to select (with url parameter)
@@ -53,21 +56,47 @@ angular.module('izmet')
                     $scope.selectArticle($scope.articles[0]);
                 }
             };
+            var faultHandler = function(){
+                alert("Cannot get articles");
+            };
 
             var unseenOnly = $scope.unseenOnly;
             var p;
-            if ($scope.currentFeedId === 'all') {
-                p = $http.get(izmetParameters.backendUrl + 'article', {params:
+
+            // load offline or not
+            if (offlineService.hasOfflineSupport &&
+                !offlineService.hasNetwork() &&
+                offlineService.offlineData != null) {
+
+                console.log("Loading offline");
+                var defer = $q.defer();
+                var subList = offlineService.offlineData.articles;
+
+                // filter unseen
+                subList = _.filter(subList, function(a) { return !a.seen });
+
+                if ($scope.currentFeedId !== 'all' && $scope.currentFeedId !== null) {
+                    var subList = _.filter(subList, function(a) { return a.feed.id == $scope.currentFeedId; });
+                }
+
+                subList = subList.slice(lastOffset, Math.min(lastOffset+pageSize, subList.length));
+                defer.resolve({data: subList});
+                p = defer.promise;
+
+            } else {
+                if ($scope.currentFeedId === 'all') {
+                    p = $http.get(izmetParameters.backendUrl + 'article', {params:
                     {limit: pageSize, offset:lastOffset, unseenOnly: unseenOnly}});
-            } else if ($scope.currentFeedId === 'starred') {
-                p = $http.get(izmetParameters.backendUrl + 'article', {params:
+                } else if ($scope.currentFeedId === 'starred') {
+                    p = $http.get(izmetParameters.backendUrl + 'article', {params:
                     {limit: pageSize, offset:lastOffset, unseenOnly: false, starred: true}});
-            } else if ($scope.currentFeedId !== null) {
-                p = $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params:
+                } else if ($scope.currentFeedId !== null) {
+                    p = $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params:
                     {limit: pageSize, offset:lastOffset, unseenOnly:unseenOnly}});
+                }
             }
             if (p) {
-                p.success(resultHandler);
+                p.then(resultHandler, faultHandler);
                 $scope.requestInflight = true;
             }
         }
@@ -132,11 +161,19 @@ angular.module('izmet')
                 $scope.currentArticle = article;
                 if (article && !article.seen) {
                     article.seen = true;
+
                     // update status on server
-                    $http.put(izmetParameters.backendUrl + 'article/' + article.id, { seen: true, read:true })
+                    if (offlineService.hasOfflineSupport &&
+                        !offlineService.hasNetwork()) {
+
+                        offlineService.addPendingAction({id: article.id, seen: true, read:true });
+                        $rootScope.$broadcast('updateUnseen', article.feed.id, { delta: -1 });
+                    } else {
+                        $http.put(izmetParameters.backendUrl + 'article/' + article.id, { seen: true, read:true })
                         .success(function(){
                             $rootScope.$broadcast('updateUnseen', article.feed.id, { delta: -1 });
                         });
+                    }
                 }
                 // scroll to article
                 if (article){
@@ -243,7 +280,15 @@ angular.module('izmet')
         };
         $scope.toggleStar = function(a){
             a.starred = !a.starred;
-            $http.put(izmetParameters.backendUrl + 'article/' + a.id, { starred: a.starred });
+
+            // update status on server
+            if (offlineService.hasOfflineSupport &&
+                !offlineService.hasNetwork()) {
+                offlineService.addPendingAction({id: a.id, starred: a.starred});
+            } else {
+                $http.put(izmetParameters.backendUrl + 'article/' + a.id, { starred: a.starred });
+            }
+
 
         };
 

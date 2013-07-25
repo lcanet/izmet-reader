@@ -44,3 +44,4 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
         }]);
 
     }]);
+

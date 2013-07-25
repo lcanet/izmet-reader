@@ -35,4 +35,7 @@ angular.module('izmet')
             $rootScope.$broadcast('showAddFeedPopup');
         };
 
+        $scope.reloadFeeds = function() {
+            feedService.loadFeeds();
+        };
     });

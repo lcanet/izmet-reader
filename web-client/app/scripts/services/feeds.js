@@ -1,7 +1,7 @@
 'use strict';
 /* global _ */
 
-function FeedService($http, izmetParameters, $rootScope, $location) {
+function FeedService($http, izmetParameters, $rootScope, $location, offlineService) {
 
     var feedService = {
         feeds: [],
@@ -12,11 +12,22 @@ function FeedService($http, izmetParameters, $rootScope, $location) {
      * Load feeds
      */
     feedService.loadFeeds = function() {
-
-        $http.get(izmetParameters.backendUrl + 'feed').success(function(result){
+        function resHandler(result) {
             feedService.feeds = result;
             $rootScope.$broadcast('updateTotalUnseen');
-        });
+        }
+
+        if (offlineService.hasOfflineSupport &&
+            !offlineService.hasNetwork()) {
+            if (offlineService.offlineData != null) {
+                resHandler(offlineService.offlineData.feeds);
+            } else {
+                alert("No connectivity - cannot get data");
+            }
+
+        } else {
+            $http.get(izmetParameters.backendUrl + 'feed').success(resHandler);
+        }
 
     };
 

@@ -26,5 +26,21 @@ angular.module('izmet')
         $rootScope.$on('offlineDataSyncEnd', function(ev, prog) {
             $scope.syncLabel = null;
         });
+
+        $scope.online = offlineService.hasNetwork();
+        $rootScope.$on('networkStateChange', function($ev, newState){
+            $scope.online = offlineService.hasNetwork();
+        });
+
+        $scope.showLastUpdate = function(){
+            if (offlineService.hasOfflineSupport) {
+                if (offlineService.offlineData == null) {
+                    alert("No offline data");
+                } else {
+                    alert("Last update : " + offlineService.offlineData.syncDate.toLocaleString());
+                }
+            }
+        };
+
     });
 

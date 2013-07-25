@@ -50,6 +50,6 @@ angular.module('izmet', ['ngMobile', 'ngResource', 'ngSanitize', 'izmetConfig'])
 
         // start offline services
         offlineService.start();
-
+        offlineService.loadLocalData();
     }])
 ;

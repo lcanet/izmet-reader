@@ -27,8 +27,13 @@
                 </li>
 
                 <li class="divider-vertical" ng-style="getStyleForConnectivity()">
-                    <a href="">
+                    <a href="" ng-click="showLastUpdate()">
                         <i class="icon" ng-class="getIconClassForConnectivity()"></i>
+                    </a>
+                </li>
+                <li class="divider-vertical">
+                    <a href="" ng-click="reloadFeeds()">
+                        <i class="icon icon-download"></i>
                     </a>
                 </li>
                 <li class="divider-vertical" >
