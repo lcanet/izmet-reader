@@ -1,7 +1,6 @@
 'use strict';
 /* global alert */
-
-function OfflineMobileService($http, izmetParameters, $rootScope, $location, $log, $timeout, $q) {
+angular.module('izmet').service('offlineService', function($http, izmetParameters, $rootScope, $location, $log, $timeout, $q) {
 
     var CONNECTIVITY_CHANGE_POLL_DELAY = 2000;
     var LOCALSTORAGE_CACHE_KEY = 'izmetCache';
@@ -171,6 +170,5 @@ function OfflineMobileService($http, izmetParameters, $rootScope, $location, $lo
         });
     };
     return service;
-}
+});
 
-angular.module('izmet').service('offlineService',OfflineMobileService);

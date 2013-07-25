@@ -2,7 +2,7 @@
 /* global _ */
 /* global alert */
 
-function FeedService($http, izmetParameters, $rootScope, $location, offlineService) {
+angular.module('izmet').service('feedService', function($http, izmetParameters, $rootScope, $location, offlineService) {
 
     var feedService = {
         feeds: [],
@@ -114,7 +114,6 @@ function FeedService($http, izmetParameters, $rootScope, $location, offlineServi
     feedService.loadFeeds();
 
     return feedService;
-}
+});
 
 
-angular.module('izmet').service('feedService',FeedService);

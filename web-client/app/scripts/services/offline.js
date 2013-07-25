@@ -1,6 +1,7 @@
 'use strict';
 
-function OfflineService() {
+
+angular.module('izmet').service('offlineService',function () {
 
     var service = {
         hasOfflineSupport: false
@@ -8,6 +9,5 @@ function OfflineService() {
 
 
     return service;
-}
+});
 
-angular.module('izmet').service('offlineService',OfflineService);
