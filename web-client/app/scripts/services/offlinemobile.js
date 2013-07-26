@@ -1,5 +1,7 @@
 'use strict';
 /* global alert */
+/* global console */
+
 angular.module('izmet').service('offlineService', function($http, izmetParameters, $rootScope, $location, $log, $timeout, $q) {
 
     var CONNECTIVITY_CHANGE_POLL_DELAY = 2000;
@@ -18,13 +20,14 @@ angular.module('izmet').service('offlineService', function($http, izmetParameter
      */
     service.start = function() {
         // check online/offline
-        if (izmetParameters.mobile && navigator && navigator.network) {
+        if (izmetParameters.mobile && navigator && navigator.connection) {
             console.log('Registering connectivity change event');
 
             var checkConnectivityFunction = function(){
-                var newNetworkState = navigator.network.connection.type;
+                var newNetworkState = navigator.connection.type;
                 if (service.networkState === null || newNetworkState !== service.networkState) {
-                    $log.log('NEW NETWORK STATE IS ' + newNetworkState);
+                    console.log('NEW NETWORK STATE IS ' + newNetworkState);
+                    //alert("New NET STATE IS " + newNetworkState);
                     service.networkState = newNetworkState;
 
                     $rootScope.$broadcast('networkStateChange', newNetworkState);
@@ -37,11 +40,11 @@ angular.module('izmet').service('offlineService', function($http, izmetParameter
 
             };
 
-            $timeout(function checkConnectivityTimerFn() {
+            var checkConnectivityTimerFn = function(){
                 checkConnectivityFunction();
                 $timeout(checkConnectivityTimerFn, CONNECTIVITY_CHANGE_POLL_DELAY);
-            }, 0);
-
+            };
+            $timeout(checkConnectivityTimerFn, 0);
         }
 
         // read data from localStorage
