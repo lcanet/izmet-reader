@@ -101,5 +101,15 @@ create index idx_article_feed_id on article (feed_id);
 create index idx_article_feed_id_starred on article (feed_id, starred);
 
 
+create table feed_stat
+(feed_id integer,
+articles_day integer,
+articles_week integer,
+articles_month integer,
+articles_quarter integer,
+articles_year integer,
+articles_stats text,
+primary key(feed_id));
+
 
     

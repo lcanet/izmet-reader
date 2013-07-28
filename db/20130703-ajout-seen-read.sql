@@ -1,7 +1,6 @@
 
 alter table article disable trigger trigger_update_article_unread;
 alter table article disable trigger trigger_insert_article_unread;
-alter table article disable trigger trigger_delete_article_unread;
 
 alter table article add column seen boolean not null default false;
 
@@ -17,7 +16,6 @@ update feed set nb_unseen = (select count(1) from article a where a.feed_id = fe
 
 alter table article enable trigger trigger_update_article_unread;
 alter table article enable trigger trigger_insert_article_unread;
-alter table article enable trigger trigger_delete_article_unread;
 
 
 

@@ -85,6 +85,9 @@ function saveResults(resultsById, callback){
         if (item.last_fetch) {
             item.last_fetch = item.last_fetch.format();
         }
+        if (item.articles_stats != null) {
+            item.articles_stats = '[' + item.articles_stats.join(',') + ']';
+        }
     });
     db.model.FeedStat.bulkCreate(vals)
         .success(function(res){
