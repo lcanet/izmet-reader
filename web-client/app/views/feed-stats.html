@@ -2,10 +2,9 @@
     <h1>IZMET Feed stats</h1>
     <form class="form-search">
         <input class="search-query" ng-model="filterFeedStats" placeholder="Filter feed"/>
-
     </form>
 
-    <table class="table table-condensed table-striped">
+    <table class="table table-condensed table-striped table-condensed">
         <thead>
         <tr>
             <th rowspan="2">Feed</th>
@@ -33,6 +32,8 @@
                     <i class="icon icon-refresh"></i>
                     force poll)
                 </a>
+                <br/>
+                <article-histogram class="article-histogram" width="300" height="50" model="r.articles_stats" global-max="globalMax"/>
             </td>
             <td>
                 {{ r.feed.last_poll | date:'dd/MM/yyyy H:mm' }}

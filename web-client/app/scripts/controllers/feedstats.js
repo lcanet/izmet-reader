@@ -1,11 +1,22 @@
 'use strict';
 /* global alert */
+/* global _ */
 
 angular.module('izmet')
     .controller('FeedStatsCtrl', function ($scope, $http, $rootScope, izmetParameters) {
         function refresh(){
             $http.get(izmetParameters.backendUrl + 'feed-stats').success(function(res){
                 $scope.stats = res;
+                // calculate global max
+                var globalMax = 0;
+                angular.forEach(res, function(fs){
+                    var data = JSON.parse(fs.articles_stats);
+                    fs.articles_stats = data;
+                    angular.forEach(data, function(i){
+                        globalMax = Math.max(globalMax, i);
+                    });
+                });
+                $scope.globalMax = globalMax;
             });
         }
 
