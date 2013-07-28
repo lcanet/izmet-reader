@@ -3,6 +3,7 @@ var db = require('../db/db.js'),
     utils = require('../utils/utils.js'),
     moment = require('moment'),
     cronJob = require('cron').CronJob,
+    config = require('../config/config.js'),
     timer = require('../utils/timer.js'),
     Sequelize = require('sequelize');
 
@@ -49,7 +50,12 @@ function getStatsPage(callback, resultsById, start){
         { property: 'articles_year', threshold: moment().subtract('year', 1) }
     ];
 
-    db.model.Article.findAll({where: '1=1', order: 'id', limit: 100, offset: start, raw:true})
+    db.model.Article.findAll({
+        where: '1=1',
+        order: 'id',
+        attributes: ['id', 'feed_id', 'article_date', 'fetch_date'],
+        limit: config.articlesByRefresh,
+        offset: start, raw:true})
         .success(function(res){
             console.log('Processing result for page ' + start);
             // process each article
@@ -59,7 +65,7 @@ function getStatsPage(callback, resultsById, start){
 
             // go to next page
             if (res.length > 0){
-                getStatsPage(callback, resultsById, start + 100);
+                getStatsPage(callback, resultsById, start + config.articlesByRefresh);
             } else{
                 callback(resultsById);
             }
@@ -88,13 +94,23 @@ function saveResults(resultsById, callback){
         .error(errorHandler);
 }
 
+function zeroArray(nb) {
+    var arr = [];
+    for (var i = 0; i < nb; i++) {
+        arr.push(0);
+    }
+    return arr;
+}
+
+
 function processArticle(standardThresholds, resultsById, article) {
     // get related feed stats
     var feedStat = resultsById[article.feed_id];
     if (!feedStat) {
         feedStat = {
             nb_articles: 0,
-            feed_id: article.feed_id
+            feed_id: article.feed_id,
+            articles_stats: zeroArray(60)
         };
         // zero of standard thresholds
         for (var i = 0; i < standardThresholds.length; i++){
@@ -118,6 +134,14 @@ function processArticle(standardThresholds, resultsById, article) {
                 feedStat[standardThresholds[i].property]++;
             }
         }
+
+        // stats by day
+        var ddiff = Math.ceil(moment().diff(ad) / 86400000);
+        if (ddiff < feedStat.articles_stats.length) {
+            feedStat.articles_stats[ddiff]++;
+        }
+
+
     }
 }
 

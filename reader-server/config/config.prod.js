@@ -21,7 +21,10 @@ module.exports = {
     twitter: {
         key: '',
         secret: ''
-    }
+    },
+
+    articlesByRefresh: 100
+
 
 
 };

@@ -12,14 +12,16 @@ module.exports = {
         port: 5432
     },
 
-    maxFeedsPerPoll: 10,
+    maxFeedsPerPoll: 20,
     pollerEnabled: false,
 
     mode: 'development',
     isDev: true,
 
     twitter: {
-        key: '',
-        secret: ''
-    }
+       key: '',
+       secret: ''
+    },
+
+    articlesByRefresh: 1000
 };
