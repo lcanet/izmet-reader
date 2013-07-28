@@ -3,6 +3,7 @@ var db = require('../db/db.js'),
     utils = require('../utils/utils.js'),
     moment = require('moment'),
     cronJob = require('cron').CronJob,
+    timer = require('../utils/timer.js'),
     Sequelize = require('sequelize');
 
 function errorHandler(err) {
@@ -14,24 +15,32 @@ function errorHandler(err) {
  */
 var updateStats = function(){
     console.log('Updating feed stats');
-    // first delete all
+    var sw = timer();
+    sw.start();
 
+    // first delete all
     db.sql.query('delete from feed_stat')
         .success(function(){
-            getStats();
+            // refresh all stats
+            getStats(function(resultsById){
+                saveResults(resultsById, function(){
+                    sw.stop();
+                    console.log("Feed stats refresh done in " + sw.getTime() + " ms");
+                });
+            });
         })
         .error(errorHandler);
 };
 
-function getStats() {
+function getStats(callback) {
     // table indexed by id
     var resultsById = {};
 
     // do some sort of pagine
-    getStatsPage(resultsById, 0);
+    getStatsPage(callback, resultsById, 0);
 }
 
-function getStatsPage(resultsById, start){
+function getStatsPage(callback, resultsById, start){
     var thresholds = [
         { property: 'articles_day', threshold: moment().subtract('day', 1) },
         { property: 'articles_week', threshold: moment().subtract('day', 7) },
@@ -50,15 +59,15 @@ function getStatsPage(resultsById, start){
 
             // go to next page
             if (res.length > 0){
-                getStatsPage(resultsById, start + 100);
+                getStatsPage(callback, resultsById, start + 100);
             } else{
-                saveResults(resultsById);
+                callback(resultsById);
             }
         })
         .error(errorHandler);
 }
 
-function saveResults(resultsById){
+function saveResults(resultsById, callback){
     console.log('Saving results');
 
     // replace moment objects
@@ -74,6 +83,7 @@ function saveResults(resultsById){
     db.model.FeedStat.bulkCreate(vals)
         .success(function(res){
             console.log('Stats insert ok');
+            callback();
         })
         .error(errorHandler);
 }
