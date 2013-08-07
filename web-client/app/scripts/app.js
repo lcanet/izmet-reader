@@ -43,5 +43,10 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
             };
         }]);
 
-    }]);
+    }])
+    .run(['notificationService', function(notificationService){
+        notificationService.start();
+    }])
+;
+
 

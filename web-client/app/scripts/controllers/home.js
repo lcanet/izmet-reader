@@ -2,7 +2,7 @@
 /* global _ */
 
 angular.module('izmet')
-    .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope, izmetParameters) {
+    .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope, izmetParameters, notificationService) {
         $http.get(izmetParameters.backendUrl + 'favorites')
             .success(function(result){
                 // prepare array of group of 2
@@ -21,5 +21,9 @@ angular.module('izmet')
             $rootScope.$broadcast('showAddFeedPopup');
         };
 
+        $scope.notifEnablable = notificationService.supported && !notificationService.enabled;
+        $scope.enableNotifications = function() {
+            notificationService.requestStart();
+        };
 
     });

@@ -1,0 +1,11 @@
+{
+    "name": "Izmet Reader",
+    "description": "Izmet Reader",
+    "manifest_version" : 2,
+    "version" : "0.1",
+    "app" : {
+    },
+    "permissions" : [
+        "notifications"
+    ]
+}
