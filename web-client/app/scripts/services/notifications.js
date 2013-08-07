@@ -3,7 +3,7 @@
 
 angular.module('izmet').service('notificationService',function ($http, $timeout, izmetParameters, $filter, $location) {
 
-    var POLL_DELAY = 2000;
+    var POLL_DELAY = 30000;
 
     var service = {
     };
