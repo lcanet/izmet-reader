@@ -1,6 +1,5 @@
 'use strict';
 /* global alert */
-/* global _ */
 
 angular.module('izmet')
     .controller('FeedStatsCtrl', function ($scope, $http, $rootScope, izmetParameters) {
