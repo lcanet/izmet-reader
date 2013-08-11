@@ -1,0 +1,81 @@
+<div ng-swipe-left="$emit('navigateNextArticle')" ng-swipe-right="$emit('navigatePrevArticle')"
+    style="height: 100%">
+
+
+    <div class="feed-header">
+        <div class="pull-right">
+            <a class="btn btn-large" href="" ng-click="markAllAsSeen()" ng-show="currentFeedId != 'starred'">
+                <i class="icon icon-resize-horizontal"></i>
+                Mark all as read
+            </a>
+            <a class="btn btn-large" href="" ng-click="toggleUnseen(true)" ng-show="unseenOnly == false && currentFeedId != 'starred'">
+                <i class="icon icon-filter"></i>
+                Show only unread
+            </a>
+            <a class="btn btn-large" href="" ng-click="toggleUnseen(false)" ng-show="unseenOnly == true && currentFeedId != 'starred'">
+                <i class="icon icon-ok"></i>
+                Show all
+            </a>
+        </div>
+        <div class="">
+            <a href="" ng-click="getNextPage()" class="btn btn-large" ng-show="currentArticle == null">
+                <i class="icon icon-download"></i>
+                Get more articles
+            </a>
+            <a href="" ng-click="selectArticle(null)" class="btn btn-large" ng-show="currentArticle != null">
+                <i class="icon icon-backward"></i>
+                Back
+            </a>
+            <a href="" ng-click="toggleStar(currentArticle)" ng-show="currentArticle != null"
+               class="btn">
+                <span class="star" ng-class="isArticledStarred(currentArticle)" ></span>
+            </a>
+
+        </div>
+    </div>
+
+    <div ng-show="requestInflight" class="loading-banner">
+        Loading articles ...
+    </div>
+    <div class="no-articles" ng-show="articles.length == 0 && !requestInflight">
+        No articles found ...
+    </div>
+
+
+    <div class="feed-view">
+        <div class="articles-list" ng-show="currentArticle == null" >
+            <table class="table table-striped">
+                <tbody>
+                <tr ng-repeat="a in articles | unseenOnly:unseenOnly" ng-click="selectArticle(a)" ng-class="getClassForArticleHeader(a)">
+                    <td class="col-articledate">
+                        {{a | ago:'article_date' }}
+                    </td>
+                    <td class="col-feedname">
+                        {{ a.feed.name }}
+                    </td>
+                    <td class="col-articletitle">
+                        {{ a.title }}
+                        <span class="star" ng-class="isArticledStarred(a)" ng-click="toggleStar(a)"></span>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="article" ng-show="currentArticle != null">
+            <h4 class="article-title">
+                <a target="_blank" href="{{currentArticle.url}}">{{currentArticle.title}}</a>
+            </h4>
+            <p class="feed-title">
+                from {{ currentArticle.feed.name }} -
+                {{currentArticle | ago:'article_date' }}
+            </p>
+            <p>
+                <span ng-bind-html="currentArticle.content | fixLinks"></span>
+            </p>
+        </div>
+
+    </div>
+
+</div>

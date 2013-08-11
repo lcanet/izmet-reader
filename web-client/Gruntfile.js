@@ -200,7 +200,7 @@ module.exports = function (grunt) {
             }
         },
         useminPrepare: {
-            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/m.html'],
+            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/m.html', '<%= yeoman.app %>/tablet.html'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -234,7 +234,12 @@ module.exports = function (grunt) {
                     '<%= yeoman.dist %>/styles/mobile.css': [
                         '.tmp/styles/mobile.css'
                         //'<%= yeoman.app %>/styles/{,*/}*.css'
+                    ],
+                    '<%= yeoman.dist %>/styles/tablet.css': [
+                        '.tmp/styles/tablet.css'
+                        //'<%= yeoman.app %>/styles/{,*/}*.css'
                     ]
+
                 }
             }
         },
@@ -305,7 +310,6 @@ module.exports = function (grunt) {
                         src: [
                             '*.{ico,txt}',
                             '.htaccess',
-                            'components/**/*',
                             'images/{,*/}*.{gif,webp}',
                             'styles/fonts/*'
                         ]
@@ -337,11 +341,11 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('build', [
-        'clean:dist',
-        'jshint',
-        'test',
-        'coffee',
-        'compass:dist',
+        // 'clean:dist',
+        //'jshint',
+        //'test',
+        //'coffee',
+        //'compass:dist'
         'useminPrepare',
         'imagemin',
         'cssmin',

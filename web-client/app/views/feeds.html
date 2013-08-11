@@ -17,22 +17,22 @@
           All articles
            <span ng-show="feedData.totalUnseen > 0">({{feedData.totalUnseen}})</span>
        </a>
-    </li>
-    <li class="all-feeds main-item" ng-class="getRowClassForFeed('starred')">
-        <a href="#/starred" title="All starred articles" >
-            <i class="icon icon-star"></i>
-            Starred articles
-        </a>
-    </li>
+    </li>    <li class="all-feeds main-item" ng-class="getRowClassForFeed('starred')">
+    <a href="#/starred" title="All starred articles" >
+        <i class="icon icon-star"></i>
+        Starred articles
+    </a>
+</li>
     <li class="feed-group-sep"></li>
     <li ng-repeat="feed in feedData.feeds | filter:filterText" ng-class="getRowClassForFeed(feed)">
         <a href="#/{{feed.id}}" title="{{feed.description}}" ng-click="selectFeed(feed)"
-                ng-class="getClassForFeed(feed)">
+           ng-class="getClassForFeed(feed)">
             <img ng-src="{{ feed | iconLink }}" height="16" class="icon"/>
             {{feed.name}}
             <span ng-show="feed.nb_unseen > 0">({{feed.nb_unseen}})</span>
         </a>
     </li>
+
 
 
 </ul>

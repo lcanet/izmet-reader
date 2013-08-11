@@ -1,4 +1,5 @@
 /* global moment */
+/* global _ */
 
 function agoCalc(arg) {
     'use strict';
@@ -80,6 +81,15 @@ angular.module('izmet')
                 }
             }
             return null;
+        };
+    })
+    .filter('unseenOnly', function () {
+        'use strict';
+        return function (tbl, filterActive) {
+            if (!tbl || !filterActive) {
+                return tbl;
+            }
+            return _.filter(tbl, function(x) {return !x.seen; });
         };
     })
     .filter('imageLink', function () {
