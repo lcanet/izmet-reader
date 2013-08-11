@@ -341,11 +341,28 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('build', [
-        // 'clean:dist',
-        //'jshint',
-        //'test',
-        //'coffee',
-        //'compass:dist'
+         'clean:dist',
+        'jshint',
+        'test',
+        'coffee',
+        'compass:dist',
+        'useminPrepare',
+        'imagemin',
+        'cssmin',
+        'htmlmin',
+        'concat',
+        'copy',
+        'ngmin',
+        'uglify',
+        'rev',
+        'usemin'
+    ]);
+
+    grunt.registerTask('build1', [
+        'compass:dist'
+    ]);
+
+    grunt.registerTask('build2', [
         'useminPrepare',
         'imagemin',
         'cssmin',
