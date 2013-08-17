@@ -39,6 +39,9 @@ function getArticles(res, feedId, unseenOnly, starred, limit, offset) {
 
     db.model.Article.findAll(args)
         .success(function (articles) {
+            for (var i = 0; i < articles.length; i++) {
+                articles[i].feed = articles[i].feed.output();
+            }
             res.send(articles);
         })
         .error(getErrorHandler(res));

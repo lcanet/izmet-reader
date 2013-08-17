@@ -22,19 +22,13 @@ app.use(express.errorHandler());
 app.use(express.logger(config.isDev ? 'dev' : 'default'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(middleware.cacheHandler());
+app.use(middleware.cacheHandler);
 app.use("/web-client", express.static(__dirname + '/web-client'));
 app.use("/dumps", express.static(__dirname + '/dumps'));
 
 // cors
 app.use(middleware.allowCrossDomain);
-app.options("*",
-    function(res,res){
-        res.header('Access-Control-Max-Age', '86400');
-        res.send('');
-    });
-
-// swagger services
+app.options('*', middleware.cacheCorsHandler);
 
 app.get('/feed', services.feed.findAll);
 app.post('/feed', services.feed.addFeed);
