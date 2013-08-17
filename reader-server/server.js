@@ -16,10 +16,11 @@ var app = express();
 
 console.log("Starting in mode " + config.mode);
 
-app.use(express.errorHandler());
 
 // all environments
 app.use(express.logger(config.isDev ? 'dev' : 'default'));
+app.use(express.compress());
+app.use(express.errorHandler());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(middleware.cacheHandler);
