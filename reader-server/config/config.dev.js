@@ -18,6 +18,10 @@ module.exports = {
     mode: 'development',
     isDev: true,
 
+    auth: {
+        "lc": 'lcpass'
+    },
+
     twitter: {
        key: '',
        secret: ''

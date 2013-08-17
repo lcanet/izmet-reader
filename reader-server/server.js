@@ -28,8 +28,21 @@ app.use("/dumps", express.static(__dirname + '/dumps'));
 
 // cors
 app.use(middleware.allowCrossDomain);
-app.options('*', middleware.cacheCorsHandler);
 
+// auth
+if (config.auth){
+    app.use(express.basicAuth(function(user,pass){
+        if (user in config.auth){
+            return pass = config.auth[user];
+        } else{
+            // not found
+            return false;
+        }
+    }, 'Unautorized'));
+}
+
+// service
+app.options('*', middleware.cacheCorsHandler);
 app.get('/feed', services.feed.findAll);
 app.post('/feed', services.feed.addFeed);
 app.get('/feed/:id', services.feed.findById);
