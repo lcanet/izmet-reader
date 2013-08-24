@@ -3,7 +3,10 @@
 
 function agoCalc(arg) {
     'use strict';
-    // don't print 'ago' if more than 1 day
+    if (!arg) {
+        return "Unknown";
+    }
+    // don't print 'ago' if more than 10 day
     var m = moment(arg);
     if (m.isBefore(moment().subtract('d', 10))) {
         return m.format('D MMM YYYY');
