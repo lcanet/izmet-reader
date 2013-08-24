@@ -3,6 +3,7 @@
 
 angular.module('izmet')
     .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope, izmetParameters, notificationService) {
+
         $http.get(izmetParameters.backendUrl + 'favorites')
             .success(function(result){
                 // prepare array of group of 2

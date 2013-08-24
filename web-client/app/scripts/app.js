@@ -44,8 +44,14 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
         }]);
 
     }])
-    .run(['notificationService', function(notificationService){
+    .run(['notificationService', '$timeout', function(notificationService, $timeout) {
         notificationService.start();
+
+        $timeout(function(){
+            $(".preloader").fadeOut(300, function(){
+                $("#main-content").show();
+            });
+        }, 50);
     }])
 ;
 
