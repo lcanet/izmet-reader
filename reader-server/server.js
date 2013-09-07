@@ -46,6 +46,7 @@ if (config.auth){
 app.options('*', middleware.cacheCorsHandler);
 app.get('/feed', services.feed.findAll);
 app.post('/feed', services.feed.addFeed);
+app.get('/feed/poll_all', services.poller.forcePollAll);
 app.get('/feed/:id', services.feed.findById);
 app.put('/feed/:id', services.feed.updateFeed);
 app.delete('/feed/:id', services.feed.deleteFeed);

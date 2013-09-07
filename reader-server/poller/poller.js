@@ -7,7 +7,8 @@ var cronJob = require('cron').CronJob,
     und = require('underscore'),
     utils = require('../utils/utils.js'),
     twitter = require('./poller_twitter.js'),
-    dilbert = require('./poller_dilbert.js');
+    dilbert = require('./poller_dilbert.js'),
+    auth = require('../utils/auth.js');
 
 var pollers = {
     'rss': rss.poll,
@@ -83,6 +84,7 @@ function markFeedUpdated(feed){
         "Accept": "application/json",
         "Content-Type": "application/json"
     };
+    auth.addBasicAuth(opts.headers);
     var req = http.request(opts, function(res){
         // not
         if (res.statusCode != 200) {
@@ -105,7 +107,13 @@ function doPoll(limit) {
     }
 
     // poll rest pi
-    http.get(config.apiLocalUrl + '/feed',
+    var opts = url.parse(config.apiLocalUrl + '/feed/');
+    opts.method = 'GET';
+    opts.headers = {
+        "Accept": "application/json"
+    };
+    auth.addBasicAuth(opts.headers);
+    var req = http.request(opts,
         function(res) {
             if (res.statusCode != 200) {
                 console.log("Error polling rest API (" + http.STATUS_CODES[res.statusCode]);
@@ -120,6 +128,7 @@ function doPoll(limit) {
                 processFeeds(resp, limit);
             });
         });
+    req.end();
 }
 
 function pollAllFeeds() {

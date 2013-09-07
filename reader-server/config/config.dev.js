@@ -3,9 +3,10 @@ module.exports = {
     serverPort: 8080,
     apiUrl: 'http://localhost:8080',
     apiLocalUrl: 'http://localhost:8080',
+    apiLocalUser: 'lc',
 
     db: {
-        database: 'reader',
+        database: 'reader-prod',
         user: 'reader',
         pass: 'reader',
         host: '192.168.0.2',
@@ -13,7 +14,7 @@ module.exports = {
     },
 
     maxFeedsPerPoll: 20,
-    pollerEnabled: false,
+    pollerEnabled: true,
 
     mode: 'development',
     isDev: true,

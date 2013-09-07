@@ -4,7 +4,8 @@ var
     utils = require('../utils/utils.js'),
     moment = require('moment'),
     http = require('http'),
-    parser = require('htmlparser2');;
+    parser = require('htmlparser2'),
+    auth = require('../utils/auth.js');
 
 function pollFeedDilbert(feed, callback) {
 
@@ -90,6 +91,7 @@ function pushArticles(feed, articles, callback) {
         "Accept": "application/json",
         "Content-Type": "application/json"
     };
+    auth.addBasicAuth(opts.headers);
     var req = http.request(opts, function(res){
         // not
         if (res.statusCode != 201 && res.statusCode != 304) {

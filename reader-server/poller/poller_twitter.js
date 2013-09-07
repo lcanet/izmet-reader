@@ -3,7 +3,8 @@ var
     https = require('https'),
     config = require('../config/config.js'),
     url = require('url'),
-    moment = require('moment');
+    moment = require('moment'),
+    auth = require('../utils/auth.js');
 
 var cachedToken = null;
 
@@ -126,6 +127,7 @@ function processTweets(feed, tweets, callback) {
         "Accept": "application/json",
         "Content-Type": "application/json"
     };
+    auth.addBasicAuth(opts.headers);
     var req = http.request(opts, function(res){
         // not
         if (res.statusCode != 201 && res.statusCode != 304) {
