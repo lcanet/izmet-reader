@@ -47,6 +47,31 @@ function getArticles(res, feedId, unseenOnly, starred, limit, offset) {
         .error(getErrorHandler(res));
 }
 
+function getArticlesFTS(res, query, limit, offset) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var queryParts = query.split(' ');
+    var tsQuery = queryParts.join(' & ');
+
+    var args = {
+        where: "to_tsvector('english', title || ' ' || content) @@ to_tsquery('" + tsQuery + "')",
+        include: [ db.model.Feed ],
+        offset: offset,
+        limit: limit,
+        order: 'article_date desc'
+    };
+
+    db.model.Article.findAll(args)
+        .success(function (articles) {
+            for (var i = 0; i < articles.length; i++) {
+                articles[i].feed = articles[i].feed.output();
+            }
+            res.send(articles);
+        })
+        .error(getErrorHandler(res));
+}
+
+
 var findByFeed = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -69,8 +94,14 @@ var findArticles = function (req, res) {
     var offset = parseInt(req.query.offset) || 0;
     var unseenOnly = "true" == req.query.unseenOnly;
     var starredOnly = "true" == req.query.starred;
+    var query = req.query.q;
 
-    getArticles(res, null, unseenOnly, starredOnly, limit, offset);
+    if (query) {
+        getArticlesFTS(res, query, limit, offset);
+    } else {
+        getArticles(res, null, unseenOnly, starredOnly, limit, offset);
+    }
+
 };
 
 var addArticles = function (req, res) {

@@ -2,7 +2,7 @@
 /* global _ */
 
 angular.module('izmet')
-    .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope, izmetParameters, notificationService) {
+    .controller('HomeCtrl', function ($http, $scope, $routeParams, $rootScope, izmetParameters, notificationService, $location) {
 
         $http.get(izmetParameters.backendUrl + 'favorites')
             .success(function(result){
@@ -27,4 +27,9 @@ angular.module('izmet')
             notificationService.requestStart();
         };
 
+        $scope.doSearch = function(){
+            if ($scope.searchQuery != "") {
+                $location.path('/search/' + $scope.searchQuery);
+            }
+        }
     });

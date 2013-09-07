@@ -32,12 +32,21 @@
                     <i class="icon icon-resize-full">
                     </i>
                     Tablet version
-
                 </a>
-
-
             </li>
-
+            <li>
+                <form class="form-search home-search">
+                    Search articles :
+                    <input type="text" placeholder="Search" ng-model="searchQuery"
+                           ui-keydown="{13: 'doSearch()'}"
+                            class="input search-query" />
+                    <a href="" ng-click="doSearch()">
+                        <i class="icon icon-search">
+                        </i>
+                        Search
+                    </a>
+                </form>
+            </li>
         </ul>
 
     <div class="row" ng-repeat="r in favorites">

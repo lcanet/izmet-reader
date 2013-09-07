@@ -77,6 +77,11 @@
             Starred articles
         </span>
     </header>
+    <header ng-show="searchQuery != null">
+        <span class="feed-title">
+           Search : {{searchQuery}}
+        </span>
+    </header>
 
     <div class="no-articles" ng-show="articles.length == 0">
         No articles found

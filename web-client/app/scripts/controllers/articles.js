@@ -69,7 +69,6 @@ angular.module('izmet')
                 !offlineService.hasNetwork() &&
                 offlineService.offlineData !== null) {
 
-                console.log('Loading offline');
                 var defer = $q.defer();
                 var subList = offlineService.offlineData.articles;
 
@@ -85,7 +84,10 @@ angular.module('izmet')
                 p = defer.promise;
 
             } else {
-                if ($scope.currentFeedId === 'all') {
+                if ($scope.searchQuery != null) {
+                    p = $http.get(izmetParameters.backendUrl + 'article', {params:
+                    {limit: pageSize, offset:lastOffset, q: $scope.searchQuery}});
+                } else if ($scope.currentFeedId === 'all') {
                     p = $http.get(izmetParameters.backendUrl + 'article', {params:
                     {limit: pageSize, offset:lastOffset, unseenOnly: unseenOnly}});
                 } else if ($scope.currentFeedId === 'starred') {
@@ -102,7 +104,7 @@ angular.module('izmet')
             }
         }
 
-        // initialisation
+        // initialisation : from feed
 
         if ($routeParams.feedId) {
 
@@ -128,6 +130,20 @@ angular.module('izmet')
             }
 
             articleIdToSelect = $routeParams.articleId;
+
+            // fetch the first page
+            getPage();
+
+        } else if ($routeParams.query) {
+            // reset articles
+            $scope.articles = null;
+            $scope.currentArticle = null;
+            pageSize = 50;
+            lastOffset = 0;
+            endOfFeed = false;
+
+            $scope.searchQuery = $routeParams.query;
+            $scope.selectedFeed = null;
 
             // fetch the first page
             getPage();
