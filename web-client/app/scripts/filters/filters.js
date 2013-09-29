@@ -4,7 +4,7 @@
 function agoCalc(arg) {
     'use strict';
     if (!arg) {
-        return "Unknown";
+        return 'Unknown';
     }
     // don't print 'ago' if more than 10 day
     var m = moment(arg);

@@ -52,8 +52,8 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
         notificationService.start();
 
         $timeout(function(){
-            $(".preloader").fadeOut(300, function(){
-                $("#main-content").show();
+            $('.preloader').fadeOut(300, function(){
+                $('#main-content').show();
             });
         }, 50);
     }])

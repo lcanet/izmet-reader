@@ -30,7 +30,7 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
         }
         var art = data[0];
 
-        if (lastArticle != null && art.id > lastArticle.id) {
+        if (lastArticle !== null && art.id > lastArticle.id) {
             pushNotification(art);
         }
         lastArticle = art;

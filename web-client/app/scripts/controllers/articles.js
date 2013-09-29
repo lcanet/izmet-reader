@@ -84,7 +84,7 @@ angular.module('izmet')
                 p = defer.promise;
 
             } else {
-                if ($scope.searchQuery != null) {
+                if ($scope.searchQuery) {
                     p = $http.get(izmetParameters.backendUrl + 'article', {params:
                     {limit: pageSize, offset:lastOffset, q: $scope.searchQuery}});
                 } else if ($scope.currentFeedId === 'all') {

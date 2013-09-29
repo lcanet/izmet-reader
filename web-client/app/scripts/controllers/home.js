@@ -28,8 +28,8 @@ angular.module('izmet')
         };
 
         $scope.doSearch = function(){
-            if ($scope.searchQuery != "") {
+            if ($scope.searchQuery) {
                 $location.path('/search/' + $scope.searchQuery);
             }
-        }
+        };
     });
