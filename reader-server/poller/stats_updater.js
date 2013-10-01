@@ -7,10 +7,6 @@ var db = require('../db/db.js'),
     timer = require('../utils/timer.js'),
     Sequelize = require('sequelize');
 
-function errorHandler(err) {
-    console.log(err);
-};
-
 /**
  * Update stats
  */
@@ -23,14 +19,24 @@ var updateStats = function(){
     db.sql.query('delete from feed_stat')
         .success(function(){
             // refresh all stats
-            getStats(function(resultsById){
-                saveResults(resultsById, function(){
+            getStats(function(err, resultsById){
+                if (err) {
+                    console.log('Cannot get stats', err);
+                    return ;
+                }
+                saveResults(resultsById, function(err){
                     sw.stop();
-                    console.log("Feed stats refresh done in " + sw.getTime() + " ms");
+                    if (err){
+                        console.log("Error refresh feed stats", err);
+                    } else {
+                        console.log("Feed stats refresh done in " + sw.getTime() + " ms");
+                    }
                 });
             });
         })
-        .error(errorHandler);
+        .error(function(err){
+            callback(err, null);
+        });
 };
 
 function getStats(callback) {
@@ -67,10 +73,12 @@ function getStatsPage(callback, resultsById, start){
             if (res.length > 0){
                 getStatsPage(callback, resultsById, start + config.articlesByRefresh);
             } else{
-                callback(resultsById);
+                callback(null, resultsById);
             }
         })
-        .error(errorHandler);
+        .error(function(err){
+            callback(err);
+        });
 }
 
 function saveResults(resultsById, callback){
@@ -92,9 +100,11 @@ function saveResults(resultsById, callback){
     db.model.FeedStat.bulkCreate(vals)
         .success(function(res){
             console.log('Stats insert ok');
-            callback();
+            callback(null);
         })
-        .error(errorHandler);
+        .error(function(err){
+            callback(err);
+        });
 }
 
 function zeroArray(nb) {

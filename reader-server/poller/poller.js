@@ -55,7 +55,7 @@ function pollFeed(feed, callback) {
         poller(feed, callback);
     } else{
         console.log("Cannot find poller for feed type " + feed.type);
-        callback();
+        callback('Cannot find poller');
     }
 }
 

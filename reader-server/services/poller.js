@@ -29,8 +29,13 @@ var forcePoll = function (req, res) {
     db.model.Feed.find(id)
         .success(function(feed){
             if (feed) {
-                poller.pollFeed(feed, function () {
-                    res.send({"code":200, description:"OK"});
+                poller.pollFeed(feed, function (err) {
+                    if (err) {
+                        console.log('Error while polling feed', err);
+                        res.send({"code":500, description:'Error while polling feeds'});
+                    } else {
+                        res.send({"code":200, description:"OK"});
+                    }
                 });
 
             } else {

@@ -11,13 +11,13 @@ var cachedToken = null;
 
 function withToken(callback) {
     if (cachedToken != null) {
-        callback(cachedToken);
+        callback(null, cachedToken);
     } else {
         var key = config.twitter.key;
         var secret = config.twitter.secret;
         if (!key || !secret) {
             console.log("No twitter secret, aborting");
-            callback(null);
+            callback('No twitter secret defined', null);
             return;
         }
 
@@ -39,7 +39,7 @@ function withToken(callback) {
         var req = https.request(opts, function(res){
             if (res.statusCode != 200){
                 console.log("Error getting oauth2 token (code " + res.statusCode + ")");
-                callback(null);
+                callback("Error getting oauth2 token (code " + res.statusCode + ")", null);
             } else {
                 var chunks = "";
                 res.on("data", function(data){
@@ -49,7 +49,7 @@ function withToken(callback) {
                     var body = JSON.parse(chunks.toString());
                     console.log("Got twitter auth response ", body);
                     cachedToken = body.access_token;
-                    callback(cachedToken);
+                    callback(null, cachedToken);
                 });
             }
         });
@@ -59,11 +59,9 @@ function withToken(callback) {
 }
 
 function pollFeedTwitter(feed, callback) {
-    withToken(function(token){
-        if (token === null) {
-            console.log("No oauth2 token, aborting");
-            callback();
-            return;
+    withToken(function(err, token){
+        if (err) {
+            callback(err);
         }
 
         // use url as screen name
@@ -78,7 +76,7 @@ function pollFeedTwitter(feed, callback) {
             function(res){
                 if (res.statusCode != 200){
                     console.log("Error polling twitter (code " + http.STATUS_CODES[res.statusCode] + ")");
-                    callback();
+                    callback("Error polling twitter (code " + http.STATUS_CODES[res.statusCode] + ")");
                     return;
                 }
                 var chunks = "";
@@ -132,7 +130,7 @@ function processTweets(feed, tweets, callback) {
         // not
         if (res.statusCode != 201 && res.statusCode != 304) {
             console.log("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
-            callback();
+            callback("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
             return;
         }
         var chunks = [];
@@ -141,9 +139,7 @@ function processTweets(feed, tweets, callback) {
         });
         res.on("end", function(){
             // fin ...
-            if (callback){
-                callback();
-            }
+            callback(null);
         });
     });
     req.on('error', function(e) {

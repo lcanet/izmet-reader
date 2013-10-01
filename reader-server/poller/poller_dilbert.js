@@ -12,7 +12,7 @@ function pollFeedDilbert(feed, callback) {
     http.get(feed.url, function(res){
         if (res.statusCode != 200){
             console.log('Error getting dilbert page - error code ' + res.statusCode);
-            callback();
+            callback('Error while getting dilbert page - ' + res.statusCode);
             return;
         }
 
@@ -49,7 +49,7 @@ function processDilbertPage(feed, page, callback) {
         pushArticles(feed, articles, callback);
     } else {
         console.log('No image found on dilbert page');
-        callback();
+        callback('No Image found');
     }
 
 }
@@ -96,7 +96,7 @@ function pushArticles(feed, articles, callback) {
         // not
         if (res.statusCode != 201 && res.statusCode != 304) {
             console.log("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
-            if (callback) callback();
+            if (callback) callback("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
             return;
         }
         var chunks = [];
@@ -104,7 +104,7 @@ function pushArticles(feed, articles, callback) {
             chunks.push(data);
         });
         res.on("end", function(){
-            if (callback) callback();
+            if (callback) callback(null);
         });
     });
 

@@ -64,7 +64,7 @@ function processArticles(feed, articles, callback) {
         // not
         if (res.statusCode != 201 && res.statusCode != 304) {
             console.log("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
-            if (callback) callback();
+            if (callback) callback("Error adding article (" + http.STATUS_CODES[res.statusCode] + ")");
             return;
         }
         var chunks = [];
@@ -72,7 +72,7 @@ function processArticles(feed, articles, callback) {
             chunks.push(data);
         });
         res.on("end", function(){
-            if (callback) callback();
+            if (callback) callback(null);
         });
     });
     req.on('error', function(e) {
