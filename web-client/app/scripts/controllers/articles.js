@@ -201,7 +201,7 @@ angular.module('izmet')
 
         $scope.markAllAsSeen = function(){
             if ($scope.currentFeedId === 'all' || $scope.currentFeedId === 'starred') {
-                $http.put(izmetParameters.backendUrl + 'article', { all: true })
+                return $http.put(izmetParameters.backendUrl + 'article', { all: true })
                     .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.seen = true;
@@ -210,7 +210,7 @@ angular.module('izmet')
 
                     });
             } else if ($scope.currentFeedId !== null) {
-                $http.put(izmetParameters.backendUrl +  'feed/' + $scope.currentFeedId + '/article')
+                return $http.put(izmetParameters.backendUrl +  'feed/' + $scope.currentFeedId + '/article')
                     .success(function(){
                         _.each($scope.articles, function(elt){
                             elt.seen = true;
@@ -289,6 +289,15 @@ angular.module('izmet')
             $scope.currentArticle = null;
             window.scrollTo(0);
 
+        };
+
+        $scope.markReadAndGoNext = function() {
+            var p = $scope.markAllAsSeen();
+            if (p && $scope.nextUnseenFeed) {
+                p.then(function(){
+                    $location.path("/" + $scope.nextUnseenFeed.id);
+                });
+            }
         };
 
         /* ********************** gestion stars ************ */
