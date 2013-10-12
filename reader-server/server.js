@@ -63,6 +63,7 @@ app.get('/favorites', services.feed.getFavorites);
 app.get('/article', services.article.findArticles);
 app.put('/article', services.article.markArticles);
 app.put('/article/:articleId', services.article.markArticle);
+app.get('/article/count', services.article.countArticles);
 
 
 app.get('/resource/default-icons/:type', services.image.getDefaultIcon);

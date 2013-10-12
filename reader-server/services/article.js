@@ -208,8 +208,28 @@ var markArticles = function (req, res) {
 };
 
 
+
+var countArticles = function (req, res) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var unseenOnly = "true" == req.query.unseenOnly;
+
+    var args = {};
+    if (unseenOnly) {
+        args.where = {
+            seen: false
+        };
+    }
+    db.model.Article.count(args)
+        .success(function(c){
+            res.send("" + c);
+        })
+        .error(getErrorHandler(res));
+};
+
+
 exports.findByFeed = findByFeed;
 exports.addArticles = addArticles;
 exports.markArticle = markArticle;
 exports.markArticles = markArticles;
 exports.findArticles = findArticles;
+exports.countArticles = countArticles;
