@@ -68,11 +68,11 @@ app.put('/article/:articleId', services.article.markArticle);
 app.get('/resource/default-icons/:type', services.image.getDefaultIcon);
 app.get('/resource/:imageId', services.image.findById);
 
-app.get('/feed-stats', services.feedStat.getStats);
-app.get('/refresh-feed-stats', function(res, res){
+app.get('/feed-stats/refresh', function(res, res){
     statsUpdater.updateStats();
     res.send('Stats refreshed');
 });
+app.get('/feed-stats', services.feedStat.getStats);
 
 
 // redirect root at end
