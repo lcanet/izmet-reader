@@ -57,21 +57,23 @@ function getStatsPage(callback, resultsById, start){
     ];
 
     db.model.Article.findAll({
-        where: '1=1',
+        where: 'id > ' + start,
         order: 'id',
         attributes: ['id', 'feed_id', 'article_date', 'fetch_date'],
         limit: config.articlesByRefresh,
-        offset: start, raw:true})
+        raw:true})
         .success(function(res){
             console.log('Processing result for page ' + start);
             // process each article
+            var maxid = 0;
             for (var i  = 0; i < res.length; i++) {
                 processArticle(thresholds, resultsById, res[i]);
+                maxid = Math.max(maxid, res[i].id);
             }
 
             // go to next page
             if (res.length > 0){
-                getStatsPage(callback, resultsById, start + config.articlesByRefresh);
+                getStatsPage(callback, resultsById, maxid);
             } else{
                 callback(null, resultsById);
             }
