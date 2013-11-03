@@ -4,6 +4,7 @@ var
     config = require('../config/config.js'),
     url = require('url'),
     moment = require('moment'),
+    und = require('underscore'),
     auth = require('../utils/auth.js');
 
 var cachedToken = null;
@@ -65,7 +66,7 @@ function pollFeedTwitter(feed, callback) {
         }
 
         // use url as screen name
-        var opts = url.parse('https://api.twitter.com/1.1/statuses/user_timeline.json?include_entities=false&include_rts=true&count=50&screen_name=' + feed.url);
+        var opts = url.parse('https://api.twitter.com/1.1/statuses/user_timeline.json?include_entities=true&include_rts=true&count=50&screen_name=' + feed.url);
         opts.method = 'GET';
         opts.headers = {
             "Accept": "application/json",
@@ -105,11 +106,22 @@ function processTweets(feed, tweets, callback) {
     var articles = [];
     for (var i = 0; i < tweets.length; i++) {
         var tweet = tweets[i];
+
+        var content = tweet.text;
+        if (tweet.entities && tweet.entities.media) {
+            und.forEach(tweet.entities.media, function(media){
+                if (media.media_url) {
+                    content += '<br/><img src="' + media.media_url + '" alt="' +
+                        media.display_url + '"/>';
+                }
+            });
+        }
+
         // push the article
         var articleData = {
             article_date: new Date(tweet.created_at),
             fetch_date: moment().format(),
-            content: tweet.text,
+            content: content,
             url: 'http://twitter.com/' + feed.url,
             title: tweet.text,
             article_id: tweet.id_str
