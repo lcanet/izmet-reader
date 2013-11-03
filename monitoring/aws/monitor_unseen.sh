@@ -11,5 +11,5 @@ CW_REGION="us-west-2"
 DATFMT=$(date +'%Y-%m-%dT%H:%M:%S.000%z')
 NB=$(echo "select count(1) from article where seen = false" | psql -h $DB_HOST -U $DB_USER  -A -t  $DB_NAME)
 
-mon-put-data --metric-name NbUnread --namespace Izmet --value $NB --timestamp $DATFMT -u Count -I $CW_ACCESS -S $CW_SECRET --region $CW_REGION
+/opt/aws/bin/mon-put-data --metric-name NbUnread --namespace Izmet --value $NB --timestamp $DATFMT -u Count -I $CW_ACCESS -S $CW_SECRET --region $CW_REGION
 
