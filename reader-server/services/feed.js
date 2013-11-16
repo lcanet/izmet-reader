@@ -97,6 +97,9 @@ var addFeed = function (req, res) {
     res.header("Content-Type", "application/json; charset=utf-8");
     var feedData = req.body;
 
+    // init default values
+    feedData.nb_read = 0;
+    feedData.nb_unseen = 0;
     if (feedData.type == 'rss') {
         addFeedRss(feedData, res);
     } else if (feedData.type == 'twitter') {
