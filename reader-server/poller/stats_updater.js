@@ -161,7 +161,7 @@ function processArticle(standardThresholds, resultsById, article) {
 }
 
 var startUpdater = function(devMode) {
-    new cronJob('00 0 * * * *', updateStats).start();
+    new cronJob('00 0 */6 * * *', updateStats).start();
 };
 
 exports.startUpdater = startUpdater;
