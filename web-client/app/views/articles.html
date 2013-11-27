@@ -33,6 +33,10 @@
             <i class="icon icon-ok"></i>
             Show all
         </a>
+        <a class="btn btn-small" href="" ng-click="toggleOrder()">
+            <i class="icon" ng-class="getOrderIconClass()"></i>
+            {{order}}
+        </a>
         <a class="btn btn-small btn-danger" href="" ng-click="deleteFeed()" ng-show="selectedFeed != null">
             <i class="icon icon-trash"></i>
             Delete feed

@@ -21,6 +21,9 @@ angular.module('izmet')
         // fetch only unread articles
         $scope.unseenOnly = true;
 
+        // order
+        $scope.order = 'asc';
+
         var articleIdToSelect = null;
 
         function getPage() {
@@ -78,6 +81,9 @@ angular.module('izmet')
                 if ($scope.currentFeedId !== 'all' && $scope.currentFeedId !== null) {
                     subList = _.filter(subList, function(a) { return a.feed.id == $scope.currentFeedId; });
                 }
+                if ($scope.order == 'desc') {
+                    subList.reverse();
+                }
 
                 subList = subList.slice(lastOffset, Math.min(lastOffset+pageSize, subList.length));
                 defer.resolve({data: subList});
@@ -85,17 +91,34 @@ angular.module('izmet')
 
             } else {
                 if ($scope.searchQuery) {
-                    p = $http.get(izmetParameters.backendUrl + 'article', {params:
-                    {limit: pageSize, offset:lastOffset, q: $scope.searchQuery}});
+                    p = $http.get(izmetParameters.backendUrl + 'article', {params: {
+                        limit: pageSize,
+                        offset:lastOffset,
+                        q: $scope.searchQuery,
+                        order: $scope.order
+                    }});
                 } else if ($scope.currentFeedId === 'all') {
-                    p = $http.get(izmetParameters.backendUrl + 'article', {params:
-                    {limit: pageSize, offset:lastOffset, unseenOnly: unseenOnly}});
+                    p = $http.get(izmetParameters.backendUrl + 'article', {params: {
+                        limit: pageSize,
+                        offset:lastOffset,
+                        unseenOnly: unseenOnly,
+                        order: $scope.order
+                    }});
                 } else if ($scope.currentFeedId === 'starred') {
-                    p = $http.get(izmetParameters.backendUrl + 'article', {params:
-                    {limit: pageSize, offset:lastOffset, unseenOnly: false, starred: true}});
+                    p = $http.get(izmetParameters.backendUrl + 'article', {params: {
+                        limit: pageSize,
+                        offset:lastOffset,
+                        unseenOnly: false,
+                        starred: true,
+                        order: $scope.order
+                    }});
                 } else if ($scope.currentFeedId !== null) {
-                    p = $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params:
-                    {limit: pageSize, offset:lastOffset, unseenOnly:unseenOnly}});
+                    p = $http.get(izmetParameters.backendUrl + 'feed/' + $scope.currentFeedId + '/article', {params: {
+                        limit: pageSize,
+                        offset: lastOffset,
+                        unseenOnly: unseenOnly,
+                        order: $scope.order
+                    }});
                 }
             }
             if (p) {
@@ -107,13 +130,6 @@ angular.module('izmet')
         // initialisation : from feed
 
         if ($routeParams.feedId) {
-
-            // reset articles
-            $scope.articles = null;
-            $scope.currentArticle = null;
-            pageSize = 50;
-            lastOffset = 0;
-            endOfFeed = false;
 
             $scope.currentFeedId = $routeParams.feedId;
             $scope.selectedFeed = null;
@@ -130,23 +146,13 @@ angular.module('izmet')
             }
 
             articleIdToSelect = $routeParams.articleId;
-
-            // fetch the first page
-            getPage();
+            resetArticles();
 
         } else if ($routeParams.query) {
             // reset articles
-            $scope.articles = null;
-            $scope.currentArticle = null;
-            pageSize = 50;
-            lastOffset = 0;
-            endOfFeed = false;
-
             $scope.searchQuery = $routeParams.query;
             $scope.selectedFeed = null;
-
-            // fetch the first page
-            getPage();
+            resetArticles();
         }
 
         $scope.getNextPage = function () {
@@ -155,6 +161,15 @@ angular.module('izmet')
                 getPage();
             }
         };
+
+        function resetArticles() {
+            $scope.articles = null;
+            $scope.currentArticle = null;
+            pageSize = 50;
+            lastOffset = 0;
+            endOfFeed = false;
+            getPage();
+        }
 
         // styles
 
@@ -223,14 +238,8 @@ angular.module('izmet')
 
         $scope.toggleUnseen = function(val) {
             $scope.unseenOnly = val;
-
             // reset
-            $scope.articles = null;
-            $scope.currentArticle = null;
-            pageSize = 50;
-            lastOffset = 0;
-            endOfFeed = false;
-            getPage();
+            resetArticles();
         };
 
         // nav clavier
@@ -298,6 +307,18 @@ angular.module('izmet')
                     $location.path("/" + $scope.nextUnseenFeed.id);
                 });
             }
+        };
+
+        $scope.toggleOrder = function() {
+            if ($scope.order == 'asc') {
+                $scope.order = 'desc';
+            } else {
+                $scope.order = 'asc';
+            }
+            resetArticles();
+        };
+        $scope.getOrderIconClass = function(){
+            return $scope.order == 'asc' ? 'icon-arrow-down' : 'icon-arrow-up';
         };
 
         /* ********************** gestion stars ************ */

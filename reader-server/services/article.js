@@ -14,7 +14,7 @@ function getErrorHandler(res){
     }
 }
 
-function getArticles(res, feedId, unseenOnly, starred, limit, offset) {
+function getArticles(res, feedId, unseenOnly, starred, limit, offset, order) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var args = {
@@ -22,7 +22,7 @@ function getArticles(res, feedId, unseenOnly, starred, limit, offset) {
         include: [ db.model.Feed ],
         offset: offset,
         limit: limit,
-        order: 'article_date desc'
+        order: 'article_date ' + (order || 'asc')
     };
     if (feedId != null){
         args.where.feed_id = feedId;
@@ -47,7 +47,7 @@ function getArticles(res, feedId, unseenOnly, starred, limit, offset) {
         .error(getErrorHandler(res));
 }
 
-function getArticlesFTS(res, query, limit, offset) {
+function getArticlesFTS(res, query, limit, offset, order) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var queryParts = query.split(' ');
@@ -58,7 +58,7 @@ function getArticlesFTS(res, query, limit, offset) {
         include: [ db.model.Feed ],
         offset: offset,
         limit: limit,
-        order: 'article_date desc'
+        order: 'article_date ' + (order || 'asc')
     };
 
     db.model.Article.findAll(args)
@@ -83,8 +83,9 @@ var findByFeed = function (req, res) {
         var offset = parseInt(req.query.offset) || 0;
         var unseenOnly = "true" == req.query.unseenOnly;
         var starredOnly = "true" == req.query.starred;
+        var order = req.query.order || 'asc';
 
-        getArticles(res, feedId, unseenOnly, starredOnly, limit, offset);
+        getArticles(res, feedId, unseenOnly, starredOnly, limit, offset, order);
     }
 };
 
@@ -95,11 +96,12 @@ var findArticles = function (req, res) {
     var unseenOnly = "true" == req.query.unseenOnly;
     var starredOnly = "true" == req.query.starred;
     var query = req.query.q;
+    var order = req.query.order || 'asc';
 
     if (query) {
-        getArticlesFTS(res, query, limit, offset);
+        getArticlesFTS(res, query, limit, offset, order);
     } else {
-        getArticles(res, null, unseenOnly, starredOnly, limit, offset);
+        getArticles(res, null, unseenOnly, starredOnly, limit, offset, order);
     }
 
 };
