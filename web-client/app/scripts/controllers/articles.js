@@ -127,6 +127,16 @@ angular.module('izmet')
             }
         }
 
+        function resetArticles() {
+            $scope.articles = null;
+            $scope.currentArticle = null;
+            pageSize = 50;
+            lastOffset = 0;
+            endOfFeed = false;
+            getPage();
+        }
+
+
         // initialisation : from feed
 
         if ($routeParams.feedId) {
@@ -161,16 +171,6 @@ angular.module('izmet')
                 getPage();
             }
         };
-
-        function resetArticles() {
-            $scope.articles = null;
-            $scope.currentArticle = null;
-            pageSize = 50;
-            lastOffset = 0;
-            endOfFeed = false;
-            getPage();
-        }
-
         // styles
 
         $scope.getClassForArticleHeader = function(article) {
@@ -304,7 +304,7 @@ angular.module('izmet')
             var p = $scope.markAllAsSeen();
             if (p && $scope.nextUnseenFeed) {
                 p.then(function(){
-                    $location.path("/" + $scope.nextUnseenFeed.id);
+                    $location.path('/' + $scope.nextUnseenFeed.id);
                 });
             }
         };
