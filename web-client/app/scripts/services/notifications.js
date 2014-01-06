@@ -4,6 +4,7 @@
 angular.module('izmet').service('notificationService',function ($http, $timeout, izmetParameters, $filter, $location) {
 
     var POLL_DELAY = 30000;
+    var NOTIFICATION_DISPLAY_TIME = 5000;
 
     var service = {
     };
@@ -21,7 +22,10 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
             $location.path('/' + art.feed.id + '/' + art.id);
         };
         n.show();
+        $timeout(function(){
+            n.close();
 
+        }, NOTIFICATION_DISPLAY_TIME);
     }
 
     function articlesReceived(data){
