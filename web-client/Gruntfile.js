@@ -31,10 +31,11 @@ module.exports = function (grunt) {
                 files: ['test/spec/{,*/}*.coffee'],
                 tasks: ['coffee:test']
             },
-            compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-                tasks: ['compass']
-            },
+            //
+            //compass: {
+            //    files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+            //    tasks: ['compass']
+            //},
             livereload: {
                 files: [
                     '<%= yeoman.app %>/{,*/}*.html',
@@ -171,24 +172,6 @@ module.exports = function (grunt) {
                 ]
             }
         },
-        compass: {
-            options: {
-                sassDir: '<%= yeoman.app %>/styles',
-                cssDir: '.tmp/styles',
-                imagesDir: 'app/images',
-                javascriptsDir: '<%= yeoman.app %>/scripts',
-                fontsDir: '<%= yeoman.app %>/styles/fonts',
-                importPath: '<%= yeoman.app %>/components',
-                relativeAssets: false,
-                raw: 'http_images_path=\'../images\'\nhttp_generated_images_path=\'../images\'\n'
-            },
-            dist: {},
-            server: {
-                options: {
-                    debugInfo: true
-                }
-            }
-        },
         concat: {
             dist: {
                 files: {
@@ -222,6 +205,19 @@ module.exports = function (grunt) {
                         dest: '<%= yeoman.dist %>/images'
                     }
                 ]
+            }
+        },
+        less: {
+            files: {
+                options: {
+                    paths: ['<%= yeoman.app %>/styles/'],
+                    cleancss: true
+                },
+                files: {
+                    '.tmp/styles/main.css': '<%= yeoman.app %>/styles/main.less',
+                    '.tmp/styles/mobile.css': '<%= yeoman.app %>/styles/mobile.less',
+                    '.tmp/styles/tablet.css': '<%= yeoman.app %>/styles/tablet.less'
+                }
             }
         },
         cssmin: {
@@ -323,7 +319,6 @@ module.exports = function (grunt) {
     grunt.registerTask('server', [
         'clean:server',
         'coffee:dist',
-        'compass:server',
         'configureProxies',
         'livereload-start',
         'connect:livereload',
@@ -334,7 +329,6 @@ module.exports = function (grunt) {
     grunt.registerTask('test', [
         'clean:server',
         'coffee',
-        'compass',
         'connect:test'
         // karma
     ]);
@@ -344,9 +338,9 @@ module.exports = function (grunt) {
         'jshint',
         'test',
         'coffee',
-        'compass:dist',
         'useminPrepare',
         'imagemin',
+        'less',
         'cssmin',
         'htmlmin',
         'concat',
@@ -357,22 +351,7 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
-    grunt.registerTask('build1', [
-        'compass:dist'
-    ]);
 
-    grunt.registerTask('build2', [
-        'useminPrepare',
-        'imagemin',
-        'cssmin',
-        'htmlmin',
-        'concat',
-        'copy',
-        'ngmin',
-        'uglify',
-        'rev',
-        'usemin'
-    ]);
 
     grunt.registerTask('default', ['build']);
 };

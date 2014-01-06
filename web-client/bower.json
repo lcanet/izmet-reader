@@ -11,7 +11,7 @@
         "moment": "2.0.0",
         "underscore": "1.4.4",
         "ngInfiniteScroll": "1.0.0",
-        "bootstrap": "2.2.0",
+        "bootstrap": "!2.3.2",
         "angular-ui-utils": "*",
         "angular-strap": "0.7.4",
         "jquery": "~1.10.0",
