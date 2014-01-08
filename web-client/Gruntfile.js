@@ -36,6 +36,14 @@ module.exports = function (grunt) {
             //    files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
             //    tasks: ['compass']
             //},
+            styles: {
+                // Which files to watch (all .less files recursively in the less directory)
+                files: ['<%= yeoman.app %>/styles/*.less'],
+                tasks: ['less:files'],
+                options: {
+                    nospawn: true
+                }
+            },
             livereload: {
                 files: [
                     '<%= yeoman.app %>/{,*/}*.html',
@@ -320,6 +328,7 @@ module.exports = function (grunt) {
         'clean:server',
         'coffee:dist',
         'configureProxies',
+        'less',
         'livereload-start',
         'connect:livereload',
         'open',
