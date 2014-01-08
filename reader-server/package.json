@@ -17,7 +17,8 @@
         "underscore": "1.4.4",
         "sequelize": "1.7.0-alpha2",
         "sequelize-postgres": "1.7.0-alpha2",
-        "htmlparser2": "*"
+        "htmlparser2": "*",
+        "nodetime": "*"
     },
     "devDependencies": {
         "should": "*",

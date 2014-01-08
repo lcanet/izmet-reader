@@ -10,7 +10,15 @@ var express = require('express')
     , statsUpdater = require('./poller/stats_updater.js')
     , middleware = require('./middleware')
     , config = require('./config/config.js')
-;
+    , nodetime = require('nodetime')
+    ;
+
+if (config.nodetime) {
+    nodetime.profile({
+        accountKey: config.nodetime.key,
+        appName: config.nodetime.app
+    });
+}
 
 var app = express();
 
