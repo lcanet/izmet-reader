@@ -23,7 +23,7 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
         };
         n.show();
         $timeout(function(){
-            n.close();
+            n.cancel();
 
         }, NOTIFICATION_DISPLAY_TIME);
     }
