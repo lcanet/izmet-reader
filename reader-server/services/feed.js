@@ -269,7 +269,7 @@ var markAllAsSeen = function (req, res) {
         return;
     }
     var id = parseInt(req.params.id);
-    db.model.Article.update({seen: true}, {feed_id: id})
+    db.model.Article.update({seen: true}, {feed_id: id, seen: false})
         .success(function(){
             res.send({code:200, description:'Articles read'}, 200);
         })
