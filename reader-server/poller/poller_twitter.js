@@ -122,7 +122,7 @@ function processTweets(feed, tweets, callback) {
             article_date: new Date(tweet.created_at),
             fetch_date: moment().format(),
             content: content,
-            url: 'http://twitter.com/' + feed.url + '/status/' + tweet.id,
+            url: 'http://twitter.com/' + feed.url + '/status/' + tweet.id_str,
             title: tweet.text,
             article_id: tweet.id_str
         };
