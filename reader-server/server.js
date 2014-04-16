@@ -7,7 +7,6 @@ var express = require('express')
     , path = require('path')
     , services = require('./services')
     , poller = require('./poller/poller.js')
-    , statsUpdater = require('./poller/stats_updater.js')
     , middleware = require('./middleware')
     , config = require('./config/config.js')
     , nodetime = require('nodetime')
@@ -77,12 +76,6 @@ app.get('/article/count', services.article.countArticles);
 app.get('/resource/default-icons/:type', services.image.getDefaultIcon);
 app.get('/resource/:imageId', services.image.findById);
 
-app.get('/feed-stats/refresh', function(res, res){
-    statsUpdater.updateStats();
-    res.send('Stats refreshed');
-});
-app.get('/feed-stats', services.feedStat.getStats);
-
 
 // redirect root at end
 app.use('/', function(req, res){
@@ -100,5 +93,4 @@ process.on('uncaughtException', function(e){
 poller.startPoller('development' == app.get('env'));
 console.log("Poller launched");
 
-statsUpdater.startUpdater('development' == app.get('env'));
 console.log('Stats updater launched');

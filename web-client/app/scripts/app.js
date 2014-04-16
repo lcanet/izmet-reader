@@ -8,10 +8,6 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
             templateUrl: 'views/home.html',
             controller: 'HomeCtrl'
         });
-        $routeProvider.when('/stats', {
-            templateUrl: 'views/feed-stats.html',
-            controller: 'FeedStatsCtrl'
-        });
         $routeProvider.when('/search/:query', {
             templateUrl: 'views/articles.html',
             controller: 'ArticlesCtrl'
