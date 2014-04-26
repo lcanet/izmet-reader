@@ -59,6 +59,18 @@
 
     </div>
 
+    <div class="feed-toolbar"  ng-show="currentFeedId == null">
+        <a class="btn btn-small" href="" ng-click="toggleOrder()">
+            <i class="icon" ng-class="getOrderIconClass()"></i>
+            {{order}}
+        </a>
+        <a class="btn btn-small" href="#/">
+            <i class="icon icon-home"></i>
+            Home
+        </a>
+    </div>
+
+
     <header ng-show="currentFeedId != null">
         <span ng-show="selectedFeed != null">
             <span class="feed-title">
