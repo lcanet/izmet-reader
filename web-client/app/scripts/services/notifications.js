@@ -15,16 +15,14 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
 
     function pushNotification(art) {
         var link = iconLinkFn(art.feed);
-        var n = window.webkitNotifications.createNotification(link,
-            art.feed.name,
-            art.title);
+        var n = new Notification(art.title, {
+                body: art.feed.name
+            });
         n.onclick = function(){
             $location.path('/' + art.feed.id + '/' + art.id);
         };
-        n.show();
         $timeout(function(){
-            n.cancel();
-
+            n.close();
         }, NOTIFICATION_DISPLAY_TIME);
     }
 
@@ -41,7 +39,7 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
     }
 
     var poll = function() {
-        $http.get(izmetParameters.backendUrl + 'article?unseenOnly=true&limit=2')
+        $http.get(izmetParameters.backendUrl + 'article?unseenOnly=true&limit=2&order=desc')
             .success(function(data){
                 articlesReceived(data);
             });
@@ -54,14 +52,14 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
 
 
     service.checkNotificationSupported = function() {
-        if (!window.webkitNotifications) {
+        if (!window.Notification) {
             this.supported = false;
             return false;
         } else {
             this.supported = true;
         }
 
-        if (window.webkitNotifications.checkPermission() === 0) { // 0 is PERMISSION_ALLOWED
+        if (window.Notification.permission == 'granted') {
             service.enabled = true;
             return true;
         } else {
@@ -84,7 +82,7 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
     };
 
     service.requestStart = function() {
-        window.webkitNotifications.requestPermission();
+        Notification.requestPermission();
         doStart();
     };
 
