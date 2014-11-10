@@ -14,10 +14,10 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
 
 
     function pushNotification(art) {
-        var link = iconLinkFn(art.feed);
-        var n = new Notification(art.title, {
+        var n = new window.Notification(art.title, {
                 body: art.feed.name
             });
+        n.icon = iconLinkFn(art.feed);
         n.onclick = function(){
             $location.path('/' + art.feed.id + '/' + art.id);
         };
@@ -82,7 +82,7 @@ angular.module('izmet').service('notificationService',function ($http, $timeout,
     };
 
     service.requestStart = function() {
-        Notification.requestPermission();
+        window.Notification.requestPermission();
         doStart();
     };
 
