@@ -161,6 +161,7 @@ angular.module('izmet')
         } else if ($routeParams.query) {
             // reset articles
             $scope.searchQuery = $routeParams.query;
+            $scope.order = 'desc';
             $scope.selectedFeed = null;
             resetArticles();
         }
