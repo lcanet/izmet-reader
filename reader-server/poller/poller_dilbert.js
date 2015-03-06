@@ -28,15 +28,13 @@ function pollFeedDilbert(feed, callback) {
 }
 
 function processDilbertPage(feed, page, callback) {
-    var pattern = new RegExp(/The Dilbert Strip/);
-
     var articles = [];
 
     var htmlParser = new parser.Parser({
         onopentag: function(name, attribs){
             if (name == 'img') {
-                var title = attribs.title;
-                if (title && pattern.test(title)) {
+                var cssClass = attribs.class;
+                if (cssClass && cssClass.indexOf('img-comic') != -1) {
                     articles.push(buildArticle(feed, attribs));
                 }
             }
@@ -62,7 +60,7 @@ function buildArticle(feed, attribs){
         articleId = image.substring(idx+1);
     }
 
-    var content = '<p><b>' + attribs.title + '</b></p><p><img src="' + feed.url + attribs.src + '"/></p>';
+    var content = '<p><b>' + attribs.alt + '</b></p><p><img src="' + attribs.src + '"/></p>';
 
     var articleData = {
         article_date: moment().format(),
@@ -70,7 +68,7 @@ function buildArticle(feed, attribs){
         content: content,
         article_id: articleId,
         url: feed.url,
-        title: attribs.title
+        title: attribs.alt
     };
 
     return articleData;
