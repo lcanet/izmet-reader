@@ -2,8 +2,8 @@
 /* global $ */
 /* global alert */
 
-angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keypress', 'izmetConfig'])
-    .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+angular.module('izmet', ['ngResource', 'ngSanitize', 'ngRoute', 'infinite-scroll', 'izmetConfig'])
+    .config(['$routeProvider', '$httpProvider', '$q', function ($routeProvider, $httpProvider, $q) {
         $routeProvider.when('/', {
             templateUrl: 'views/home.html',
             controller: 'HomeCtrl'
@@ -22,33 +22,38 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'infinite-scroll', 'ui.keyp
         });
         $routeProvider.otherwise({redirectTo: '/'});
 
-        $httpProvider.defaults.transformRequest.push(function(d){
-            $('#ajax-loader').show();
-            return d;
-        });
-        $httpProvider.responseInterceptors.push(['$q', function($q){
-            return function(promise){
-                return promise.then(function(res){
-                    $('#ajax-loader').hide();
-                    if (res.data.error === true) {
-                        alert(res.data.message);
-                        return $q.reject(res);
+        $httpProvider.interceptors.push(function () {
+            var nbRequests = 0;
+            return {
+                request: function (config) {
+                    nbRequests++;
+                    $('#ajax-loader').show();
+                    return config;
+                },
+                response: function (response) {
+                    nbRequests--;
+                    if (nbRequests === 0) {
+                        $('#ajax-loader').hide();
                     }
-                    return res;
-                }, function(res){
-                    $('#ajax-loader').hide();
-                    alert('network error');
-                    return $q.reject(res);
-                });
+                    return response;
+                },
+                responseError: function (err) {
+                    nbRequests--;
+                    if (nbRequests === 0) {
+                        $('#ajax-loader').hide();
+                    }
+                    alert(err.message);
+                    return $q.reject(err);
+                }
             };
-        }]);
+        });
 
     }])
-    .run(['notificationService', '$timeout', function(notificationService, $timeout) {
+    .run(['notificationService', '$timeout', function (notificationService, $timeout) {
         notificationService.start();
 
-        $timeout(function(){
-            $('.preloader').fadeOut(300, function(){
+        $timeout(function () {
+            $('.preloader').fadeOut(300, function () {
                 $('#main-content').show();
             });
         }, 50);

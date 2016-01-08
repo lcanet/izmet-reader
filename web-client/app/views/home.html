@@ -31,7 +31,7 @@
                 <form class="form-search home-search">
                     Search articles :
                     <input type="text" placeholder="Search" ng-model="searchQuery"
-                           ui-keydown="{13: 'doSearch()'}"
+                           ng-keydown="validateSearch($event)"
                             class="input search-query" />
                     <a href="" ng-click="doSearch()">
                         <i class="icon icon-search">

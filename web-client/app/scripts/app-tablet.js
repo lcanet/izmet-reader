@@ -5,8 +5,8 @@
 /**
  * Module for the mobile versions
  */
-angular.module('izmet', ['ngMobile', 'ngResource', 'ngSanitize', 'izmetConfig'])
-    .config(['$routeProvider', '$httpProvider', 'izmetParametersProvider', function ($routeProvider, $httpProvider, izmetParametersProvider) {
+angular.module('izmet', ['ngMobile', 'ngResource', 'ngRoute', 'ngSanitize', 'izmetConfig'])
+    .config(['$routeProvider', '$httpProvider', 'izmetParametersProvider', '$q', function ($routeProvider, $httpProvider, izmetParametersProvider, $q) {
         $routeProvider.when('/', {
             templateUrl: 'views/home-tablet.html'
         });
@@ -20,22 +20,32 @@ angular.module('izmet', ['ngMobile', 'ngResource', 'ngSanitize', 'izmetConfig'])
             $('#ajax-loader').show();
             return d;
         });
-        $httpProvider.responseInterceptors.push(['$q', function($q){
-            return function(promise){
-                return promise.then(function(res){
-                    $('#ajax-loader').hide();
-                    if (res.data.error === true) {
-                        alert(res.data.message);
-                        return $q.reject(res);
+
+        $httpProvider.interceptors.push(function() {
+            var nbRequests = 0;
+            return {
+                request: function (config) {
+                    nbRequests++;
+                    $('#ajax-loader').show();
+                    return config;
+                },
+                response: function (response) {
+                    nbRequests--;
+                    if (nbRequests === 0){
+                        $('#ajax-loader').hide();
                     }
-                    return res;
-                }, function(res){
-                    $('#ajax-loader').hide();
-                    alert('network error');
-                    return $q.reject(res);
-                });
+                    return response;
+                },
+                responseError: function (err) {
+                    nbRequests--;
+                    if (nbRequests === 0){
+                        $('#ajax-loader').hide();
+                    }
+                    alert(err.message);
+                    return $q.reject(err);
+                }
             };
-        }]);
+        });
 
         // pre-configure app
         izmetParametersProvider.defaults.mobile = false;

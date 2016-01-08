@@ -79,7 +79,44 @@ module.exports = function (grunt) {
                         ];
                     }
                 }
-            }
+            },
+            proxies: [
+                {
+                    context: '/feed',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
+                },
+                {
+                    context: '/favorites',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
+                },
+                {
+                    context: '/article',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
+                },
+                {
+                    context: '/resource',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
+                },
+                {
+                    context: '/feed-stats',
+                    host: 'localhost',
+                    port: 8080,
+                    https: false,
+                    changeOrigin: false
+                }
+            ]
         },
         open: {
             server: {

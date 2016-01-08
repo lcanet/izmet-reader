@@ -9,34 +9,35 @@ angular.module('izmet')
                 $event.target.nodeName.toUpperCase() !== 'INPUT';
         }
 
-        $scope.keyNavNext = function($event) {
-            if (isKeyboardFocusAllowed($event)){
-                $event.preventDefault();
-                $rootScope.$broadcast('navigateNextArticle');
+        $scope.onKeyDown = function ($event) {
+            if (!isKeyboardFocusAllowed($event)) {
+                return;
             }
-        };
-        $scope.keyNavPrev = function($event) {
-            if (isKeyboardFocusAllowed($event)){
-                $event.preventDefault();
-                $rootScope.$broadcast('navigatePrevArticle');
-            }
-        };
-        $scope.openArticle = function($event) {
-            if (isKeyboardFocusAllowed($event)){
-                $event.preventDefault();
-                $rootScope.$broadcast('openArticleLink');
-            }
-        };
-        $scope.starArticle = function($event) {
-            if (isKeyboardFocusAllowed($event)){
-                $event.preventDefault();
-                $rootScope.$broadcast('starCurrentArticle');
-            }
-        };
-        $scope.keyGoHome = function($event) {
-            if (isKeyboardFocusAllowed($event)) {
+
+            switch ($event.keyCode) {
+            case 72:
                 $event.preventDefault();
                 $location.path('/');
+                break;
+            case 74:
+                $event.preventDefault();
+                $rootScope.$broadcast('navigateNextArticle');
+                break;
+            case 75:
+                $event.preventDefault();
+                $rootScope.$broadcast('navigatePrevArticle');
+                break;
+
+            case 79:
+                $event.preventDefault();
+                $rootScope.$broadcast('openArticleLink');
+                break;
+
+            case 83:
+                $event.preventDefault();
+                $rootScope.$broadcast('starCurrentArticle');
+                break;
             }
         };
+
     });
