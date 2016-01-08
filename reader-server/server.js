@@ -9,15 +9,7 @@ var express = require('express')
     , poller = require('./poller/poller.js')
     , middleware = require('./middleware')
     , config = require('./config/config.js')
-    , nodetime = require('nodetime')
     ;
-
-if (config.nodetime) {
-    nodetime.profile({
-        accountKey: config.nodetime.key,
-        appName: config.nodetime.app
-    });
-}
 
 var app = express();
 
@@ -87,10 +79,8 @@ console.log("Server launched on port " + config.serverPort);
 
 process.on('uncaughtException', function(e){
     console.trace("UNCAUGHT", e);
-
 });
 
 poller.startPoller('development' == app.get('env'));
 console.log("Poller launched");
 
-console.log('Stats updater launched');

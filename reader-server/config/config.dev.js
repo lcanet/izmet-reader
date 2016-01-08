@@ -6,7 +6,7 @@ module.exports = {
     apiLocalUser: 'lc',
 
     db: {
-        database: 'reader-prod',
+        database: 'reader',
         user: 'reader',
         pass: 'reader',
         host: '192.168.0.2',
@@ -14,14 +14,10 @@ module.exports = {
     },
 
     maxFeedsPerPoll: 20,
-    pollerEnabled: true,
+    pollerEnabled: false,
 
     mode: 'development',
     isDev: true,
-
-    auth: {
-        "lc": 'lcpass'
-    },
 
     twitter: {
        key: '',

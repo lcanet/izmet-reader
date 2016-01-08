@@ -7,7 +7,6 @@ var mountFolder = function (connect, dir) {
 module.exports = function (grunt) {
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
-    var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
     // configurable paths
     var yeomanConfig = {
@@ -65,7 +64,6 @@ module.exports = function (grunt) {
                     middleware: function (connect) {
                         return [
                             lrSnippet,
-                            proxySnippet,
                             mountFolder(connect, '.tmp'),
                             mountFolder(connect, yeomanConfig.app)
                         ];
@@ -81,44 +79,7 @@ module.exports = function (grunt) {
                         ];
                     }
                 }
-            },
-            proxies: [
-                {
-                    context: '/feed',
-                    host: 'localhost',
-                    port: 8080,
-                    https: false,
-                    changeOrigin: false
-                },
-                {
-                    context: '/favorites',
-                    host: 'localhost',
-                    port: 8080,
-                    https: false,
-                    changeOrigin: false
-                },
-                {
-                    context: '/article',
-                    host: 'localhost',
-                    port: 8080,
-                    https: false,
-                    changeOrigin: false
-                },
-                {
-                    context: '/resource',
-                    host: 'localhost',
-                    port: 8080,
-                    https: false,
-                    changeOrigin: false
-                },
-                {
-                    context: '/feed-stats',
-                    host: 'localhost',
-                    port: 8080,
-                    https: false,
-                    changeOrigin: false
-                }
-            ]
+            }
         },
         open: {
             server: {
@@ -327,7 +288,6 @@ module.exports = function (grunt) {
     grunt.registerTask('server', [
         'clean:server',
         'coffee:dist',
-        'configureProxies',
         'less',
         'livereload-start',
         'connect:livereload',

@@ -11,7 +11,7 @@ function IzmetParametersProvider() {
 
     this.defaults = {
         mobile: false,
-        backendUrl: '/'
+        backendUrl: 'http://localhost:8080/'
     };
 
     this.$get = function(){

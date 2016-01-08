@@ -32,7 +32,7 @@ angular.module('izmet')
     .filter('fixLinks', function () {
         'use strict';
         return function (text) {
-            if (text){
+            if (text) {
                 return text.replace(new RegExp('href="http', 'g'), 'target="_blank" href="http');
             }
             return text;
@@ -63,7 +63,7 @@ angular.module('izmet')
     .filter('feedUrl', function () {
         'use strict';
         return function (feed) {
-            if (feed=== null) {
+            if (feed === null) {
                 return null;
             }
             if (feed.type === 'twitter') {
@@ -72,16 +72,24 @@ angular.module('izmet')
             return feed.url;
         };
     })
-    .filter('iconLink', function () {
+    .filter('iconLink', function (izmetParameters) {
         'use strict';
         return function (arg) {
+            var href;
             if (arg && arg.links) {
-                for (var i = 0; i < arg.links.length ; i++) {
+                for (var i = 0; i < arg.links.length; i++) {
                     var l = arg.links[i];
                     if (l.type === 'icon') {
-                        return l.href;
+                        href = l.href;
+                        break;
                     }
                 }
+            }
+            if (href) {
+                if (href[0] === '/') {
+                    href = href.substring(1);
+                }
+                return izmetParameters.backendUrl + href;
             }
             return null;
         };
@@ -92,14 +100,16 @@ angular.module('izmet')
             if (!tbl || !filterActive) {
                 return tbl;
             }
-            return _.filter(tbl, function(x) {return !x.seen; });
+            return _.filter(tbl, function (x) {
+                return !x.seen;
+            });
         };
     })
     .filter('imageLink', function () {
         'use strict';
         return function (arg) {
             if (arg && arg.links) {
-                for (var i = 0; i < arg.links.length ; i++) {
+                for (var i = 0; i < arg.links.length; i++) {
                     var l = arg.links[i];
                     if (l.type === 'image') {
                         return l.href;
