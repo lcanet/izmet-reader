@@ -138,6 +138,7 @@
             <h3>
                 <a target="_blank" href="{{currentArticle.url}}">{{currentArticle.title}}</a>
                 <span class="star-big" ng-class="isArticledStarred(currentArticle)" ng-click="toggleStar(currentArticle)"></span>
+                <span class="icon icon-off mark-unread-icon" title="Mark as unread" ng-click="markUnread()"></span>
             </h3>
             <p>
                 {{currentArticle.article_date | date:'EEEE d MMM yyyy - H:mm:ss' }}

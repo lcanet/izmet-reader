@@ -37,6 +37,11 @@ angular.module('izmet')
                 $event.preventDefault();
                 $rootScope.$broadcast('starCurrentArticle');
                 break;
+
+            case 85:  // 'u'
+                $event.preventDefault();
+                $rootScope.$broadcast('navigateNextArticle', true);
+                break;
             }
         };
 
