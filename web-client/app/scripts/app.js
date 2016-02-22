@@ -3,7 +3,7 @@
 /* global alert */
 
 angular.module('izmet', ['ngResource', 'ngSanitize', 'ngRoute', 'infinite-scroll', 'izmetConfig'])
-    .config(['$routeProvider', '$httpProvider', '$q', function ($routeProvider, $httpProvider, $q) {
+    .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         $routeProvider.when('/', {
             templateUrl: 'views/home.html',
             controller: 'HomeCtrl'
@@ -22,7 +22,7 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'ngRoute', 'infinite-scroll
         });
         $routeProvider.otherwise({redirectTo: '/'});
 
-        $httpProvider.interceptors.push(function () {
+        $httpProvider.interceptors.push(['$q', function ($q) {
             var nbRequests = 0;
             return {
                 request: function (config) {
@@ -46,7 +46,7 @@ angular.module('izmet', ['ngResource', 'ngSanitize', 'ngRoute', 'infinite-scroll
                     return $q.reject(err);
                 }
             };
-        });
+        }]);
 
     }])
     .run(['notificationService', '$timeout', function (notificationService, $timeout) {
